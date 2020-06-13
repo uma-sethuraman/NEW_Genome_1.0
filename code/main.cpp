@@ -106,115 +106,69 @@ void runTests(AbstractGenome* genome) {
 
 void runGeneTest(AbstractGenome* genome) {
 
-	size_t index = 0;
-	GN::genomeWrite(genome, index, int(10));
-	index += 4;
-	GN::genomeWrite(genome, index, int(15));
-	index += 4;
-	GN::genomeWrite(genome, index, std::byte(30));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(31));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(32));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(33));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(34));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(36));
-	index++;
-	GN::genomeWrite(genome, index, std::byte(37));
-	index++;
-	//GN::genomeWrite(genome, index, std::byte(38));
-	//index++;
-	for (int i(0); i < 10; i++) {
-		GN::genomeWrite(genome, index, std::byte(255 * (i%2)));
-		index++;
-	}
-
-
-	// define payload and GeneDefinition for ANNLayer
-	struct ANNLayer {
-		double LayerPos;
-		std::array<double, 10> weights;
-	};
-	AbstractGenome::GeneDefinition ANNLayer = { "ANNLayer",{(std::byte)13},sizeof(ANNLayer) };
+	std::cout << "\n\nrunGeneTest...\nThis shows an example of loading\na struct into the genome and\nhow memory is affected.\n" << std::endl;
 
 	// define payload and GeneDefinition for deterministic gate
-	struct DetGatePayload {
+	struct MyGenePayload {
 		int num_in, num_out;
 		std::array<uint8_t, 7> addresses;
-		std::bitset<17> logic; // will use 3 bytes
-		std::uint8_t val;
+		std::bitset<17> logic; // will use 4 bytes, bitset uses 4 bytes at a time
+		double answer;
 	};
-	AbstractGenome::GeneDefinition DetGeneDef = { "det",{(std::byte)42,(std::byte)212},sizeof(DetGatePayload) };
 
+	AbstractGenome::GeneDefinition MyGeneDef = { "MyGene",{(std::byte)42,(std::byte)212},sizeof(MyGenePayload) };
+	//GeneDefinition name, start codon, size of gene
 
-	// define payload and GeneDefinition for probabilistic gate
-	struct ProbGatePayload {
-		int num_in, num_out;
-		std::array<uint8_t, 8> addresses;
-		std::array<bool, 5> logic; // will use 16 bytes
-	};
-	AbstractGenome::GeneDefinition ProbGeneDef = { "prob",{(std::byte)43,(std::byte)211},sizeof(ProbGatePayload) };
+	std::cout << "gene contains:\n  ints  'num_in', 'num_out'\n  array<uint8_t, 7> 'addresses'\n  bitset<17> 'logic'\n  double 'answer'";
+	
+	// write a MyGenomePayload into the genome at index 0
+	GN::genomeWrite(genome, 0, MyGenePayload{ 255 + 10,20,{30,31,32,33,34,35,36},std::bitset<17>(0b111100101100101101),42.42 });
+	// note that the bitstring will print in reverse order below (least signifigent diget first)
 
 	// set up genes set in genome
-	int key = genome->initGeneSet({ DetGeneDef,ProbGeneDef });
+	// the list can contain more then one GeneDefinition
+	// key is a value used to get these genes
+	int key = genome->initGeneSet({ MyGeneDef });
 
 	// get the list of start positions for the genes
 	auto startPos = genome->getGenePositions(key);
 
-	// read a DetGatePayload from start of first deterministic gate
-	const auto& gate0_info = GN::genomeRead<DetGatePayload>(genome, 0);
+	// read a MyGene from start of first deterministic gate
+	const auto& MyGene_data = GN::genomeRead<MyGenePayload>(genome, 0);
 
 	// print sizes
-	std::cout << "Det GatePayload sizeof() " << sizeof(gate0_info) << std::endl;
-	std::cout << "Det GatePayload.num_in sizeof() " << sizeof(gate0_info.num_in) << std::endl;
-	std::cout << "Det GatePayload.num_in sizeof() " << sizeof(gate0_info.num_out) << std::endl;
-	std::cout << "Det GatePayload.addresses sizeof() " << sizeof(gate0_info.addresses) << std::endl;
-	std::cout << "Det GatePayload.logic sizeof() " << sizeof(gate0_info.logic) << std::endl;
-	std::cout << "Det GatePayload.val sizeof() " << sizeof(gate0_info.val) << std::endl;
+	std::cout << "Det MyGene_data sizeof() " << sizeof(MyGene_data) << std::endl;
+	std::cout << "Det MyGene_data.num_in sizeof() " << sizeof(MyGene_data.num_in) << std::endl;
+	std::cout << "Det MyGene_data.num_out sizeof() " << sizeof(MyGene_data.num_out) << std::endl;
+	std::cout << "Det MyGene_data.addresses sizeof() " << sizeof(MyGene_data.addresses) << std::endl;
+	std::cout << "Det MyGene_data.logic sizeof() " << sizeof(MyGene_data.logic) << std::endl;
+	std::cout << "Det MyGene_data.answer sizeof() " << sizeof(MyGene_data.answer) << std::endl;
 
 	std::cout << "Det Gate:" << std::endl;
-	std::cout << "  num_in:  " << gate0_info.num_in << std::endl;
-	std::cout << "  num_out: " << gate0_info.num_out << std::endl;
+	std::cout << "  num_in:  " << MyGene_data.num_in << std::endl;
+	std::cout << "  num_out: " << MyGene_data.num_out << std::endl;
 	std::cout << "  addresses: ";
-	for (auto& v : gate0_info.addresses) {
+	for (auto& v : MyGene_data.addresses) {
 		std::cout << " " << int(v);
 	}
 	std::cout << "\n  logic: ";
-	for (size_t v(0); v < gate0_info.logic.size(); v++) {
-		std::cout << " " << gate0_info.logic[v];
+	for (size_t v(0); v < MyGene_data.logic.size(); v++) {
+		std::cout << " " << MyGene_data.logic[v];
 	}
 	std::cout << std::endl;
-	std::cout << "  val: " << int(gate0_info.val) << std::endl;
+	std::cout << "  val: " << MyGene_data.answer << std::endl;
 
-	// read a ProbGatePayload from start of first deterministic gate
-	auto gate2_info = GN::genomeRead<ProbGatePayload>(genome, startPos["det"][0]);
-
-	// print sizes
-	std::cout << "ProbGatePayload sizeof() " << sizeof(gate2_info) << std::endl;
-	std::cout << "ProbGatePayload.num_in sizeof() " << sizeof(gate2_info.num_in) << std::endl;
-	std::cout << "ProbGatePayload.addresses sizeof() " << sizeof(gate2_info.addresses) << std::endl;
-	std::cout << "ProbGatePayload.logic sizeof() " << sizeof(gate2_info.logic) << std::endl;
-
-	std::cout << "Prob Gate:" << std::endl;
-	std::cout << "  num_in:  " << gate2_info.num_in << std::endl;
-	std::cout << "  num_out: " << gate2_info.num_out << std::endl;
-	std::cout << "  addresses: ";
-	for (auto& v : gate2_info.addresses) {
-		std::cout << " " << int(v); // type is uint8_t so we need to make it an int to print
-	}
-	std::cout << "\n  logic: output as bool:";
-	for (bool v : gate2_info.logic) {
-		std::cout << " " << v;
-	}
-	std::cout << "\n\nthis is a problem... but..." << std::endl;
-	std::cout << "\n  logic: output as (value & 1):";
-	for (bool v : gate2_info.logic) {
-		std::cout << " " << (v & 1);
+	// iterate over MyGene_data size locations in genome
+	auto head = genome->data();
+	std::cout << "genome byte values for MyGene:" << std::endl;
+	for (int i(0); i < sizeof(MyGenePayload); i++) {
+		std::cout << " " << i << ":" << (int)head[i] << std::endl;
 	}
 	std::cout << std::endl;
+	std::cout << "0-3 = num_in (int), 4-7 = num_out (int),\n"
+		"8-14 = addresses (vect of uint8_t),"
+		"\n15 is skipped so bitstring can start on word,\n"
+		"16-23 logic (bitset), 24-31 anwser (double)\n" << std::endl;
 }
 
 int main() {
@@ -227,6 +181,7 @@ int main() {
 	AbstractGenome* secondGenome = new TestGenome(200);
 
 	runGeneTest(secondGenome);
+
 	delete secondGenome;
 
 
