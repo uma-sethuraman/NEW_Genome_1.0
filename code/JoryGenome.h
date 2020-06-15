@@ -4,6 +4,8 @@
 #include "AbstractGenome.h"
 #include <cstddef>
 
+//Mell was here :)
+
 class JoryGenome : public AbstractGenome {
 private:
 	// custom properties & functions
