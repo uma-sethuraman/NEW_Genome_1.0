@@ -59,41 +59,34 @@ public:
 
 namespace GN {
 
-
-
-
-
     template <class T>
-    auto genomeRead(AbstractGenome* genome, int index) -> T& {
+    auto genomeRead(AbstractGenome* genome, size_t index) -> T& {
         return reinterpret_cast<T*>(genome->data() + index)[0];
     }
 
     template <class T>
-    auto genomeWrite(AbstractGenome* genome, int index, T value) -> void {
-        reinterpret_cast<T*>(genome->data() + index)[0] = value;
+    auto genomeWrite(AbstractGenome* genome, size_t index, const T& value) -> void {
+        memcpy(genome->data() + index, &value, sizeof(T));
     }
 
-
-
-
-
-
+    // ==============================================
     // python-like named arguments
+    // ==============================================
+
     struct GenomeReadParams {
         AbstractGenome* genome;
-        int index;
+        size_t index;
     };
     template <class T>
     auto genomeRead(const GenomeReadParams& params) -> T& {
         return genomeRead<T>(params.genome, params.index);
     }
 
-    // python-like named arguments
     template <class T>
     struct GenomeWriteParams {
         AbstractGenome* genome;
-        int index;
-        T value;
+        size_t index;
+        const T& value;
     };
     template <class T>
     auto genomeWrite(const GenomeWriteParams<T>& params) -> void {

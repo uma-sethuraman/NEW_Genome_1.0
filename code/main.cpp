@@ -6,6 +6,7 @@
 #include "AbstractGenome.h"
 #include "TestGenome.h"
 #include <cstddef>
+#include "utilities.h"
 
 void runTests(AbstractGenome* genome) {
 	//initialize genome to 8 sites
@@ -14,9 +15,6 @@ void runTests(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		readHead[i] = (std::byte)(i + 1);
 	readHead[7] = (std::byte)(0b10000001); // 129, or -127
-
-	//GN::genomeWrite(genome, 5, uint8_t(10));
-
 
 	/* this test demonstrates no time is spent copying into num if we use references.
 	   * Note: genomeRead<>() is defined in AbstractGenome.h
@@ -87,7 +85,7 @@ void runTests(AbstractGenome* genome) {
 	assert(GN::genomeRead<uint8_t>(genome, 0) == 255);
 
 	// write several bytes
-	for (int i = 0; i < 4; i++) { // rewrite first 4 bytes with (2,4,6,8)
+	for (size_t i = 0; i < 4; i++) { // rewrite first 4 bytes with (2,4,6,8)
 		GN::genomeWrite<uint8_t>({ .genome = genome, .index = i, .value = uint8_t((i + 1) * 2) });
 		assert(GN::genomeRead<uint8_t>(genome, i) == (i + 1) * 2);
 	}
@@ -122,7 +120,14 @@ void runGeneTest(AbstractGenome* genome) {
 	std::cout << "gene contains:\n  ints  'num_in', 'num_out'\n  array<uint8_t, 7> 'addresses'\n  bitset<17> 'logic'\n  double 'answer'";
 	
 	// write a MyGenomePayload into the genome at index 0
-	GN::genomeWrite(genome, 0, MyGenePayload{ 255 + 10,20,{30,31,32,33,34,35,36},std::bitset<17>(0b111100101100101101),42.42 });
+    MyGenePayload gene_instance;
+    clean(gene_instance); // zero out memory
+    gene_instance.num_in = 255+10;
+    gene_instance.num_out = 20;
+    gene_instance.addresses = {30,31,32,33,34,35,36};
+    gene_instance.logic = 0b111100101100101101;
+    gene_instance.answer = 42.42;
+    GN::genomeWrite(genome, 0, gene_instance);
 	// note that the bitstring will print in reverse order below (least signifigent diget first)
 
 	// set up genes set in genome
