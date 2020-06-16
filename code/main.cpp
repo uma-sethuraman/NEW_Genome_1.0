@@ -7,6 +7,8 @@
 #include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
+#include "TetianaGenome.h"
+#include "TD_NKFitnessEvaluator.h"
 
 void runTests(AbstractGenome* genome) {
 	//initialize genome to 8 sites
@@ -177,7 +179,7 @@ void runGeneTest(AbstractGenome* genome) {
 }
 
 int main() {
-	AbstractGenome* genome = new TestGenome(8);
+	/*AbstractGenome* genome = new TestGenome(8);
 	// AbstractGenome  & y = *(new TestGenome);
 
 	runTests(genome);
@@ -188,7 +190,12 @@ int main() {
 	runGeneTest(secondGenome);
 
 	delete secondGenome;
+     */
+    
+    AbstractGenome* genome = new TetianaGenome(8);
+    nk_fitness_evaluate (genome);
 
+    delete genome;
 
 	return(0);
 }
