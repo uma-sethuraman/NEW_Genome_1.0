@@ -36,4 +36,6 @@ public:
 		return(geneMap);
 	}
     
+    virtual void mutate() override;
+    
 };
