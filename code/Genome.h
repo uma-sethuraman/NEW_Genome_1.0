@@ -10,9 +10,11 @@
 #include <vector>
 #include <cstdint>
 #include <cstddef>
+
+
 #include "AbstractGenome.h"
 
-typedef char Byte; // c++17 std::byte doesn't always work
+typedef char Byte; // c++17 Byte doesn't always work
 
 
 /** Implementation of a genom object **/
@@ -23,8 +25,8 @@ private:
 
 public:
     /** Constructor
-     * \param _size Size of gene */
-	Genome(size_t _size) : AbstractGenome(_size)
+     * \param size Size of gene */
+	Genome(size_t size) : AbstractGenome(size)
     {
         gene = new Byte[size_];
     }
@@ -37,29 +39,34 @@ public:
 
     /** Gets pointer to data
      * \return pointer to gene */
-	std::byte* data() override
+	Byte* data() override
     {
-        return reinterpret_cast<std::byte*>(gene);
+        return reinterpret_cast<Byte*>(gene);
     }
 
-	virtual void resize(size_t new_size) override 
+    /** Resizes the Genome
+     * \param newSize new size of genome **/
+	virtual void resize(size_t newSize) override 
     {}
+
+    /** Initialize a gene set 
+     * 	geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
+     * return a key that can be used to access these genes in the future
+     * \param geneInfo
+     * \return empty **/
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override 
     {
-		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
-		// return a key that can be used to access these genes in the future
-
-		// temporary return
 		return(1);
 	}
 
+    /** Gets map of gene positions
+     * return a map of vector where each map key is the name indicated in GeneDefinition,
+     * and the vector is the list of start codons associated with that name.
+     * \param key
+     * \return temp **/
 	virtual std::unordered_map<std::string, std::vector<size_t>> getGenePositions(int key) override 
     {
-		// return a map of vector where each map key is the name indicated in GeneDefinition,
-		//and the vector is the list of start codons associated with that name.
-
-		// temporary return
 		std::unordered_map<std::string, std::vector<size_t>> geneMap = { {"det", {0}},{"prob",{ 10,20}} };
 		return(geneMap);
 	}
