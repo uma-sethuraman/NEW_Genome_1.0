@@ -4,9 +4,12 @@
 #include <vector>
 #include <bitset>
 #include "AbstractGenome.h"
+#include "Uma_NKGenome.h"
+#include "Uma_NKEvaluator.h"
 #include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
+#include <random>
 
 void runTests(AbstractGenome* genome) {
 	//initialize genome to 8 sites
@@ -176,87 +179,6 @@ void runGeneTest(AbstractGenome* genome) {
 		"16-23 logic (bitset), 24-31 anwser (double)\n" << std::endl;
 }
 
-void runNKFitness() {
-	// hardcoded parameters
-	const int N = 5;
-	const int K = 2;
-	
-	std::cout << "\nNK FITNESS TEST: \n";
-	std::cout << "N = " << N << ", K = " << K << std::endl;
-
-	// struct with bitset of N genome values (N bits)
-	struct MyGene {
-		std::bitset<N> values;
-	};
-
-	AbstractGenome* genome = new TestGenome(N);
-
-	// Generate a genome which is the binary representation
-	// of some random number between 0 and (2^N)-1
-	std::srand(std::time(0));
-	int random_num = rand() % (static_cast<int>(pow(2, N)));
-	std::cout << "\nRandom Genome Num: " << random_num << std::endl;
-
-	// Create a MyGene struct containing the binary (bitset) version of random_num.
-	// Write this into the genome, as this MyGene stores the genome values.
-	MyGene gene;
-	clean(gene);
-	gene.values = std::bitset<N>(random_num); // std::bitset<5>(26) = 0b11010
-    GN::genomeWrite(genome, 0, gene);
-
-	// Read data from and print genome
-	const auto& data = GN::genomeRead<MyGene>(genome, 0);
-	std::cout << "\nGenome: ";
-	for (int v = data.values.size() - 1; v >= 0; v--) {
-		std::cout << " " << data.values[v];
-	}
-	std::cout << "\n";
-	
-	// Generate and print random score matrix
-	std::cout << "\nScore Matrix:\n";
-	int rows = pow(2, K);
-	std::vector<std::vector<double>> scoreMatrix(rows, std::vector<double>(N));
-    for (int i = 0; i < rows; i++) { 
-        for (int j = 0; j < N; j++){ 
-            scoreMatrix[i][j] = (((double)rand()) / ((double) RAND_MAX));
-            std::cout << scoreMatrix[i][j] << " ";
-        } 
-        std::cout << "\n";
-    }
-	std::cout << "\n";
-
-	double score = 0;
-
-	// Read in MyGene struct from genome, which contains bitset of genome values
-	const auto& genome_data = GN::genomeRead<MyGene>(genome, 0);
-	std::bitset<N> genome_values = genome_data.values;
-
-	// Loop through all values/bits in genome
-	for (int n_index = 0; n_index < N; n_index++) {
-      unsigned int group_int = 0; // stores int version of group of sites starting at n_index
-
-	  // Loop through groups of k sites
-      for (int k_index = 0; k_index < K; k_index++) {
-		  int gen_index = n_index+k_index; // current position in a group of sites
-		  if (gen_index >= N)
-		  	gen_index = gen_index-N; // wrap-around genome case
-		  int exponent = (K-1)-k_index; // power of 2 to multiply/shift the current bit by
-
-		  // Indexing into the genome at (N-1)-gen_index accounts for the bitset being in reverse order
-          group_int += (genome_values[(N-1)-gen_index] << exponent);
-      }
-
-      std::cout << "Position " << n_index << " int: " << group_int << std::endl;
-      score += scoreMatrix[group_int][n_index]; // update score for each group of k sites in genome
-  }
-
-  // Update final score
-  score = score/N;
-  std::cout << "\nFinal score: " << score << std::endl;
-
-  delete genome;
-}
-
 int main() {
 	AbstractGenome* genome = new TestGenome(8);
 	// AbstractGenome  & y = *(new TestGenome);
@@ -270,7 +192,8 @@ int main() {
 
 	delete secondGenome;
 
-	runNKFitness();
+	// Order of parameters: N, K, updates, population size, debug mode
+	runNKFitness(5, 2, 100, 100, 0);
 
 	return(0);
 }
