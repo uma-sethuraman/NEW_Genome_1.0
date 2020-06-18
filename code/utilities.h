@@ -8,15 +8,27 @@ std::ostream& operator<<(std::ostream& os, std::byte& byte) {
     os << uint16_t(byte);
     return os;
 }
-
-// convenience for writing array-like things (vectors, arrays, etc.)
-template <class Iterable, typename T = typename Iterable::value_type>
-std::ostream& operator<<(std::ostream& os, Iterable& iterable) {
-    os << "[";
-    for (int i(-iterable.size()); i<-1; i++)
-        os << end(iterable)[i] << ",";
-    os << end(iterable)[-1] << "]";
-    return os;
+template <class T>
+void printCSV(std::ostream& os, const T& arr){
+  os << '[';
+  for(int i(0); i<arr.size()-1; ++i)
+    os << arr[i] << ',';
+  os << arr[arr.size()-1] << ']';
+}
+template<class T>
+auto operator<<( std::ostream& os, const std::valarray<T>& arr ) -> std::ostream& {
+  printCSV(os, arr);
+  return os;
+}
+template<class T,std::size_t N>
+auto operator<<( std::ostream& os, const std::array<T, N>& arr ) -> std::ostream& {
+  printCSV(os, arr);
+  return os;
+}
+template<class T, class A>
+auto operator<<( std::ostream& os, const std::vector<T, A>& arr ) -> std::ostream& {
+  printCSV(os, arr);
+  return os;
 }
 
 // convenience for filling a thing with zeros
