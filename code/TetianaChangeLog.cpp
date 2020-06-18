@@ -10,20 +10,34 @@ void delete_mutation(int ind, std::vector<int>& genome, std::set<int>& mutations
     
     // TODO check if index is outside of boundaries
     
-    if (first_deletion == genome.end()) {
-        // first deletion
-        //std::cout << "first deletion" << std::endl;
-        std::vector<int>::iterator to_del_it = genome.begin() + ind;
-        //if (to_del_it != genome.end()) std::cout << "to_del_it: " << *to_del_it << std::endl;
-        first_deletion = to_del_it;
+    if (first_deletion == genome.end()) { // first deletion
+        first_deletion = genome.begin() + ind; //std::vector<int>::iterator to_del_it = genome.begin() + ind;
     } else {
-        if (genome[ind] > *first_deletion) {
-            mutations.insert(ind); // TODO what if already exists - need to delete next one?
-        } else if (genome[ind] < *first_deletion) {
+        if (ind > (first_deletion - genome.begin())) { // index to delete is after first_deletion
+            if (mutations.find(ind) != mutations.end()) {
+                // already exists - need to delete next one
+                mutations.insert(ind + 1); // what is ind + 1 also in the set
+            } else {
+                // update
+                mutations.insert(ind);
+            }
+                
+            
+        } else if (ind < (first_deletion - genome.begin())) {
             std::vector<int>::iterator to_del_it = genome.begin() + ind;
             mutations.insert(*first_deletion);
             first_deletion = to_del_it;
-        } // TODO if genome[ind] == *first_deletion - need to delete next one?
+        }  else {
+            // if ind == (first_deletion - genome.begin()) - need to delete next one
+            if (mutations.find(ind + 1) != mutations.end()) {
+                // already exists - need to delete next one
+                mutations.insert(ind + 2);
+            } else {
+                // update
+                mutations.insert(ind + 1);
+            }
+        }
+        
     }
     
 }
@@ -33,7 +47,7 @@ void reconstruct(std::vector<int>& genome, std::set<int>& mutations,
     
     if (first_deletion != genome.end()) {
         for (auto it = mutations.rbegin(); it != mutations.rend(); ++it) {
-            genome.erase(first_deletion + (*it)); // iterator + int
+            genome.erase(/*first_deletion*/ genome.begin() + (*it)); // iterator + int
         }
         genome.erase(first_deletion); // iterator
     }
@@ -44,7 +58,7 @@ void reconstruct(std::vector<int>& genome, std::set<int>& mutations,
 
 int main()
 {
-    std::vector<int> genome{0, 1, 2, 3, 4, 5};
+    std::vector<int> genome{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     
     //std::set<std::vector<int>::iterator> mutations;
     //std::unique_ptr<int> first_deletion = nullptr;
