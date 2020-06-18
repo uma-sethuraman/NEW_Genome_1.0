@@ -4,6 +4,9 @@
 #include<unordered_map>
 #include <cstddef>
 
+
+typedef char Byte; // c++17 Byte doesn't always work
+
 class AbstractGenome {
 protected:
     size_t size_; // size should be size of memory when 
@@ -11,7 +14,7 @@ protected:
 public:
     struct GeneDefinition {
         std::string name;
-        std::vector<std::byte> startCodon;
+        std::vector<Byte> startCodon;
         size_t geneSize; // size in bytes
     };
 
@@ -25,7 +28,7 @@ public:
     
     virtual void resize(size_t new_size) {size_ = new_size;};
 
-    virtual std::byte* data() {
+    virtual Byte* data() {
         std::cout << "data has not been written for this genome class" << std::endl;
         exit(1);
     }
