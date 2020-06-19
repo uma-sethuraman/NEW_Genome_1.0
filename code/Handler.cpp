@@ -57,13 +57,11 @@ void Handler::Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<Segment
 
 /** Insertion mutation 
  * \param startMutation address of insertion mutation **/
-template < typename T >
-void Handler::PointMutation(T value)
+void Handler::PointMutation(std::shared_ptr< Mutation > mutation)
 {
     std::cout << "Point mutation" << std::endl; 
 
-    Mutation mutation(value);
-    std::shared_ptr<SegmentNode> pointMutation = std::make_shared<SegmentNode>(mutation.data(), mutation.size());
+    std::shared_ptr<SegmentNode> pointMutation = std::make_shared<SegmentNode>(mutation->data(), mutation->size());
 
     if (SegmentIterator.pos() == 0) // Front case
     {  
@@ -75,7 +73,12 @@ void Handler::PointMutation(T value)
         Connect(pointMutation, Segment);
 
         /// move head of reader
+        Pos++;
         SegmentIterator = Segment->begin();
+
+        /// update starting segment
+        if (Segment == Genome->GeneSegments->StartSegment)
+            Genome->GeneSegments->StartSegment = pointMutation;
     }
     else if (SegmentIterator.pos() == Segment->size()-1)  // Back case
     {
@@ -87,12 +90,14 @@ void Handler::PointMutation(T value)
         Connect(pointMutation, Segment->next());
 
         /// move head of reader to next segment
-        Segment = Segment->next();
+        Pos += Segment->size()+1;
+        Segment = pointMutation->next();
     }
     else    // Middle case
     {
         /// cut segment in two
         auto cutSegment = Segment->Cut(SegmentIterator.pos());
+        cutSegment->TruncateLeft();
 
         /// connect the cut segments
         Connect(Segment, pointMutation);
@@ -117,10 +122,46 @@ void Handler::PointMutation(T value)
 /** Insertion mutation 
  * \param startMutation address of insertion mutation
  * \param sizeMutation size of mutation **/
-template < typename T >
-void Handler::InsertMutation(T value)
+void Handler::InsertMutation(std::shared_ptr< Mutation > mutation)
 {
+    std::cout << "Insetion mutation" << std::endl; 
 
+    std::shared_ptr<SegmentNode> insertMutation = std::make_shared<SegmentNode>(mutation->data(), mutation->size());
+
+    if (SegmentIterator.pos() == Segment->size()-1)  // Back case
+    {
+        /// connect segments
+        Connect(Segment, insertMutation);
+        Connect(insertMutation, Segment->next());
+
+        /// move head of reader to next segment
+        Pos += Segment->size()+1;
+        Segment = insertMutation->next();
+        if (Segment)
+            SegmentIterator = Segment->begin();
+    }
+    else    //  Middle case
+    {
+        /// cut segment in two
+        auto cutSegment = Segment->Cut(SegmentIterator.pos()+1);
+
+        /// connect the cut segments
+        Connect(Segment, insertMutation);
+        Connect(insertMutation, cutSegment);
+        Connect(cutSegment, Segment->next());
+
+        /// move head of reader to newly cut segment
+        Pos += Segment->size()+1;
+        Segment = cutSegment;
+        SegmentIterator = Segment->begin();
+
+        /// update number of segments
+        Genome->GeneSegments->Size++;
+    }
+
+    /// update number of segments
+    Genome->GeneSegments->Size++;
+    Genome->GeneSegments->SiteCount++;
 }
 
 
@@ -180,23 +221,3 @@ void Handler::DeleteMutation(size_t sizeMutation)
     /// edit genome properties
     Genome->GeneSegments->SiteCount -= sizeMutation; 
 }
-
-
-/// Defining template functions
-template void Handler::PointMutation(u_int8_t value);
-template void Handler::PointMutation(u_int16_t value);
-template void Handler::PointMutation(u_int32_t value);
-template void Handler::PointMutation(u_int64_t value);
-template void Handler::PointMutation(int value);
-template void Handler::PointMutation(long value);
-template void Handler::PointMutation(long long value);
-template void Handler::PointMutation(char value);
-
-template void Handler::InsertMutation(u_int8_t value);
-template void Handler::InsertMutation(u_int16_t value);
-template void Handler::InsertMutation(u_int32_t value);
-template void Handler::InsertMutation(u_int64_t value);
-template void Handler::InsertMutation(int value);
-template void Handler::InsertMutation(long value);
-template void Handler::InsertMutation(long long value);
-template void Handler::InsertMutation(char value);
