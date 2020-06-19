@@ -1,9 +1,9 @@
 #pragma once
 #include <stdint.h>
 #include <iostream>
-#include<unordered_map>
+#include <unordered_map>
 #include <cstddef>
-
+#include <vector>
 
 typedef char Byte; // c++17 Byte doesn't always work
 
