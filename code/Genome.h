@@ -26,28 +26,18 @@ private:
 public:
     /** Constructor
      * \param size Size of gene */
-	Genome(size_t size) : AbstractGenome(size)
-    {
-        gene = new Byte[size_];
-    }
+	Genome(size_t size) : AbstractGenome(size) { gene = new Byte[size_]; }
 
     /** Deconstructor **/
-	~Genome() override 
-    {
-		delete[] gene;
-	}
+	~Genome() override { delete[] gene;	}
 
     /** Gets pointer to data
      * \return pointer to gene */
-	Byte* data() override
-    {
-        return reinterpret_cast<Byte*>(gene);
-    }
+	Byte* data() override { return reinterpret_cast<Byte*>(gene); }
 
     /** Resizes the Genome
      * \param newSize new size of genome **/
-	virtual void resize(size_t newSize) override 
-    {}
+	virtual void resize(size_t newSize) override {}
 
     /** Initialize a gene set 
      * 	geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
