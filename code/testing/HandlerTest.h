@@ -13,6 +13,7 @@
 #include "../GenomeLite.h"
 #include "../Handler.h"
 #include "../Mutation.h"
+#include "../MutationHeap.h"
 
 typedef char Byte; ///< Byte for easy viewing
 
@@ -21,7 +22,9 @@ namespace TestHandler
 {
     void testPointMutation()
     {
-         std::cout << "\nTest Point Mutation" << std::endl;
+        MutationHeap mutationPool = MutationHeap();
+
+        std::cout << "\nTest Point Mutation" << std::endl;
         /// creating genome
         std::shared_ptr<AbstractGenome> genome = std::make_shared<Genome>(8);
 
@@ -35,29 +38,34 @@ namespace TestHandler
         Handler handler(genomeMutation);
 
         /// testing deleting 0
+        std::cout << "Point Mutation at 0" << std::endl;
         handler.reset();
-        std::cout << "Test Point Front: ";
+        int countOnes = 0;
         while (handler.index() < genomeMutation->size())
         {
             if (static_cast<int>(*handler) == 0)
             {
-                handler.PointMutation((Byte)1);
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.PointMutation(mutation);
             }	
+            handler.next();
         }
 
-        int countOnes = 0;
+        std::cout << "Counting 1s" << std::endl;
+        countOnes = 0;
         handler.reset();
         while (handler.index() < genomeMutation->size())
         {
+            // std::cout << handler.index() << ": " << (int)*handler << std::endl;
             if (static_cast<int>(*handler) == 1)
                 countOnes++;
             handler.next();
         }
-        assert(genomeMutation->size() == 7);
+        assert(genomeMutation->size() == 8);
         assert(genomeMutation->segmentsCount() == 2);
         assert(countOnes == 2);
 
-        std::cout << "Passed" << std::endl;
+        std::cout << "Test Point Front: Passed" << std::endl;
 
         /// testing deleting 7
         countOnes = 0;
@@ -67,8 +75,10 @@ namespace TestHandler
         {
             if (static_cast<int>(*handler) == 7)
             {
-                handler.PointMutation((Byte)1);
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.PointMutation(mutation);
             }	
+            handler.next();
         }
 
         countOnes = 0;
@@ -79,7 +89,7 @@ namespace TestHandler
                 countOnes++;
             handler.next();
         }
-        assert(genomeMutation->size() == 7);
+        assert(genomeMutation->size() == 8);
         assert(genomeMutation->segmentsCount() == 3);
         assert(countOnes == 3);
 
@@ -91,21 +101,23 @@ namespace TestHandler
         std::cout << "Test Point Middle: ";
         while (handler.index() < genomeMutation->size())
         {
-            if (static_cast<int>(*handler) == 0)
+            if (static_cast<int>(*handler) == 5)
             {
-                handler.PointMutation((Byte)1);
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.PointMutation(mutation);
             }	
+            handler.next();
         }
 
         countOnes = 0;
         handler.reset();
         while (handler.index() < genomeMutation->size())
         {
-            if (static_cast<int>(*handler) == 5)
+            if (static_cast<int>(*handler) == 1)
                 countOnes++;
             handler.next();
         }
-        assert(genomeMutation->size() == 7);
+        assert(genomeMutation->size() == 8);
         assert(genomeMutation->segmentsCount() == 5);
         assert(countOnes == 4);
 
@@ -119,7 +131,107 @@ namespace TestHandler
 
     void testInsertionMutation()
     {
+        MutationHeap mutationPool = MutationHeap();
 
+        std::cout << "\nTest Insert Mutation" << std::endl;
+        /// creating genome
+        std::shared_ptr<AbstractGenome> genome = std::make_shared<Genome>(8);
+
+        ///init genome
+        for (size_t i = 0; i < genome->size(); i++)
+        {
+            genome->data()[i] = i;
+        }
+
+        std::shared_ptr<GenomeLite> genomeMutation = std::make_shared<GenomeLite>(genome);
+        Handler handler(genomeMutation);
+
+        /// testing inserting 0
+        handler.reset();
+        int countOnes = 0;
+        while (handler.index() < genomeMutation->size())
+        {
+            if (static_cast<int>(*handler) == 0)
+            {
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.InsertMutation(mutation);
+            }	
+            handler.next();
+        }
+
+        std::cout << "Counting 1s" << std::endl;
+        countOnes = 0;
+        handler.reset();
+        while (handler.index() < genomeMutation->size())
+        {
+            if (static_cast<int>(*handler) == 1)
+                countOnes++;
+            handler.next();
+        }
+        assert(genomeMutation->size() == 9);
+        assert(genomeMutation->segmentsCount() == 3);
+        assert(countOnes == 2);
+
+        std::cout << "Test Insert Front: Passed" << std::endl;
+
+        /// testing inserting 7
+        countOnes = 0;
+        handler.reset();
+        std::cout << "Test Insert Back: ";
+        while (handler.index() < genomeMutation->size())
+        {
+            if (static_cast<int>(*handler) == 7)
+            {
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.InsertMutation(mutation);
+            }	
+            handler.next();
+        }
+
+        countOnes = 0;
+        handler.reset();
+        while (handler.index() < genomeMutation->size())
+        {
+            if (static_cast<int>(*handler) == 1)
+                countOnes++;
+            handler.next();
+        }
+        assert(genomeMutation->size() == 10);
+        assert(genomeMutation->segmentsCount() == 4);
+        assert(countOnes == 3);
+
+
+        std::cout << "Passed" << std::endl;
+
+        /// testing deleting 5
+        handler.reset();
+        std::cout << "Test Insert Middle: ";
+        while (handler.index() < genomeMutation->size())
+        {
+            if (static_cast<int>(*handler) == 5)
+            {
+                auto mutation = mutationPool.AddMutation((Byte)1);
+                handler.InsertMutation(mutation);
+            }	
+            handler.next();
+        }
+
+        countOnes = 0;
+        handler.reset();
+        while (handler.index() < genomeMutation->size())
+        {
+            // std::cout << handler.index() << ": " << (int)*handler << std::endl;
+            if (static_cast<int>(*handler) == 1)
+                countOnes++;
+            handler.next();
+        }
+        assert(genomeMutation->size() == 11);
+        assert(genomeMutation->segmentsCount() == 6);
+        assert(countOnes == 4);
+
+        std::cout << "Passed" << std::endl;
+
+        std::cout << "Insertion Mutation Passed" << std::endl; 
     }
 
     void testCopyMutation()
