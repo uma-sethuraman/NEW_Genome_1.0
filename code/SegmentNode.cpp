@@ -17,8 +17,8 @@ void SegmentNode::TruncateLeft(size_t cutSize)
     Size -= cutSize;
 
     
-    std::cout << "Start " << std::hex << (unsigned long)Start << std::endl;
-    std::cout << "End " << (unsigned long)Start+Size << std::endl;
+    std::cout << "B " << std::hex << (unsigned long)Start << std::endl;
+    std::cout << "E " << (unsigned long)Start+Size << std::endl;
     std::cout << std::endl;
 }
 
@@ -30,8 +30,8 @@ void SegmentNode::TruncateRight(size_t cutSize)
     Size -= cutSize;
 
     std::cout << "SegmentNode " << this << " Truncate Right " << cutSize << std::endl;
-    std::cout << "Start " << std::hex << (unsigned long)Start << std::endl;
-    std::cout << "End " << (unsigned long)Start+Size << std::endl;
+    std::cout << "B " << std::hex << (unsigned long)Start << std::endl;
+    std::cout << "E " << (unsigned long)Start+Size << std::endl;
     std::cout << std::endl;
 }
 
