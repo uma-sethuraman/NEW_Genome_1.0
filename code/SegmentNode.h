@@ -7,12 +7,10 @@
  **/
 
 #pragma once
-#include <vector>
 #include <cstdint>
 #include <cstddef>
 #include <memory>
 #include <iostream>
-
 
 
 typedef char Byte; // c++17 std::byte doesn't always work
@@ -49,71 +47,30 @@ public:
     /** Deconstructor **/
     ~SegmentNode() {}
 
-
     /** Gets size
      * \returns size of segment **/
     const size_t size() { return Size; }
+
     /** Gets size
      * \returns size of segment **/
     std::shared_ptr<SegmentNode> next() { return Next; }
+
     /** Gets size
      * \returns size of segment **/
     std::shared_ptr<SegmentNode> prev() { return Prev; }
 
-
     /** Sets size
      * \returns size of segment **/
     void SetNext(std::shared_ptr<SegmentNode> next) { Next = next; }
+
     /** Setes size
      * \returns size of segment **/
     void SetPrev(std::shared_ptr<SegmentNode> prev) { Prev = prev; }
 
 
-
-    ///      Altering current SegmentNode       ///
-
-    /** Truncates Segment from left 
-     * \param cutSize amount to cut off the left of current segment */
-    void TruncateLeft(size_t cutSize = 1)
-    {
-        Start = Start+cutSize;
-        Size -= cutSize;
-
-        std::cout << "SegmentNode " << this << " Truncate Left " << cutSize << std::endl;
-        std::cout << "Start " << std::hex << (unsigned long)Start << std::endl;
-        std::cout << "End " << (unsigned long)Start+Size << std::endl;
-        std::cout << std::endl;
-    }
-
-    /** Truncates Segment from right 
-     * \param cutSize amount to cut off the right of current segment */
-    void TruncateRight(size_t cutSize = 1)
-    {
-        Size -= cutSize;
-
-        std::cout << "SegmentNode " << this << " Truncate Right " << cutSize << std::endl;
-        std::cout << "Start " << std::hex << (unsigned long)Start << std::endl;
-        std::cout << "End " << (unsigned long)Start+Size << std::endl;
-        std::cout << std::endl;
-    }
-
-    ///      Creating new SegmentNodes          ///
-
-    /** Subdivide segment at index
-     * \param index Index to cut the segment
-     * \return pair of two new SegmentNodes to the cut segments */
-    std::pair< std::shared_ptr<SegmentNode>, std::shared_ptr<SegmentNode> > Subdivide(size_t index)
-    {
-        std::cout << "cut" << std::endl;
-        std::shared_ptr<SegmentNode> firstSegment = std::make_shared<SegmentNode>(Start, index);
-        std::shared_ptr<SegmentNode> secondSegment = std::make_shared<SegmentNode>(Start+index, Size-index);
-
-        std::pair< std::shared_ptr<SegmentNode>, std::shared_ptr<SegmentNode> > segmentPair = 
-            {firstSegment, secondSegment};
-
-        return segmentPair;
-    }
-
+    void TruncateLeft(size_t cutSize = 1);
+    void TruncateRight(size_t cutSize = 1);
+    std::shared_ptr<SegmentNode> Cut(size_t index);
 
 
     /** Iterator that iterates over the segments */
@@ -132,33 +89,21 @@ public:
 
         /** Gets current position
          * \return position in segment **/
-        const size_t pos()
-        {
-            return Pos;
-        }
+        const size_t pos() { return Pos; }
 
         /** Test for end of the iterator
         * \param other Other Iter object to compare against
         * \returns True if we this position equals not equal to the other position */
-        bool operator==(const Iter& other) const
-        {
-            return Pos == other.Pos;
-        }
+        bool operator==(const Iter& other) const { return Pos == other.Pos && Segment == other.Segment; }
 
         /** Test for end of the iterator
         * \param other Other Iter object to compare against
         * \returns True if we this position equals not equal to the other position */
-        bool operator!=(const Iter& other) const
-        {
-            return Pos != other.Pos;
-        }
+        bool operator!=(const Iter& other) const { return Pos != other.Pos || Segment != other.Segment; }
 
         /** Get value at current position
          * \returns Value at Pos in the collection */
-        Byte operator *() const 
-        { 
-            return Segment->Start[Pos]; 
-        }
+        Byte operator *() const { return Segment->Start[Pos]; }
 
         /** Increment the iterator
          * \returns Reference to this iterator */
@@ -184,6 +129,5 @@ public:
     /** Get an iterator for the end of the collection
      * \returns Iter object at position past the end */
     Iter end() { return Iter(this, Size); }
-
 
 };
