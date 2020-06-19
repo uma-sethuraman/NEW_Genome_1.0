@@ -39,8 +39,8 @@ public:
         : Start(start), Size(size)
     {
         std::cout << "SegmentNode " << this << std::endl;
-        std::cout << "Start " << std::hex << (unsigned long)Start << std::endl;
-        std::cout << "End " << (unsigned long)Start+Size << std::endl;
+        std::cout << "B " << std::hex << (unsigned long)Start << std::endl;
+        std::cout << "E " << (unsigned long)Start+Size << std::endl;
         std::cout << std::endl;
     }
 
