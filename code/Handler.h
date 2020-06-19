@@ -13,6 +13,7 @@
 #include "GenomeLite.h"
 #include "SegmentList.h"
 #include "SegmentNode.h"
+#include "Mutation.h"
 
 /** Handler Handler for mutating over genome **/
 class Handler
@@ -48,10 +49,8 @@ public:
     void next();
     void prev();
     void Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<SegmentNode> right);
-    template < typename T >
-    void PointMutation(T value);
-    template < typename T >
-    void InsertMutation(T value);
+    void PointMutation(std::shared_ptr< Mutation > mutation);
+    void InsertMutation(std::shared_ptr< Mutation > mutation);
     void CopyMutation(Byte* startMutation, size_t sizeMutation = 1);
     void DeleteMutation(size_t sizeMutation = 1);
 };
