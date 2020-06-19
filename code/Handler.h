@@ -13,17 +13,17 @@
 #include "GenomeLite.h"
 #include "SegmentList.h"
 #include "SegmentNode.h"
-#include "Mutation.h"
+#include "GeneSegment.h"
 
 /** Handler Handler for mutating over genome **/
 class Handler
 {
-private:
+protected:
     std::shared_ptr<GenomeLite> Genome; ///< current genome iterating on
     std::shared_ptr<SegmentNode> Segment;    ///< current SegmentNode iterating on
     size_t Pos = 0;  ///< position up until Segment
 
-    SegmentNode::Iter SegmentIterator;
+    SegmentNode::Iter SegmentIterator;  ///< iterator for each segment
 
 public:
     /** (deleted) default Constructor **/
@@ -48,9 +48,4 @@ public:
     void reset();
     void next();
     void prev();
-    void Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<SegmentNode> right);
-    void PointMutation(std::shared_ptr< Mutation > mutation);
-    void InsertMutation(std::shared_ptr< Mutation > mutation);
-    void CopyMutation(Byte* startMutation, size_t sizeMutation = 1);
-    void DeleteMutation(size_t sizeMutation = 1);
 };
