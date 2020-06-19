@@ -12,21 +12,24 @@
 #include <memory>
 #include <iostream>
 
+#include "GeneSegment.h"
+
 
 typedef char Byte; // c++17 std::byte doesn't always work
 
 
-/** Implementation of a genom object **/
+/** Implementation of a genome object **/
 class SegmentNode
 {
 private:
     /// Data variables
+    std::shared_ptr< GeneSegment > Segment;
 	Byte* Start; ///< Start of memory
     size_t Size; ///< Size of segment
 
     /// Linked list variables
-    std::shared_ptr<SegmentNode> Prev = nullptr;
-    std::shared_ptr<SegmentNode> Next = nullptr;
+    std::shared_ptr< SegmentNode > Prev = nullptr;
+    std::shared_ptr< SegmentNode > Next = nullptr;
 
 public:
     /** (deleted) Default Constructor */
@@ -35,8 +38,21 @@ public:
     /** Constructor
      * \param start beginning of segment
      * \param size size of segment */
-    SegmentNode(Byte* start, size_t size) 
-        : Start(start), Size(size)
+    SegmentNode(std::shared_ptr< GeneSegment> segment) 
+        : Segment(segment), Start(segment->data()), Size(segment->size())
+    {
+        std::cout << "SegmentNode " << this << std::endl;
+        std::cout << "B " << std::hex << (unsigned long)Start << std::endl;
+        std::cout << "E " << (unsigned long)Start+Size << std::endl;
+        std::cout << std::endl;
+    }
+
+
+    /** Constructor
+     * \param start beginning of segment
+     * \param size size of segment */
+    SegmentNode(std::shared_ptr< GeneSegment> segment, Byte* start, size_t size) 
+        : Segment(segment), Start(start), Size(size)
     {
         std::cout << "SegmentNode " << this << std::endl;
         std::cout << "B " << std::hex << (unsigned long)Start << std::endl;

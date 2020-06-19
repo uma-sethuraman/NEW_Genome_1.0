@@ -24,6 +24,7 @@ class SegmentList
 private:
     /// Gives handler access to variables
     friend class Handler; 
+    friend class MutatorHandler;
 
     /// Data variables
     size_t Size = 1; ///< number of nodes in list
@@ -38,8 +39,8 @@ public:
 
     /** Constructor 
      * \param genome to construct from **/
-    SegmentList(std::shared_ptr<AbstractGenome> genome) 
-        :  SiteCount(genome->size()), StartSegment(std::make_shared<SegmentNode>(genome->data(), genome->size())) {}
+    SegmentList(std::shared_ptr< GeneSegment > genome) 
+        :  SiteCount(genome->size()), StartSegment(std::make_shared<SegmentNode>(genome)) {}
 
     /** gets number of segments in list
      * \return size **/

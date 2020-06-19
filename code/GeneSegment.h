@@ -1,9 +1,9 @@
 /**
- * \file Mutation.h
+ * \file GeneSegment.h
  * \author Victoria Cao
  * 
- * \brief Mutation class that has an array of bytes containing
- * physical values of a mutation
+ * \brief GeneSegment class that has an array of bytes containing
+ * physical values of a GeneSegment
  **/
 
 #pragma once
@@ -17,27 +17,44 @@ typedef char Byte; // c++17 std::byte doesn't always work
 
 
 /** Implementation of a genom object **/
-class Mutation
+class GeneSegment
 {
 private:
     Byte* Gene; ///< new byte of data
     const size_t Size;
 
+    bool NewData = true;
+
 public:
     /** (deleted) Default Constructor **/
-    Mutation() = delete;
+    GeneSegment() = delete;
+
+    /** Constructor 
+     * \param value value to put into gene **/
+    GeneSegment(size_t size) : Size(size)
+    {
+        Gene = new Byte[Size];
+    }
 
     /** Constructor 
      * \param value value to put into gene **/
     template < typename T >
-    Mutation(T value) : Size(sizeof(T))
+    GeneSegment(T value) : Size(sizeof(T))
     {
         Gene = new Byte[Size];
         std::memcpy(Gene, &value, Size*sizeof(Byte));
     }
 
+    /** Constructor 
+     * \param value value to put into gene **/
+    GeneSegment(Byte* gene, size_t size) : Gene(gene), Size(size), NewData(false) {}
+
     /** Deconstructor **/
-    ~Mutation() { delete[] Gene; }
+    ~GeneSegment() 
+    { 
+        if (NewData)
+            delete[] Gene; 
+    }
 
     /** Gets data of gene 
      * \return pointer to data **/

@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "testing/HandlerTest.h"
+#include "testing/TestHandler.h"
 
 typedef char Byte; // c++17 Byte doesn't always work
 

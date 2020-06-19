@@ -42,7 +42,7 @@ void SegmentNode::TruncateRight(size_t cutSize)
  **/
 std::shared_ptr<SegmentNode> SegmentNode::Cut(size_t index)
 {
-    std::shared_ptr<SegmentNode> cutSegment = std::make_shared<SegmentNode>(Start+index, Size-index);
+    auto cutSegment = std::make_shared<SegmentNode>(Segment, Start+index, Size-index);
     TruncateRight(Size-index);
 
     return cutSegment;

@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <vector>
 
-#include "Mutation.h"
 
 typedef char Byte; // c++17 std::byte doesn't always work
 
