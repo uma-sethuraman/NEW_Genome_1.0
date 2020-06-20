@@ -2,17 +2,16 @@
  * \file MutatorHandler.h
  * \author Victoria Cao
  * 
- * \brief Segment node class for segmentation of data
- * implementation
+ * \brief Handler for mutating
  **/
 
 #include <memory>
 #include <iostream>
 #include <cstddef>
 
-#include "GenomeLite.h"
-#include "SegmentList.h"
-#include "SegmentNode.h"
+#include "../GenomeLite.h"
+#include "../SegmentList.h"
+#include "../SegmentNode.h"
 
 #include "Handler.h"
 
@@ -25,12 +24,12 @@ public:
 
     /** Constructor
      * \param genome Genome GeneSegment on */
-    MutatorHandler(std::shared_ptr<GenomeLite> genome) : Handler(genome) {} 
+    MutatorHandler(GenomeLite* genome) : Handler(genome) {} 
 
     /** Deconstructor **/
     ~MutatorHandler() {}
 
-    void Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<SegmentNode> right);
+    void Connect(SegmentNode* left, SegmentNode* right);
     void PointMutation(std::shared_ptr< GeneSegment > mutation);
     void InsertMutation(std::shared_ptr< GeneSegment > mutation);
     void CopyMutation(Byte* startMutation, size_t sizeMutation = 1);

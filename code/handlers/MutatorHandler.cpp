@@ -10,7 +10,7 @@
 /** Connect two nodes
  * \param left node 
  * \param right node **/
-void MutatorHandler::Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<SegmentNode> right)
+void MutatorHandler::Connect(SegmentNode*  left, SegmentNode* right)
 {
     if (left)
         left->SetNext(right);
@@ -22,55 +22,51 @@ void MutatorHandler::Connect(std::shared_ptr<SegmentNode> left, std::shared_ptr<
  * \param startMutation address of insertion mutation **/
 void MutatorHandler::PointMutation(std::shared_ptr< GeneSegment > mutation)
 {
-    std::cout << "Point mutation" << std::endl; 
+    SegmentNode* pointMutation = new SegmentNode(mutation);
 
-    std::shared_ptr< SegmentNode > pointMutation = std::make_shared< SegmentNode >(mutation);
-
-    if (SegmentIterator.pos() == 0) // Front case
+    if (NodeIndex == 0) // Front case
     {  
         /// cut segment
         Segment->TruncateLeft();
 
         /// connect segments
         Connect(Segment->prev(), pointMutation);
-        Connect(pointMutation, Segment);
-
-        /// move head of reader
-        Pos++;
-        SegmentIterator = Segment->begin();
+        Connect(pointMutation, Segment); 
 
         /// update starting segment
-        if (Segment == Genome->GeneSegments->StartSegment)
-            Genome->GeneSegments->StartSegment = pointMutation;
+        if (Segment == Genome->GeneSegments->Head)
+            Genome->GeneSegments->Head = pointMutation;
+
+        /// move handler to point mutation
+        Segment = Segment->prev();
     }
-    else if (SegmentIterator.pos() == Segment->size()-1)  // Back case
+    else if (NodeIndex == Segment->size()-1)  // Back case
     {
         /// cut segment 
         Segment->TruncateRight();
 
         /// connect segments
-        Connect(Segment, pointMutation);
         Connect(pointMutation, Segment->next());
+        Connect(Segment, pointMutation);
 
-        /// move head of reader to next segment
-        Pos += Segment->size()+1;
-        Segment = pointMutation->next();
+        /// move handler to point mutatoin
+        Segment = Segment->next();
+
     }
-    else    // Middle case
+    else     // Middle case
     {
         /// cut segment in two
-        auto cutSegment = Segment->Cut(SegmentIterator.pos());
+        auto cutSegment = Segment->Cut(NodeIndex);
         cutSegment->TruncateLeft();
 
         /// connect the cut segments
+        Connect(cutSegment, Segment->next());
         Connect(Segment, pointMutation);
         Connect(pointMutation, cutSegment);
-        Connect(cutSegment, Segment->next());
 
-        /// move head of reader to newly cut segment
-        Pos += Segment->size();
-        Segment = cutSegment;
-        SegmentIterator = Segment->begin();
+        /// move handler to point mutatoin
+        Segment = Segment->next();
+        NodeIndex = 0;
 
         /// update number of segments
         Genome->GeneSegments->Size++;
@@ -87,40 +83,32 @@ void MutatorHandler::PointMutation(std::shared_ptr< GeneSegment > mutation)
  * \param sizeMutation size of mutation **/
 void MutatorHandler::InsertMutation(std::shared_ptr< GeneSegment > mutation)
 {
-    std::cout << "Insetion mutation" << std::endl; 
+    SegmentNode* insertMutation = new SegmentNode(mutation);
 
-    std::shared_ptr< SegmentNode > insertMutation = std::make_shared< SegmentNode >(mutation);
-
-    if (SegmentIterator.pos() == Segment->size()-1)  // Back case
+    if (NodeIndex == Segment->size()-1)  // Back case
     {
         /// connect segments
-        Connect(Segment, insertMutation);
         Connect(insertMutation, Segment->next());
-
-        /// move head of reader to next segment
-        Pos += Segment->size()+1;
-        Segment = insertMutation->next();
-        if (Segment)
-            SegmentIterator = Segment->begin();
+        Connect(Segment, insertMutation);
     }
     else    //  Middle case
     {
         /// cut segment in two
-        auto cutSegment = Segment->Cut(SegmentIterator.pos()+1);
+        auto cutSegment = Segment->Cut(NodeIndex+1);
 
         /// connect the cut segments
+        Connect(cutSegment, Segment->next());
         Connect(Segment, insertMutation);
         Connect(insertMutation, cutSegment);
-        Connect(cutSegment, Segment->next());
-
-        /// move head of reader to newly cut segment
-        Pos += Segment->size()+1;
-        Segment = cutSegment;
-        SegmentIterator = Segment->begin();
 
         /// update number of segments
         Genome->GeneSegments->Size++;
     }
+
+    /// move handler to insertion mutation
+    GlobalIndex++;
+    NodeIndex = 0;
+    Segment = Segment->next();
 
     /// update number of segments
     Genome->GeneSegments->Size++;
@@ -143,39 +131,31 @@ void MutatorHandler::CopyMutation(Byte* startMutation, size_t sizeMutation)
  * \param sizeMutation size of mutation **/
 void MutatorHandler::DeleteMutation(size_t sizeMutation)
 {
-    if (SegmentIterator.pos() == 0) // Front case
+    if (NodeIndex == 0) // Front case
     {  
         /// cut segment
         Segment->TruncateLeft();
-
-        /// move head of reader
-        SegmentIterator = Segment->begin();
     }
-    else if (SegmentIterator.pos() == Segment->size()-1)  // Back case
+    else if (NodeIndex == Segment->size()-1)  // Back case
     {
         /// cut segment 
         Segment->TruncateRight();
 
-        /// move head of reader to next segment
-        Pos += Segment->size();
-        Segment = Segment->next();
-        if (Segment)
-            SegmentIterator = Segment->begin();
+        NodeIndex--;
     }
     else    // Middle case
     {
         /// cut segment in two
-        auto cutSegment = Segment->Cut(SegmentIterator.pos());
+        auto cutSegment = Segment->Cut(NodeIndex);
         cutSegment->TruncateLeft();
 
         /// connect the cut segments
-        Connect(Segment, cutSegment);
         Connect(cutSegment, Segment->next());
+        Connect(Segment, cutSegment);
+  
 
         /// move head of reader to newly cut segment
-        Pos += Segment->size();
-        Segment = cutSegment;
-        SegmentIterator = Segment->begin();
+        NodeIndex--;
 
         /// update number of segments
         Genome->GeneSegments->Size++;
