@@ -63,4 +63,13 @@ public:
      * \return number of bytes of data **/
     size_t size() { return Size; }
 
+    void print()
+    {
+        for (size_t i = 0; i < Size; i++)
+        {
+            std::cout << (int)Gene[i] << ", ";
+        }
+        std::cout << std::endl;
+    }
+
 };
