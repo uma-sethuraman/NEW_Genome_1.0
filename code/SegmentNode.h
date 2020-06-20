@@ -53,7 +53,7 @@ public:
     }
 
     /** Deconstructor **/
-    ~SegmentNode() {  }
+    ~SegmentNode() { delete Next; }
 
     /** Gets size
      * \returns size of segment **/

@@ -31,7 +31,7 @@ private:
     size_t SiteCount;   ///< sum of sites from all nodes
 
     /// Linked list variables
-    std::shared_ptr<SegmentNode> StartSegment;
+    SegmentNode* Head;
 
 public:
     /** (deleted) Default constructor **/
@@ -40,7 +40,13 @@ public:
     /** Constructor 
      * \param genome to construct from **/
     SegmentList(std::shared_ptr< GeneSegment > genome) 
-        :  SiteCount(genome->size()), StartSegment(std::make_shared<SegmentNode>(genome)) {}
+        :  SiteCount(genome->size()), Head(new SegmentNode(genome)) {}
+
+    /** Deconstructor **/
+    ~SegmentList() 
+    { 
+        delete Head;
+    }
 
     /** gets number of segments in list
      * \return size **/
@@ -48,5 +54,15 @@ public:
     /** gets total number of sites from all segments
      * \return siteCount **/
     const size_t siteCount() { return SiteCount; }
+
+    void print()
+    {
+        SegmentNode* curr = Head;
+        while (curr != nullptr)
+        {
+            curr->print();
+            curr = curr->next();
+        }
+    }
     
 };
