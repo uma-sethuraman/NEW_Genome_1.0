@@ -3,18 +3,24 @@
 #include <stdint.h>
 #include "AbstractGenome.h"
 #include <cstddef>
+#include <list>
 
 class StephanieGenome : public AbstractGenome {
 private:
 	// custom properties & functions
 	std::vector<std::byte> sites;
+	std::list<std::byte> changelog;
+
+
 public:
 	StephanieGenome(size_t _size);
 	~StephanieGenome() override {
-		std::cout << "done" << std::endl;
+		std::cout << "\ndone" << std::endl;
 	}
 
 	std::byte* data() override;
+
+	std::list<std::byte>::iterator changelogDataIterator() override;
 
 	virtual void resize(size_t new_size) override;
 
@@ -34,4 +40,5 @@ public:
 		std::unordered_map<std::string, std::vector<size_t>> geneMap = { {"det", {0}},{"prob",{ 10,20}} };
 		return(geneMap);
 	}
+
 };

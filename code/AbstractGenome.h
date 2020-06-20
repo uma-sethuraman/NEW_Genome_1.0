@@ -3,6 +3,7 @@
 #include <iostream>
 #include<unordered_map>
 #include <cstddef>
+#include <list>
 
 class AbstractGenome {
 protected:
@@ -11,7 +12,7 @@ protected:
 public:
     struct GeneDefinition {
         std::string name;
-        std::vector<std::byte> startCodon;
+        std::vector<std::byte> startCodon; //vector of bytes
         size_t geneSize; // size in bytes
     };
 
@@ -19,7 +20,7 @@ public:
 
     AbstractGenome(size_t _size) :size_(_size) {}
 
-    virtual ~AbstractGenome() {}
+    virtual ~AbstractGenome() {} // member function that you expect to be redefined in derived classes
     
     virtual size_t size() {return size_;}
     
@@ -30,8 +31,13 @@ public:
         exit(1);
     }
 
+    virtual std::list<std::byte>::iterator changelogDataIterator() {
+        std::cout << "changelog data has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
     virtual AbstractGenome* clone() {
-        std::cout << "mutate has not been written for this genome class" << std::endl;
+        std::cout << "clone has not been written for this genome class" << std::endl;
         exit(1);
     }
 
