@@ -1,5 +1,5 @@
 /**
- * \file HandlerTest.h
+ * \file TestMutatorHandler.h
  * \author Victoria Cao
  * 
  * \brief namespace for testing handler functions
@@ -11,19 +11,19 @@
 #include "../AbstractGenome.h"
 #include "../Genome.h"
 #include "../GenomeLite.h"
-#include "../MutatorHandler.h"
 #include "../GeneSegment.h"
+#include "../handlers/MutatorHandler.h"
 
 typedef char Byte; ///< Byte for easy viewing
 
 /** handler testing functions **/
-namespace TestHandler
+namespace TestMutatorHandler
 {
     void testPointMutation()
     {
         std::cout << "\nTest Point Mutation" << std::endl;
         /// creating genome
-        std::shared_ptr<AbstractGenome> genome = std::make_shared<Genome>(8);
+        AbstractGenome* genome = new Genome(8);
 
         ///init genome
         for (size_t i = 0; i < genome->size(); i++)
@@ -31,11 +31,11 @@ namespace TestHandler
             genome->data()[i] = i;
         }
 
-        std::shared_ptr<GenomeLite> genomeMutation = std::make_shared<GenomeLite>(genome);
+        GenomeLite* genomeMutation = new GenomeLite(genome);
         MutatorHandler handler(genomeMutation);
 
+
         /// testing deleting 0
-        std::cout << "Point Mutation at 0" << std::endl;
         handler.reset();
         int countOnes = 0;
         while (handler.index() < genomeMutation->size())
@@ -48,26 +48,24 @@ namespace TestHandler
             handler.next();
         }
 
-        std::cout << "Counting 1s" << std::endl;
         countOnes = 0;
         handler.reset();
         while (handler.index() < genomeMutation->size())
         {
-            // std::cout << handler.index() << ": " << (int)*handler << std::endl;
             if (static_cast<int>(*handler) == 1)
                 countOnes++;
             handler.next();
         }
+        
         assert(genomeMutation->size() == 8);
         assert(genomeMutation->segmentsCount() == 2);
         assert(countOnes == 2);
 
         std::cout << "Test Point Front: Passed" << std::endl;
 
-        /// testing deleting 7
+        /// testing point 7
         countOnes = 0;
         handler.reset();
-        std::cout << "Test Point Back: ";
         while (handler.index() < genomeMutation->size())
         {
             if (static_cast<int>(*handler) == 7)
@@ -77,6 +75,7 @@ namespace TestHandler
             }	
             handler.next();
         }
+  
 
         countOnes = 0;
         handler.reset();
@@ -91,13 +90,13 @@ namespace TestHandler
         assert(countOnes == 3);
 
 
-        std::cout << "Passed" << std::endl;
+        std::cout << "Test Point Back: Passed" << std::endl;
 
-        /// testing deleting 5
+        /// testing point 5
         handler.reset();
-        std::cout << "Test Point Middle: ";
         while (handler.index() < genomeMutation->size())
         {
+            // handler.print();
             if (static_cast<int>(*handler) == 5)
             {
                 auto mutation = std::make_shared< GeneSegment >((Byte)1);
@@ -114,15 +113,17 @@ namespace TestHandler
                 countOnes++;
             handler.next();
         }
+
+        // genomeMutation->print(); 
         assert(genomeMutation->size() == 8);
         assert(genomeMutation->segmentsCount() == 5);
         assert(countOnes == 4);
 
+        std::cout << "Test Point Middle: Passed" << std::endl;
 
-        std::cout << "Passed" << std::endl;
 
-
-        std::cout << "Point Mutation Passed" << std::endl; 
+        delete genomeMutation;
+        delete genome;
 
     }
 
@@ -130,7 +131,7 @@ namespace TestHandler
     {
         std::cout << "\nTest Insert Mutation" << std::endl;
         /// creating genome
-        std::shared_ptr<AbstractGenome> genome = std::make_shared<Genome>(8);
+        AbstractGenome* genome = new Genome(8);
 
         ///init genome
         for (size_t i = 0; i < genome->size(); i++)
@@ -138,7 +139,7 @@ namespace TestHandler
             genome->data()[i] = i;
         }
 
-        std::shared_ptr<GenomeLite> genomeMutation = std::make_shared<GenomeLite>(genome);
+        GenomeLite* genomeMutation = new GenomeLite(genome);
         MutatorHandler handler(genomeMutation);
 
         /// testing inserting 0
@@ -154,7 +155,6 @@ namespace TestHandler
             handler.next();
         }
 
-        std::cout << "Counting 1s" << std::endl;
         countOnes = 0;
         handler.reset();
         while (handler.index() < genomeMutation->size())
@@ -172,7 +172,6 @@ namespace TestHandler
         /// testing inserting 7
         countOnes = 0;
         handler.reset();
-        std::cout << "Test Insert Back: ";
         while (handler.index() < genomeMutation->size())
         {
             if (static_cast<int>(*handler) == 7)
@@ -196,11 +195,10 @@ namespace TestHandler
         assert(countOnes == 3);
 
 
-        std::cout << "Passed" << std::endl;
+        std::cout << "Test Insert Back: Passed" << std::endl;
 
         /// testing deleting 5
         handler.reset();
-        std::cout << "Test Insert Middle: ";
         while (handler.index() < genomeMutation->size())
         {
             if (static_cast<int>(*handler) == 5)
@@ -224,9 +222,12 @@ namespace TestHandler
         assert(genomeMutation->segmentsCount() == 6);
         assert(countOnes == 4);
 
-        std::cout << "Passed" << std::endl;
+        std::cout << "Test Insert Middle: Passed" << std::endl;
 
         std::cout << "Insertion Mutation Passed" << std::endl; 
+
+        delete genomeMutation;
+        delete genome;
     }
 
     void testCopyMutation()
@@ -239,7 +240,7 @@ namespace TestHandler
     {
         std::cout << "\nTest Delete Mutation" << std::endl;
         /// creating genome
-        std::shared_ptr<AbstractGenome> genome = std::make_shared<Genome>(8);
+        AbstractGenome* genome = new Genome(8);
 
         ///init genome
         for (size_t i = 0; i < genome->size(); i++)
@@ -247,7 +248,7 @@ namespace TestHandler
             genome->data()[i] = i;
         }
 
-        std::shared_ptr<GenomeLite> genomeMutation = std::make_shared<GenomeLite>(genome);
+        GenomeLite* genomeMutation = new GenomeLite(genome);
         MutatorHandler handler(genomeMutation);
 
         /// testing deleting 0
@@ -308,5 +309,8 @@ namespace TestHandler
 
 
         std::cout << "Delete Mutation Passed" << std::endl;
+
+        delete genomeMutation;
+        delete genome;
     }
 }
