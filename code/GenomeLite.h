@@ -29,7 +29,7 @@ private:
     friend class MutatorHandler;
 
 	AbstractGenome* ParentGenome; ///< pointer to parent genome
-    std::unique_ptr< SegmentList > GeneSegments;  ///< list of gene segments
+    SegmentList* GeneSegments;  ///< list of gene segments
 
 public:
     /** Constructor
@@ -37,11 +37,11 @@ public:
 	GenomeLite(AbstractGenome* genome) : ParentGenome(genome)
     {
         auto segment = std::make_shared< GeneSegment >(genome->data(), genome->size());
-        GeneSegments = std::make_unique< SegmentList >(segment);
+        GeneSegments = new SegmentList(segment);
     }
 
     /** Deconstructor **/
-	~GenomeLite() {}
+	~GenomeLite() { delete GeneSegments; }
 
     /** Gets size 
      * \returns size of genome **/
@@ -51,6 +51,7 @@ public:
      * \returns size of genome **/
     size_t segmentsCount() { return GeneSegments->size(); }
 
+    /** Prints Segment list **/
     void print()
     {
         GeneSegments->print();

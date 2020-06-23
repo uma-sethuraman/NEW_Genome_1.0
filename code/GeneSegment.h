@@ -63,6 +63,8 @@ public:
      * \return number of bytes of data **/
     size_t size() { return Size; }
 
+
+   /** Prints linked list segment nodes**/
     void print()
     {
         for (size_t i = 0; i < Size; i++)

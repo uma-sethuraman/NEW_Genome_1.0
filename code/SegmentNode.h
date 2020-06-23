@@ -14,9 +14,7 @@
 
 #include "GeneSegment.h"
 
-
 typedef char Byte; // c++17 std::byte doesn't always work
-
 
 /** Implementation of a genome object **/
 class SegmentNode
@@ -39,18 +37,14 @@ public:
      * \param start beginning of segment
      * \param size size of segment */
     SegmentNode(std::shared_ptr< GeneSegment> segment) 
-        : Segment(segment), Start(segment->data()), Size(segment->size())
-    {
-    }
+        : Segment(segment), Start(segment->data()), Size(segment->size()) {}
 
 
     /** Constructor
      * \param start beginning of segment
      * \param size size of segment */
     SegmentNode(std::shared_ptr< GeneSegment> segment, Byte* start, size_t size) 
-        : Segment(segment), Start(start), Size(size)
-    {
-    }
+        : Segment(segment), Start(start), Size(size) {}
 
     /** Deconstructor **/
     ~SegmentNode() { delete Next; }
@@ -75,7 +69,7 @@ public:
             return *Start+index;
         else
         {
-            std::cout << "trying to get " << (int)index << "from" << std::endl;
+            std::cout << "Errpr: trying to get data from index " << (int)index << std::endl;
             print();
             exit(1);
         }
@@ -104,7 +98,7 @@ public:
         
         for (size_t i = 0; i < Size; i++)
         {
-            std::cout << (int)(*(Start+i)) << ", ";
+            std::cout << std::dec << (unsigned int)(*(Start+i)) << ", ";
         }
         std::cout << std::endl;
 
