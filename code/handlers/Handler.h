@@ -5,7 +5,7 @@
  * \brief Segment node class for segmentation of data
  * implementation
  **/
-
+#pragma once
 #include <memory>
 #include <iostream>
 #include <cstddef>
@@ -40,6 +40,10 @@ public:
     * \return position in segment **/
     const size_t index() { return GlobalIndex; }
 
+    /** Gets current segment
+     * \return segment **/
+    const SegmentNode* segment() { return Segment; }
+
     /** Get value at current position
      * \returns Value at Pos in the collection */
     const Byte operator *() const { return Segment->getData(NodeIndex); }
@@ -47,7 +51,9 @@ public:
     void reset();
     void next();
     void prev();
+    void moveTo(size_t index);
 
+   /** Prints Handler positions and current node**/
     void print()
     {
         std::cout << "Global Pos: " << GlobalIndex << "\t Node Pos: " << NodeIndex << std::endl;

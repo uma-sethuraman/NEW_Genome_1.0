@@ -39,3 +39,16 @@ void Handler::prev()
         Segment = Segment->prev();
     }
 }
+
+/** Moves handler to index 
+ * \param index **/
+void Handler::moveTo(size_t index)
+{
+    // get segment index is located in
+    auto segmentInfo = Genome->GeneSegments->Table->Search(index);
+
+    Segment = segmentInfo.second;
+    NodeIndex = segmentInfo.first-index;
+    GlobalIndex = index;
+
+}
