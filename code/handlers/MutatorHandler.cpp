@@ -74,7 +74,9 @@ void MutatorHandler::PointMutation(std::shared_ptr< GeneSegment > mutation)
 
     /// update number of segments
     Genome->GeneSegments->Size++;
-    
+
+    Genome->GeneSegments->Table->Insert(GlobalIndex, pointMutation);
+    Genome->GeneSegments->Table->Insert(GlobalIndex+1, pointMutation->next());
 }
 
 
@@ -113,6 +115,9 @@ void MutatorHandler::InsertMutation(std::shared_ptr< GeneSegment > mutation)
     /// update number of segments
     Genome->GeneSegments->Size++;
     Genome->GeneSegments->SiteCount++;
+
+    Genome->GeneSegments->Table->Insert(GlobalIndex, insertMutation);
+    Genome->GeneSegments->Table->Insert(GlobalIndex++, insertMutation->next());
 }
 
 
@@ -163,4 +168,7 @@ void MutatorHandler::DeleteMutation(size_t sizeMutation)
     
     /// edit genome properties
     Genome->GeneSegments->SiteCount -= sizeMutation; 
+
+    Genome->GeneSegments->Table->Insert(GlobalIndex, Segment);
+    Genome->GeneSegments->Table->Insert(GlobalIndex+1, Segment->next());
 }

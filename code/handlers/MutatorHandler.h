@@ -4,7 +4,7 @@
  * 
  * \brief Handler for mutating
  **/
-
+#pragma once
 #include <memory>
 #include <iostream>
 #include <cstddef>
