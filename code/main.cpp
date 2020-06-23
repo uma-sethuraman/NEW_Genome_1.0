@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "testing/TestMutatorHandler.h"
+#include "testing/TestHandler.h"
 
 typedef char Byte; // c++17 Byte doesn't always work
 
@@ -15,9 +16,10 @@ int main() {
 	/// Handler Testing
 	TestMutatorHandler::testPointMutation();
 	TestMutatorHandler::testInsertionMutation();
-	// TestMutatorHandler::testCopyMutation();
 	TestMutatorHandler::testDeleteMutation();
+	// TestMutatorHandler::testCopyMutation();
 
+	TestHandler::testSearch();
 
 	return(0);
 }
