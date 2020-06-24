@@ -31,11 +31,6 @@ public:
         exit(1);
     }
 
-    virtual std::list<std::byte>::iterator changelogDataIterator() {
-        std::cout << "changelog data has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
     virtual AbstractGenome* clone() {
         std::cout << "clone has not been written for this genome class" << std::endl;
         exit(1);
@@ -46,6 +41,30 @@ public:
         exit(1);
     }
 
+    virtual void insertMutation(size_t index, std::vector<std::byte> values) {
+        std::cout << "insertMutation has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    virtual void insertMutation(size_t index, std::byte value) {
+        std::cout << "insertMutation has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    virtual void deleteMutation(size_t index, int delta) {
+        std::cout << "deleteMutation has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    virtual void pointMutation(size_t index, std::byte value) {
+        std::cout << "pointMutation has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    virtual void printChangelog() {
+        std::cout << "printChangelog has not been written for this genome class" << std::endl;
+        exit(1);
+    }
     virtual void initalize() {
         std::cout << "initalize has not been written for this genome class" << std::endl;
         exit(1);

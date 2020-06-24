@@ -3,14 +3,17 @@
 #include <stdint.h>
 #include "AbstractGenome.h"
 #include <cstddef>
-#include <list>
+#include <map>
+#include <iostream>
 
 class StephanieGenome : public AbstractGenome {
 private:
-	// custom properties & functions
+	struct ChangelogStruct {
+		std::byte value;
+		int delta;
+	};
+	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
-	std::list<std::byte> changelog;
-
 
 public:
 	StephanieGenome(size_t _size);
@@ -20,9 +23,17 @@ public:
 
 	std::byte* data() override;
 
-	std::list<std::byte>::iterator changelogDataIterator() override;
-
 	virtual void resize(size_t new_size) override;
+
+	virtual void insertMutation(size_t index, std::vector<std::byte> values) override;
+
+	virtual void insertMutation(size_t index, std::byte value) override;
+
+	virtual void deleteMutation(size_t index, int delta) override;
+
+	virtual void pointMutation(size_t index, std::byte value) override;
+
+	virtual void printChangelog() override;
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
 		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and

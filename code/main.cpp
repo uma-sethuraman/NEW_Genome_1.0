@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <cassert>
 #include <array>
@@ -11,12 +12,6 @@
 #include <iomanip>
 #include <algorithm>
 #include <cstdlib>
-
-struct genomeChangelog {
-	std::byte* address;
-	size_t index;		//is this really needed?
-	int indexDiff;
-};
 
 
 void stephanie_runNKFitnessTests(AbstractGenome* genome) {
@@ -91,221 +86,21 @@ void stephanie_runNKFitnessTests(AbstractGenome* genome) {
 	}
 }
 
-void stephanie_runChangeLogStruct(AbstractGenome* genome) {
-	//std::vector of a genomeChangelog struct
-	std::vector<genomeChangelog> changelog;
-	genome->resize(100);									//initialize genome to 100
-	auto readHead = genome->data();							//return a pointer to the first element address of the vector
-	for (size_t i(0); i < genome->size(); i++) {			//populate the genome with values
+
+void stephanie_runTests(AbstractGenome* genome) {
+	genome->resize(10);
+	auto readHead = genome->data();
+	for (size_t i(0); i < genome->size(); ++i)
 		readHead[i] = (std::byte)(Random::getInt(99));
-	}
-
-	//delete three sites
-	changelog.push_back(genomeChangelog());
-	changelog[0].address = &(GN::genomeRead<std::byte>(genome, 3));
-	changelog[0].index = 3;
-	changelog[0].indexDiff = -3;
-	size_t modifiedSize = genome->size() + changelog[0].indexDiff;
-	size_t counter = 0;
-	/*for (size_t i(0); i < modifiedSize; i++) {
-		for (auto& itr : changelog) {
-			if (i == itr.index) {
-				i += std::abs(itr.indexDiff);
-			}
-		}
-		std::cout << counter << " " << i << " " << GN::genomeRead<std::byte>(genome, i) << std::endl;
-		counter++;
-	}*/
-
 	for (size_t i(0); i < genome->size(); i++) {
-		for (auto& itr : changelog) {
-			if (i == itr.index) {
-				counter += std::abs(itr.indexDiff);
-			}
-		}
-		std::cout << i << " " << counter << " " << GN::genomeRead<std::byte>(genome, i) << std::endl;
-		counter++;
+	//	std::cout << GN::genomeRead<std::byte>(genome, i) << " ";
 	}
-
-	//delete one site
-/*	changelog.push_back(genomeChangelog());
-	changelog[0].address = &(GN::genomeRead<std::byte>(genome, 3));
-	changelog[0].index = 3;
-	changelog[0].indexDiff = -1;
-
-	size_t modifiedSize = genome->size() + changelog[0].indexDiff;
-	for (auto& itr : changelog) {
-		std::cout << itr.index << std::endl;
-	}
-	std::vector<genomeChangelog>::iterator itr;
-	size_t counter = 0;
-	for (size_t i(0); i <= modifiedSize; i++) {
-		for (auto& itr : changelog) {
-			if (i == itr.index)
-				i++;
-		}
-
-		std::cout << counter << " " << GN::genomeRead<std::byte>(genome, i) << std::endl;
-		counter++;
-	}*/
-}
-
-void stephanie_runChangeLogBytePtr(AbstractGenome* genome) {
-	//std::vector storing site position and std::byte pointers
-    /*	std::vector<std::pair<size_t, std::byte*>> changelog;
-	genome->resize(100);									//initialize genome to 100
-	auto readHead = genome->data();							//return a pointer to the first element address of the vector
-	for (size_t i(0); i < genome->size(); i++) {			//populate the genome with values
-		readHead[i] = (std::byte)(Random::getInt(99));
-	}
-	//site 3 will be deleted
-	//get pointer to site 3 in genome
-	std::byte* deletedSiteAddress = &(GN::genomeRead<std::byte>(genome, 3)); 
-	size_t deletedSiteIndex = 3;
-	changelog.push_back(std::make_pair(deletedSiteIndex, deletedSiteAddress));
-	//get pointer to site 4
-	std::byte* nextSiteAddress = deletedSiteAddress + 1;
-	size_t nextSiteIndex = deletedSiteIndex + 1;
-	std::cout << deletedSiteIndex << " " << deletedSiteAddress << " " << *deletedSiteAddress << std::endl;
-	std::cout << nextSiteIndex << " " << nextSiteAddress << " " << *nextSiteAddress << std::endl;
-
-	//how to have genome print values and then print the other section?
-
-	auto genomeStart = genome->data();
-	size_t index = 0;
-	size_t counter = 0;
-	std::vector<std::pair<size_t, std::byte*>>::iterator itr;
-
-	while (genomeStart <= &readHead[100-1]) {
-		for (auto& itr : changelog) {
-			//if address of site is in the changelog vector
-			//increment the index
-			if (itr.second == &(GN::genomeRead<std::byte>(genome, counter))) {
-				index++;
-			}
-		}
-		if (index < 100) {
-			std::cout << counter << " " << GN::genomeRead<std::byte>(genome, index) << " " << &(GN::genomeRead<std::byte>(genome, index)) << std::endl;
-
-		}
-		genomeStart++;
-		counter++;
-		index++;
-	}
-*/
-    /*	std::byte* address = &(GN::genomeRead<std::byte>(genome, 3));
-	size_t index = 3;
-	while (address <= &readHead[100-1]) {
-		std::cout << address << " [" << index << "]: " << *address << std::endl;
-		index++;
-		address++;
-	}
-
-	std::cout << address << " " << *address << std::endl; 	// address is a pointer of std::byte, *address gives you the value at that pointer address
-	++address;
-	std::cout << address << " " << *address << std::endl;
-	++address;
-	std::cout << address << " " << *address << std::endl;*/
-
-	//std::vector storing std::byte pointers
-    /*	std::vector<std::byte*> testVector;
-	genome->resize(100);									//initialize genome to 100
-	auto readHead = genome->data();							//return a pointer to the first element address of the vector
-	for (size_t i(0); i < genome->size(); i++) {			//populate the genome with values
-		readHead[i] = (std::byte)(Random::getInt(99));
-		testVector.push_back(&readHead[i]);					//populate the vector with values
-	}
-	size_t counter = 0;
-	for (std::vector<std::byte*>::iterator it = testVector.begin(); it != testVector.end(); ++it) {
-		std::cout << counter << " " << *(*it) << std::endl;
-			counter++;
-	}*/ 
-
-}
-
-void stephanie_runChangeLogMap(AbstractGenome* genome) {
-
-	//map of size_t, and vector of bytes -- implemented, needs more complexity
-	/*
-	std::map<size_t, std::vector<std::byte>> changeLog;
-
-	for (size_t i(0); i < genome->size(); i++) {
-		std::byte value = (std::byte)(Random::getInt(99));
-		readHead[i] = value;
-		changeLog.insert(std::pair<size_t, std::vector<std::byte> >(i, std::vector<std::byte>()));
-		changeLog[i].push_back(value);
-	}
-//	GN::genomeWrite(genome, 3, (std::byte)(92));
-	changeLog[3].push_back((std::byte)92);
-	changeLog[1].push_back((std::byte)75);
-	changeLog.erase(2);
-
-	for (auto& t : changeLog)
-		std::cout << t.first << " " << t.second << std::endl;
-	//	for (size_t i(0); i < genome->size(); ++i)
-	//		std::cout << "[" << i << "]: " << GN::genomeRead<std::byte>(genome, i) << "\n";*/
-
-	//map of size_t, and vector pair of index and bytes -- sorta implemented
-	/*std::map < size_t, std::vector<std::pair<size_t, std::byte>> > changeLog;
-
-	for (size_t i(0); i < genome->size(); i++) {
-		std::byte value = (std::byte)(Random::getInt(99));
-		readHead[i] = value;
-		changeLog[i].push_back(std::make_pair(0, value));
-	}
-	changeLog[3].push_back(std::make_pair(1, (std::byte)92));
-	std::cout << changeLog[3][0].first << std::endl;
-	std::cout << changeLog[3][0].second << std::endl;
-	size_t my_index = 3;
-	std::cout << changeLog[my_index][0].first << std::endl;
-	std::cout << changeLog[my_index][0].second << std::endl;
-	std::cout << changeLog[my_index][1].first << std::endl;
-	std::cout << changeLog[my_index][1].second << std::endl;*/
-
-	//map of size_t, and map of index and bytes -- implemented
-	/*	std::map< size_t, std::map<size_t, std::byte> > changeLog;
-		for (size_t i(0); i < genome->size(); i++) {
-			std::byte value = (std::byte)(Random::getInt(99));
-			readHead[i] = value;
-
-			changeLog.insert(make_pair(i, std::map<size_t, std::byte>()));
-			changeLog[i].insert(make_pair(0, value));
-		}
-
-		changeLog[3].insert(make_pair(1, (std::byte)92)); //point mutation
-		changeLog[1].insert(make_pair(2, (std::byte)75)); //point mutation
-
-
-		std::map< size_t, std::map<size_t, std::byte> >::iterator itr;	// For accessing outer map
-		std::map<size_t, std::byte>::iterator ptr;	// For accessing inner map
-
-		//print through all items
-		for (itr = changeLog.begin(); itr != changeLog.end(); itr++) {
-			for (ptr = itr->second.begin(); ptr != itr->second.end(); ptr++) {
-				std::cout << "[" << itr->first
-					<< "][" << ptr->first
-					<< "]: " << ptr->second << std::endl;
-			}
-		}
-		//print only the last head of the sub map
-		for (itr = changeLog.begin(); itr != changeLog.end(); itr++) {
-			auto test = itr->second.rbegin();
-			std::cout << "[" << itr->first << "][" << test->first << "]: " << test->second << std::endl;
-		}
-
-		//insertion mutation
-		itr = changeLog.find(2);
-		auto test = itr->second.rbegin();
-		auto changeLogValue = test->second;
-		std::cout << itr->first << " " << changeLogValue  << std::endl;
-		changeLog[2].insert(make_pair(3, (std::byte)75)); //point mutation
-
-
-		for (itr = changeLog.begin(); itr != changeLog.end(); itr++) {
-			auto test = itr->second.rbegin();
-			auto changeLogValue = test->second;
-		}*/
-
+	std::cout << std::endl;
+	std::vector<std::byte> list = { (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 };
+	genome->insertMutation((size_t)1, list);
+	genome->pointMutation((size_t)1, (std::byte)88);
+	genome->deleteMutation((size_t)2, -2);
+	genome->printChangelog();
 }
 
 void runTests(AbstractGenome* genome) {
@@ -479,7 +274,7 @@ void runGeneTest(AbstractGenome* genome) {
 int main() {
 	AbstractGenome* genome = new StephanieGenome(100);
 
-	stephanie_runChangeLogStruct(genome);
+	stephanie_runTests(genome);
 
 	delete genome;
 
