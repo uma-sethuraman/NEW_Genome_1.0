@@ -14,6 +14,7 @@ int main() {
 	/// Handler Testing
 	TestTree::TestDelete();
 	TestTree::TestInsert();
+	TestTree::TestPoint();
 
 	return(0);
 }
