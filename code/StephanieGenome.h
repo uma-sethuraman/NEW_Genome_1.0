@@ -10,10 +10,11 @@ class StephanieGenome : public AbstractGenome {
 private:
 	struct ChangelogStruct {
 		std::byte value;
-		int delta;
+		int offset;
 	};
 	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
+	std::vector<size_t> keys; //TODO: check if this is needed?
 
 public:
 	StephanieGenome(size_t _size);
@@ -29,11 +30,13 @@ public:
 
 	virtual void insertMutation(size_t index, std::byte value) override;
 
-	virtual void deleteMutation(size_t index, int delta) override;
+	virtual void deleteMutation(size_t index, int offset) override;
 
 	virtual void pointMutation(size_t index, std::byte value) override;
 
 	virtual void printChangelog() override;
+
+	virtual void generateGenome(AbstractGenome* genome) override;
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
 		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and

@@ -65,6 +65,12 @@ public:
         std::cout << "printChangelog has not been written for this genome class" << std::endl;
         exit(1);
     }
+
+    virtual void generateGenome(AbstractGenome* genome) {
+        std::cout << "generateGenome has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
     virtual void initalize() {
         std::cout << "initalize has not been written for this genome class" << std::endl;
         exit(1);
