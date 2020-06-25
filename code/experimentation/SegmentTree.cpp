@@ -5,6 +5,10 @@
 
 #include "SegmentTree.h"
 
+/** Gets height of node
+ * \param node to get height of
+ * \return height of node of -1 if null
+ **/
 int SegmentTree::GetHeight(SegmentNode* node)
 {
     if (node)
@@ -14,6 +18,10 @@ int SegmentTree::GetHeight(SegmentNode* node)
     
 }
 
+/** Calculates the balance factor of node
+ * \param node to get the balance factor of 
+ * \return balance factor of the node
+ **/
 int SegmentTree::GetBalance(SegmentNode* node)
 {
     auto left = GetHeight(node->Left);
@@ -22,6 +30,11 @@ int SegmentTree::GetBalance(SegmentNode* node)
     return left - right;
 }
 
+/** Finds the index in the tree
+ * \param index to find
+ * \return node that the index lies within, local index into the segment
+ * that the index is at
+ **/
 std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
 {
     SegmentNode* node = Root;
@@ -64,6 +77,10 @@ std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
     return {node, left};
 }
 
+/** Rotates subtree right
+ * \param root root of subtree to rotate on
+ * \return new root of the subtree
+ **/
 SegmentNode* SegmentTree::RotateRight(SegmentNode* root)
 {
     SegmentNode* newRoot = root->Left; // new newRoot 
@@ -107,6 +124,10 @@ SegmentNode* SegmentTree::RotateRight(SegmentNode* root)
     return newRoot;
 }
 
+/** Rotates subtree left
+ * \param root root of subtree to rotate on
+ * \return new root of the subtree
+ **/
 SegmentNode* SegmentTree::RotateLeft(SegmentNode* root)
 {
     SegmentNode* newRoot = root->Right; // new newRoot 
@@ -150,7 +171,9 @@ SegmentNode* SegmentTree::RotateLeft(SegmentNode* root)
     return newRoot;
 }
 
-
+/** Updates weight of node
+ * \param node to update weight of
+ **/
 void SegmentTree::UpdateWeight(SegmentNode* node)
 {
     if (node)
@@ -167,6 +190,9 @@ void SegmentTree::UpdateWeight(SegmentNode* node)
     }
 }
 
+/** Updates height of Node
+ * \param node to update height of
+ **/
 void SegmentTree::UpdateHeight(SegmentNode* node)
 {
     if (node)
@@ -178,19 +204,23 @@ void SegmentTree::UpdateHeight(SegmentNode* node)
     }
 }
 
+/** Rebalances at the node if needed
+ * \param node to check for rebalancing
+ * \return new node that replaces node if rebalanced
+ **/
 SegmentNode* SegmentTree::ReBalance(SegmentNode* node)
 {
     auto balance = GetBalance(node);
 
-    if (balance == 2)
+    if (balance == 2) // Right case
     {
-        if (GetBalance(node->Left) == -1)
+        if (GetBalance(node->Left) == -1) // Right Left case
             RotateLeft(node->Left);
         return RotateRight(node);
     }
-    else if (balance == -2)
+    else if (balance == -2) // Left case
     {
-        if (GetBalance(node->Right) == 1)
+        if (GetBalance(node->Right) == 1) // Left Right case
             RotateRight(node->Right);
         return RotateLeft(node);
     }
@@ -198,44 +228,79 @@ SegmentNode* SegmentTree::ReBalance(SegmentNode* node)
     return node;
 }
 
-void SegmentTree::Update(SegmentNode* root)
+/** Updates the tree from node to root
+ * \param node to start updating from
+ **/
+void SegmentTree::Update(SegmentNode* node)
 {
-    SegmentNode* node = root;
     while (node)
     {
+        // update weight and height
         UpdateWeight(node);
         UpdateHeight(node);
+
+        // rebalance if necessary
         node = ReBalance(node)->Parent;
     }
-
 }
 
+/** Deletes site at index in the tree
+ * \param index index to delete site
+ **/
 void SegmentTree::Delete(size_t index)
 {
+    /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
     auto startIndex = found.second;
-    
-    // print();
-    std::cout << node << " " << index-startIndex << std::endl;
 
-    SegmentNode* newNode = node->Cut(index-startIndex);
-    newNode->TruncateLeft();
+    SegmentNode* cutNode = node->Cut(index-startIndex);
+    cutNode->TruncateLeft();    // remove value at index
 
     /// adopt nodes right
-    newNode->Right = node->Right;
-    if (newNode->Right)
-        newNode->Right->Parent = newNode;
+    cutNode->Right = node->Right;
+    if (cutNode->Right)
+        cutNode->Right->Parent = cutNode;
 
     /// change node right to cut node
-    node->Right = newNode;
-    newNode->Parent = node;
+    node->Right = cutNode;
+    cutNode->Parent = node;
 
-    Update(newNode);
+    /// update the tree
+    Update(cutNode);
+    Size += 1;
 }
 
-void SegmentTree::Insert(SegmentNode* root, size_t index)
-{}
+/** Inserts mutation into index in the tree
+ * \param mutation new mutation to insert
+ * \param index index to insert the mutation after 
+ **/
+void SegmentTree::Insert(size_t index, SegmentNode* mutation)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto node = found.first;
+    auto startIndex = found.second;
+
+    SegmentNode* cutNode = node->Cut(index-startIndex);
+
+    /// adopt nodes right
+    cutNode->Right = node->Right;
+    if (cutNode->Right)
+        cutNode->Right->Parent = cutNode;
+
+    /// change node right to mutation
+    node->Right = mutation;
+    mutation->Parent = node;
+
+    /// change mutation right to cut node
+    mutation->Right = cutNode;
+    cutNode->Parent = mutation;
+
+    /// update the tree
+    Update(cutNode);
+    Size += 2;
+}
 
 
 /** prints the tree breadth first **/
