@@ -67,6 +67,7 @@ public:
     std::pair<SegmentNode*, size_t> Find(size_t index);
     void Delete(size_t index);
     void Insert(size_t index, SegmentNode* mutation);
+    void Point(size_t index, SegmentNode* mutation);
     void print();
 
 };

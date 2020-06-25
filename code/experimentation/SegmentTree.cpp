@@ -302,6 +302,38 @@ void SegmentTree::Insert(size_t index, SegmentNode* mutation)
     Size += 2;
 }
 
+/** Point mutation into index in the tree
+ * \param mutation new mutation to insert
+ * \param index index to insert the mutation after 
+ **/
+void SegmentTree::Point(size_t index, SegmentNode* mutation)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto node = found.first;
+    auto startIndex = found.second;
+
+    SegmentNode* cutNode = node->Cut(index-startIndex);
+    cutNode->TruncateLeft();    // remove value at index
+
+    /// adopt nodes right
+    cutNode->Right = node->Right;
+    if (cutNode->Right)
+        cutNode->Right->Parent = cutNode;
+
+    /// change node right to mutation
+    node->Right = mutation;
+    mutation->Parent = node;
+
+    /// change mutation right to cut node
+    mutation->Right = cutNode;
+    cutNode->Parent = mutation;
+
+    /// update the tree
+    Update(cutNode);
+    Size += 2;
+}
+
 
 /** prints the tree breadth first **/
 void SegmentTree::print()
