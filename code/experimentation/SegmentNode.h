@@ -58,54 +58,25 @@ public:
 
     /** Gets size
      * \returns size of data **/
-    const size_t size() { return Size; }
+    const size_t GetSize() { return Size; }
+
+    /** Gets height
+     * \returns height of node**/
+    const size_t GetHeight() { return Height; }
 
     /** Gets size
      * \returns size of data **/
-    SegmentNode* next() { return Right; }
+    SegmentNode* GetRight() { return Right; }
 
     /** Gets size
      * \returns size of data **/
-    SegmentNode* prev() { return Left; }
-
-    /** Gets data from Segment
-     * \returns size of data **/
-    const Byte getData(size_t index)
-    {
-        if (index < Size)
-            return *Start+index;
-        else
-        {
-            std::cout << "Errpr: trying to get data from index " << (int)index << std::endl;
-            print();
-            exit(1);
-        }
-        
-    }
+    SegmentNode* GetLeft() { return Left; }
 
 
+    const Byte getData(size_t index);
     void TruncateLeft(size_t cutSize = 1);
     void TruncateRight(size_t cutSize = 1);
     SegmentNode* Cut(size_t index);
-
-    void print()
-    {
-        std::cout << "SegmentNode " << this << std::endl;
-        std::cout << "weight " << Weight << " size " << Size << " height " << Height << std::endl;
-        std::cout << "prev " << std::hex << Left << std::endl;
-        std::cout << "B " << (unsigned long)Start << std::endl;
-        std::cout << "E " << (unsigned long)Start+Size << std::endl;
-        
-        for (size_t i = 0; i < Size; i++)
-        {
-            std::cout << std::dec << (unsigned int)(*(Start+i)) << ", ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "next " << Right << std::endl;
-        std::cout << std::endl;
-    }
-
-
+    void print();
 
 };
