@@ -13,6 +13,7 @@ typedef char Byte; // c++17 Byte doesn't always work
 int main() {
 	/// Handler Testing
 	TestTree::TestDelete();
+	TestTree::TestInsert();
 
 	return(0);
 }
