@@ -8,6 +8,7 @@
 
 #include "testing/TestTree.h"
 #include "testing/TestHandler.h"
+#include "testing/TestHandlerMutations.h"
 
 typedef char Byte; // c++17 Byte doesn't always work
 
@@ -44,9 +45,20 @@ int main() {
 	// TestTree::TestPoint();
 
 	/// Handler Testing
-	Title("HANDLER TESTING");
+	// Title("HANDLER TESTING");
 
-	TestHandler::TestConstructor();
+	// TestHandler::TestConstructor();
+	// TestHandler::TestIterator();
+	// TestHandler::TestMoveTo();
+
+	// EndTest();
+
+	/// Handler Mutation Testing
+	Title("HANDLER MUTATION TESTING");
+
+	TestHandlerMutations::TestDeletion();
+	// TestHandlerMutations::TestIterator();
+	// TestHandlerMutations::TestMoveTo();
 
 	EndTest();
 
