@@ -61,7 +61,7 @@ public:
         exit(1);
     }
 
-    virtual AbstractHandler CreateHandler() {
+    virtual AbstractHandler* NewHandler() {
         std::cout << "Handler has not been created for this class" << std::endl;
         exit(1);
     }
