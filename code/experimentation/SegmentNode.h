@@ -16,6 +16,8 @@
 
 typedef char Byte; // c++17 std::byte doesn't always work
 
+class SegmentPool;
+
 /** Implementation of a genome object **/
 class SegmentNode
 {
@@ -64,11 +66,10 @@ public:
      * \returns height of node**/
     const size_t GetHeight() { return Height; }
 
-
     const Byte GetData(size_t index);
     void TruncateLeft(size_t cutSize = 1);
     void TruncateRight(size_t cutSize = 1);
-    SegmentNode* Cut(size_t index);
+    SegmentNode* Cut(SegmentPool* pool, size_t index);
     void Print();
 
 };

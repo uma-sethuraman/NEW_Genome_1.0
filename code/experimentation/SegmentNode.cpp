@@ -6,6 +6,8 @@
 #include <iostream>
 #include "SegmentNode.h"
 
+#include "SegmentPool.h"
+
 
 /** Truncates Data from left 
  * \param cutSize amount to cut off the left of current segment 
@@ -28,12 +30,13 @@ void SegmentNode::TruncateRight(size_t cutSize)
 
 
 /** Subdivide segment at index
+ * \param pool The pool of memory to make a pointer from
  * \param index Index to cut the segment
  * \return pair of two new SegmentNodes to the cut segments 
  **/
-SegmentNode* SegmentNode::Cut(size_t index)
+SegmentNode* SegmentNode::Cut(SegmentPool* pool, size_t index)
 {
-    SegmentNode* cutSegment = new SegmentNode(Data, Start+index, Size-index);
+    SegmentNode* cutSegment = pool->CreateNode(Data, Start+index, Size-index);
     TruncateRight(Size-index);
 
     return cutSegment;
