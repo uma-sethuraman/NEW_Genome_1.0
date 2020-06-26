@@ -38,8 +38,7 @@ private:
     void UpdateHeight(SegmentNode* node);
     void UpdateWeight(SegmentNode* node);
     void Update(SegmentNode* node);
-    template < typename T >
-    SegmentNode* CreateNode(T data);
+    SegmentNode* CreateNode(Byte* data, size_t size);
 
     ///.rebalancing functions
     SegmentNode* RotateRight(SegmentNode* node);
@@ -79,10 +78,8 @@ public:
     /// mutation functions
     std::pair<SegmentNode*, size_t> Find(size_t index);
     void Delete(size_t index);
-    template < typename T >
-    void Insert(size_t index, T mutation);
-    template < typename T >
-    void Point(size_t index, T mutation);
+    void Insert(size_t index, Byte* mutation, size_t size);
+    void Point(size_t index, Byte* mutation, size_t size);
     void Print();
 
 };

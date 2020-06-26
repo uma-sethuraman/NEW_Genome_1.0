@@ -95,12 +95,12 @@ void SegmentTree::Update(SegmentNode* node)
 
 /** Creates a new node in the pool 
  * \param data creates new segment in tree
- * \return poitner to new node
+ * \param size of data
+ * \return pointer to new node
  **/
-template < typename T >
-SegmentNode* SegmentTree::CreateNode(T data)
+SegmentNode* SegmentTree::CreateNode(Byte* data, size_t size)
 {
-    return Pool->CreateNode(std::make_shared< GeneSegment >(data));
+    return Pool->CreateNode(std::make_shared< GeneSegment >(data, size, true));
 }
 
 
@@ -300,41 +300,54 @@ void SegmentTree::Delete(size_t index)
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
-    auto startIndex = found.second;
+    auto offset = index-found.second;
 
-    SegmentNode* cutNode = node->Cut(index-startIndex);
-    cutNode->TruncateLeft();    // remove value at index
+    if (offset == 0) // Front case
+    {
+        node->TruncateLeft();
+        Update(node);
+    }
+    else if (offset == node->GetSize()-1) // Back case
+    {
+        node->TruncateRight();
+        Update(node);
+    }
+    else    // Middle case
+    {
+        SegmentNode* cutNode = node->Cut(Pool, offset);
+        cutNode->TruncateLeft();    // remove value at index
 
-    /// adopt nodes right
-    cutNode->Right = node->Right;
-    if (cutNode->Right)
-        cutNode->Right->Parent = cutNode;
+        /// adopt nodes right
+        cutNode->Right = node->Right;
+        if (cutNode->Right)
+            cutNode->Right->Parent = cutNode;
 
-    /// change node right to cut node
-    node->Right = cutNode;
-    cutNode->Parent = node;
+        /// change node right to cut node
+        node->Right = cutNode;
+        cutNode->Parent = node;
 
-    /// update the tree
-    Update(cutNode);
-    Size += 1;
+        /// update the tree
+        Size += 1;
+        Update(cutNode);
+    }
 }
 
-/** Inserts mutation into index in the tree
- * \param mutation new mutation to insert
+/** Point mutation into index in the tree
  * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
  **/
-template < typename T >
-void SegmentTree::Insert(size_t index, T mutation)
+void SegmentTree::Insert(size_t index, Byte* mutation, size_t size)
 {
     /// create new node from mutation
-    SegmentNode* newNode = CreateNode(mutation);
+    SegmentNode* newNode = CreateNode(mutation, size);
 
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
-    auto startIndex = found.second;
+    auto offset = index-found.second;
 
-    SegmentNode* cutNode = node->Cut(index-startIndex);
+    SegmentNode* cutNode = node->Cut(Pool, offset);
 
     /// adopt nodes right
     cutNode->Right = node->Right;
@@ -355,21 +368,21 @@ void SegmentTree::Insert(size_t index, T mutation)
 }
 
 /** Point mutation into index in the tree
- * \param mutation new mutation to insert
  * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
  **/
-template < typename T >
-void SegmentTree::Point(size_t index, T mutation)
+void SegmentTree::Point(size_t index, Byte* mutation, size_t size)
 {
     /// create new node from mutation
-    SegmentNode* newNode = CreateNode(mutation);
+    SegmentNode* newNode = CreateNode(mutation, size);
 
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
-    auto startIndex = found.second;
+    auto offset = index-found.second;
 
-    SegmentNode* cutNode = node->Cut(index-startIndex);
+    SegmentNode* cutNode = node->Cut(Pool, offset);
     cutNode->TruncateLeft();    // remove value at index
 
     /// adopt nodes right
@@ -438,22 +451,5 @@ void SegmentTree::DeleteTree(SegmentNode* root)
     }
     delete root;
 }
-
-
-/*********************************************************************************
- * 
- * 
- *  Delcarations of templated functions
- * 
- * 
- ********************************************************************************/
-template SegmentNode* SegmentTree::CreateNode(Byte data);
-template SegmentNode* SegmentTree::CreateNode(uint16_t data);
-
-template void SegmentTree::Insert(size_t index, Byte mutation);
-template void SegmentTree::Insert(size_t index, uint16_t mutation);
-
-template void SegmentTree::Point(size_t index, Byte mutation);
-template void SegmentTree::Point(size_t index, uint16_t mutation);
 
 
