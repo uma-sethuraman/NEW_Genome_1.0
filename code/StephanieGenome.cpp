@@ -107,21 +107,23 @@ void StephanieGenome::deleteMutation(size_t index, int siteOffset) {
 		c.offset = siteOffset;
 		c.value = (std::byte)0;
 		changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
-	}
-	auto affectedSites = index + 1;
-	for (int i = 0; i < (abs(siteOffset) - 1); i++) {
-		if (changelog.count(affectedSites) && changelog[affectedSites].offset < 0) {
-			//std::cout << "\t(" << index << ") " << " site affected " << affectedSites << " has deletion node of " << changelog[affectedSites].offset << std::endl;
-			changelog[index].offset = changelog[index].offset + changelog[affectedSites].offset;
-			changelog.erase(affectedSites);
+
+		auto deletedSites = index + 1;
+		for (int i = 0; i < (abs(siteOffset) - 1); i++) {
+			if (changelog.count(deletedSites) && changelog[deletedSites].offset < 0) {
+				//std::cout << "\t(" << index << ") " << " site affected " << deletedSites << " has deletion node of " << changelog[deletedSites].offset << std::endl;
+				changelog[index].offset = changelog[index].offset + changelog[deletedSites].offset;
+				changelog.erase(deletedSites);
+			}
+			deletedSites++;
 		}
-		affectedSites++;
 	}
+
 	for (auto site : changelog) {
-		if (changelog.count(site.first + abs(siteOffset)) && changelog[site.first + abs(siteOffset)].offset < 0) {
-			auto nextSite = site.first + abs(siteOffset);
-			//std::cout << "\t(" << site.first << ") " << "next site " << nextSite << " has deletion " << changelog[nextSite].offset << std::endl;
-			if ((nextSite - 1) == site.first) {
+		if (changelog.count(site.first + abs(siteOffset)) && changelog[site.first + abs(siteOffset)].offset < 0){
+			if (changelog[site.first].offset < 0) {
+				auto nextSite = site.first + abs(siteOffset);
+				//std::cout << "\t(" << site.first << ") " << "next site " << nextSite << " has deletion " << changelog[nextSite].offset << std::endl;
 				changelog[site.first].offset = changelog[index].offset + changelog[nextSite].offset;
 				changelog.erase(nextSite);
 			}
@@ -142,7 +144,7 @@ void StephanieGenome::pointMutation(size_t index, std::byte value) {
 }
 
 void StephanieGenome::printChangelog() {
-	std::cout << "\n--- start of map ---" << std::endl;
+	std::cout << "--- start of map ---" << std::endl;
 	for (auto site : changelog) {
 		std::cout << site.first;
 		std::byte siteValue = site.second.value;
@@ -150,7 +152,7 @@ void StephanieGenome::printChangelog() {
 		printf(", value: %i ", siteValue);
 		printf(" siteOffset: %i\n", siteOffset);
 	}
-	std::cout << "--- end of map ---\n" << std::endl;
+	std::cout << "--- end of map ---" << std::endl;
 }
 
 void StephanieGenome::generateGenome(AbstractGenome* genome) {
@@ -169,85 +171,50 @@ void StephanieGenome::generateGenome(AbstractGenome* genome) {
 	size_t genomeIndex = 0;
 	size_t modifiedIndex = 0;
 	for (int i = 0; i < modifiedSites.size(); i++) {
-		std::cout << std::endl;
+		//std::cout << std::endl;
 		if (!changelog.count(i)) { //if genomeIndex is not on map
-			std::cout << i << " is not on map" <<  std::endl;
-			std::cout << "i: " << i << std::endl;
-			std::cout << "genome index: " << genomeIndex << std::endl;
-			std::cout << "modified index: " << modifiedIndex << std::endl;
-			std::cout << "value: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
+			//std::cout<< i << " is not on map" <<  std::endl;
+			//std::cout<< "i: " << i << std::endl;
+			//std::cout<< "genome index: " << genomeIndex << std::endl;
+			//std::cout<< "modified index: " << modifiedIndex << std::endl;
+			//std::cout<< "value: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
 			modifiedSites[i] = GN::genomeRead<std::byte>(genome, genomeIndex);
 			genomeIndex++;
 			modifiedIndex++;
 		}
 		else if (changelog.count(i) && changelog[i].offset == 0) { //point mutation
-			std::cout << i << " is a point mutation" << std::endl;
-			std::cout << "i: " << i << std::endl;
-			std::cout << "genome index: " << genomeIndex << std::endl;
-			std::cout << "modified index: " << modifiedIndex << std::endl;
-			std::cout << "value: " << (int)changelog[genomeIndex].value << std::endl;
+			//std::cout<< i << " is a point mutation" << std::endl;
+			//std::cout<< "i: " << i << std::endl;
+			//std::cout<< "genome index: " << genomeIndex << std::endl;
+			//std::cout<< "modified index: " << modifiedIndex << std::endl;
+			//std::cout<< "value: " << (int)changelog[genomeIndex].value << std::endl;
 			modifiedSites[i] = changelog[modifiedIndex].value;
 			genomeIndex++;
 			modifiedIndex++;
 		}
 		else if (changelog.count(i) && changelog[i].offset > 0) { //insert mutation
-			std::cout << i << " is a insert mutation" << std::endl;
-			std::cout << "i: " << i << std::endl;
-			std::cout << "genome index: " << genomeIndex << std::endl;
-			std::cout << "modified index: " << modifiedIndex << std::endl;
-			std::cout << "value: " << (int)changelog[modifiedIndex].value << std::endl;
+			//std::cout<< i << " is a insert mutation" << std::endl;
+			//std::cout<< "i: " << i << std::endl;
+			//std::cout<< "genome index: " << genomeIndex << std::endl;
+			//std::cout<< "modified index: " << modifiedIndex << std::endl;
+			//std::cout<< "value: " << (int)changelog[modifiedIndex].value << std::endl;
 			modifiedSites[i] = changelog[modifiedIndex].value;
 			modifiedIndex++;
 		}
 		else if (changelog.count(i) && changelog[i].offset < 0) { //delete mutation
-			std::cout << i << " is a delete mutation" << std::endl;
-			std::cout << "i: " << i << std::endl;
-			std::cout << "offset: " << abs(changelog[i].offset) << std::endl;
+			//std::cout<< i << " is a delete mutation" << std::endl;
+			//std::cout<< "i: " << i << std::endl;
+			//std::cout<< "offset: " << abs(changelog[i].offset) << std::endl;
 			genomeIndex = genomeIndex + abs(changelog[i].offset);
-			std::cout << "genome index: " << genomeIndex << std::endl;
-			std::cout << "modified index: " << modifiedIndex << std::endl;
-			std::cout << "value: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
+			//std::cout<< "genome index: " << genomeIndex << std::endl;
+			//std::cout<< "modified index: " << modifiedIndex << std::endl;
+			//std::cout<< "value: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
 			modifiedSites[i] = GN::genomeRead<std::byte>(genome, genomeIndex);
 			genomeIndex++;
 			modifiedIndex++;
 		}
 	}
-
-
-
-/*
-	if (!changelog.count(i)) { //if the site is not on the map
-		std::cout << "i: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
-		i++;
-		genomeIndex++;
-		modifiedIndex++;
-	}
-	else if (changelog.count(i) && changelog[i].offset == 0) { //point mutation
-		std::cout << "i: " << (int)changelog[modifiedIndex].value << std::endl;
-		i++;
-		genomeIndex++;
-		modifiedIndex++;
-	}
-	else if (changelog.count(i) && changelog[i].offset > 0) { //insert mutation
-		std::cout << "i: " << (int)changelog[modifiedIndex].value << std::endl;
-		i++;
-		modifiedIndex++;
-	}
-*/
-
-
-/*	for (int i = 0; i < modifiedSites.size(); i++) {
-		if (!changelog.count(i)) {
-			modifiedSites[i] = GN::genomeRead<std::byte>(genome, i);
-		}
-		else if(changelog.count(i) && changelog[i].value != (std::byte)0) {
-			modifiedSites[i] = changelog[i].value;
-		}
-		else if (changelog.count(i) && changelog[i].value == (std::byte)0) {
-
-		}
-	}*/
-
+	std::cout << std::endl;
 	for (int i = 0; i < modifiedSites.size(); i++) {
 		std::cout << (int)modifiedSites[i] << " ";
 	}
