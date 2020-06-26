@@ -40,7 +40,7 @@ public:
 
     /** Constructor 
      * \param value value to put into gene **/
-    GeneSegment(Byte* gene, size_t size, bool newData) 
+    GeneSegment(Byte* gene, size_t size, bool newData = false) 
         : Gene(gene), Size(size), NewData(newData) {}
 
     /** Deconstructor **/
@@ -59,7 +59,7 @@ public:
 
 
    /** Prints linked list segment nodes**/
-    void print()
+    void Print()
     {
         std::cout << "size: " << Size << " Values: ";
         for (size_t i = 0; i < Size; i++)
