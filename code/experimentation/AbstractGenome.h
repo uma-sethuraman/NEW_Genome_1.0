@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <vector>
 
+#include "AbstractHandler.h"
+
 typedef char Byte; // c++17 Byte doesn't always work
 
 class AbstractGenome {
@@ -56,6 +58,11 @@ public:
 
     virtual std::unordered_map<std::string,std::vector<size_t>> getGenePositions(int key) {
         std::cout << "getGenePositions has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    virtual AbstractHandler CreateHandler() {
+        std::cout << "Handler has not been created for this class" << std::endl;
         exit(1);
     }
 };

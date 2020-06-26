@@ -1,0 +1,77 @@
+/**
+ * \file AbstractHandler.h
+ * \author Victoria Cao
+ * 
+ * \brief Abstract class for a handler of a given genome
+ **/
+#pragma once
+#include <iostream>
+#include <cstddef>
+
+typedef char Byte;
+
+/** Handler for traversing and mutating over genome **/
+class AbstractHandler
+{
+protected:
+    size_t Index = 0; ///< index into gene/site
+
+public:
+    /** (deleted) default Constructor **/
+    AbstractHandler() = default;
+
+    /** Deconstructor **/
+    ~AbstractHandler() {}
+
+    /** Gets current position
+    * \return position in segment **/
+    const size_t GetIndex() { return Index; }
+
+    /** Get value at current position
+     * \returns Value at Pos in the collection */
+    virtual const Byte operator *() const
+    {
+        std::cout << "* operator has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+
+    /** Resets handler to first index**/
+    virtual void Reset()
+    {
+        std::cout << "Reset has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+    /** Moves handler to next index*/
+    virtual void Next()
+    {
+        std::cout << "Next has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+
+    /** Moves handler to previous index **/
+    virtual void Prev()
+    {
+        std::cout << "Prev has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+
+    /** Moves handler to index
+     * \param index index to move to **/
+    virtual void MoveTo(size_t index)
+    {
+        std::cout << "MoveTo has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+    /** Prints handler**/
+    virtual void Print()
+    {
+        std::cout << "Print has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+};
