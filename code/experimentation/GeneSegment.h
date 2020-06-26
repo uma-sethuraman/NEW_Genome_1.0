@@ -31,15 +31,6 @@ public:
 
     /** Constructor 
      * \param value value to put into gene **/
-    template < typename T >
-    GeneSegment(T value) : Size(sizeof(T))
-    {
-        Gene = new Byte[Size];
-        std::memcpy(Gene, &value, Size*sizeof(Byte));
-    }
-
-    /** Constructor 
-     * \param value value to put into gene **/
     GeneSegment(Byte* gene, size_t size, bool newData = false) 
         : Gene(gene), Size(size), NewData(newData) {}
 
