@@ -6,12 +6,14 @@
  **/
 
 #pragma once
+
 #include <memory>
 #include <iostream>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <queue>
+
 #include "SegmentNode.h"
 
 typedef char Byte; // easy reading
@@ -40,10 +42,11 @@ private:
     void DeleteTree(SegmentNode* node);
 
 public:
-    /** Default constructor **/
+    /** (deleted) Default constructor **/
     SegmentTree() = delete;
 
-    /** Default constructor **/
+    /** Constructor 
+     * \param root new root of tree **/
     SegmentTree(SegmentNode* root) 
         : Root(root) {}
 

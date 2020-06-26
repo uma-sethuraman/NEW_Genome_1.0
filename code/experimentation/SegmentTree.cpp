@@ -5,6 +5,16 @@
 
 #include "SegmentTree.h"
 
+
+/*********************************************************************************
+ *  PRIVATE
+ * 
+ *  Helper functions for getting and updating nodes
+ * 
+ * 
+ ********************************************************************************/
+
+
 /** Gets height of node
  * \param node to get height of
  * \return height of node of -1 if null
@@ -30,52 +40,65 @@ int SegmentTree::GetBalance(SegmentNode* node)
     return left - right;
 }
 
-/** Finds the index in the tree
- * \param index to find
- * \return node that the index lies within, local index into the segment
- * that the index is at
+/** Updates height of Node
+ * \param node to update height of
  **/
-std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
+void SegmentTree::UpdateHeight(SegmentNode* node)
 {
-    SegmentNode* node = Root;
-
-    /// boundary variables
-    size_t left = 0;    // Left boundary of node
-    size_t right = node->Weight;    // Right boundary of node
-    if (node->Left)
-        left += node->Left->Weight;
-    if (node->Right)
-        right -= node->Right->Weight;
-
-    size_t min = 0;     // Left boundary of node's left subtree
-    size_t max = node->Weight;  // Right boundary of node's right subtree
-    
-    /// Find the segment that index lies within
-    while(index < left || index >= right)
-    {
-        if (index >= right)
-        { 
-            min = right;
-            node = node->Right;
-        }  
-        else
-        {
-            max = left;
-            node = node->Right;
-        }
+    if (node)
+    {   
+        int left = GetHeight(node->Left);
+        int right = GetHeight(node->Right);
         
-        // Update node's segment boundary
-        left = min;
-        right = max;
-        if (node->Left)
-            left += node->Left->Weight;
-        if (node->Right)
-            right -= node->Right->Weight;
-           
+        // node height is one plus the taller subtree
+        node->Height = std::max(left, right) +1;
     }
-
-    return {node, left};
 }
+
+/** Updates weight of node
+ * \param node to update weight of
+ **/
+void SegmentTree::UpdateWeight(SegmentNode* node)
+{
+    if (node)
+    {   
+        size_t right = 0;
+        size_t left = 0;
+        if (node->Right)
+            right = node->Right->Weight;
+        if (node->Left)
+            left = node->Left->Weight;
+
+        // node weight is sum of left and right subtrees and it's own weight
+        node->Weight = node->Size + right + left;
+    }
+}
+
+/** Updates the tree from node to root
+ * \param node to start updating from
+ **/
+void SegmentTree::Update(SegmentNode* node)
+{
+    while (node)
+    {
+        // update weight and height of node
+        UpdateWeight(node);
+        UpdateHeight(node);
+
+        // rebalance if necessary and move up the tree
+        node = ReBalance(node)->Parent;
+    }
+}
+
+
+/*********************************************************************************
+ *  PRIVATE
+ * 
+ *  Rebalancing functions
+ * 
+ * 
+ ********************************************************************************/
+
 
 /** Rotates subtree right
  * \param root root of subtree to rotate on
@@ -171,38 +194,7 @@ SegmentNode* SegmentTree::RotateLeft(SegmentNode* root)
     return newRoot;
 }
 
-/** Updates weight of node
- * \param node to update weight of
- **/
-void SegmentTree::UpdateWeight(SegmentNode* node)
-{
-    if (node)
-    {   
-        size_t right = 0;
-        size_t left = 0;
-        if (node->Right)
-            right = node->Right->Weight;
-        if (node->Left)
-            left = node->Left->Weight;
 
-
-        node->Weight = node->Size + right + left;
-    }
-}
-
-/** Updates height of Node
- * \param node to update height of
- **/
-void SegmentTree::UpdateHeight(SegmentNode* node)
-{
-    if (node)
-    {   
-        int left = GetHeight(node->Left);
-        int right = GetHeight(node->Right);
-        
-        node->Height = std::max(left, right) +1;
-    }
-}
 
 /** Rebalances at the node if needed
  * \param node to check for rebalancing
@@ -210,7 +202,7 @@ void SegmentTree::UpdateHeight(SegmentNode* node)
  **/
 SegmentNode* SegmentTree::ReBalance(SegmentNode* node)
 {
-    auto balance = GetBalance(node);
+    auto balance = GetBalance(node); // Balance factor for node
 
     if (balance == 2) // Right case
     {
@@ -228,21 +220,64 @@ SegmentNode* SegmentTree::ReBalance(SegmentNode* node)
     return node;
 }
 
-/** Updates the tree from node to root
- * \param node to start updating from
- **/
-void SegmentTree::Update(SegmentNode* node)
-{
-    while (node)
-    {
-        // update weight and height
-        UpdateWeight(node);
-        UpdateHeight(node);
 
-        // rebalance if necessary
-        node = ReBalance(node)->Parent;
+
+/*********************************************************************************
+ *  PUBLIC
+ * 
+ *  Mutation functions
+ * 
+ * 
+ ********************************************************************************/
+
+
+/** Finds the index in the tree
+ * \param index to find
+ * \return node that the index lies within, local index into the segment
+ * that the index is at
+ **/
+std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
+{
+    SegmentNode* node = Root;
+
+    /// boundary variables
+    size_t left = 0;    // Left boundary of node
+    size_t right = node->Weight;    // Right boundary of node
+    if (node->Left)
+        left += node->Left->Weight;
+    if (node->Right)
+        right -= node->Right->Weight;
+
+    size_t min = 0;     // Left boundary of node's left subtree
+    size_t max = node->Weight;  // Right boundary of node's right subtree
+    
+    /// Find the segment that index lies within
+    while(index < left || index >= right)
+    {
+        if (index >= right)
+        { 
+            min = right;
+            node = node->Right;
+        }  
+        else
+        {
+            max = left;
+            node = node->Right;
+        }
+        
+        // Update node's segment boundary
+        left = min;
+        right = max;
+        if (node->Left)
+            left += node->Left->Weight;
+        if (node->Right)
+            right -= node->Right->Weight;
+           
     }
+
+    return {node, left};
 }
+
 
 /** Deletes site at index in the tree
  * \param index index to delete site
@@ -335,6 +370,17 @@ void SegmentTree::Point(size_t index, SegmentNode* mutation)
 }
 
 
+
+
+/*********************************************************************************
+ * 
+ * 
+ *  Misc printing and helper destructor functions
+ * 
+ * 
+ ********************************************************************************/
+
+
 /** prints the tree breadth first **/
 void SegmentTree::print()
 {
@@ -360,7 +406,7 @@ void SegmentTree::print()
     }
     std::cout << std::endl;
 
-    }
+}
 
 /** deletes root and children
  * \param root to start deleting at **/

@@ -2,7 +2,7 @@
  * \file TestTree.h
  * \author Victoria Cao
  * 
- * \brief Testing rope functions
+ * \brief Testing segment tree functions
  **/
 
 #pragma once
@@ -16,6 +16,7 @@ namespace TestTree
 {
     void TestDelete()
     {
+        // initializing tree 
         size_t size = 100;
         Byte* data = new Byte[size];
         for (size_t i(0); i < size; i++) { data[i] = (Byte)i; }
@@ -42,6 +43,7 @@ namespace TestTree
 
     void TestInsert()
     {
+        // initializing tree 
         size_t size = 100;
         Byte* data = new Byte[size];
         for (size_t i(0); i < size; i++) { data[i] = (Byte)i; }
@@ -69,6 +71,7 @@ namespace TestTree
 
     void TestPoint()
     {
+        // initializing tree 
         size_t size = 100;
         Byte* data = new Byte[size];
         for (size_t i(0); i < size; i++) { data[i] = (Byte)i; }
