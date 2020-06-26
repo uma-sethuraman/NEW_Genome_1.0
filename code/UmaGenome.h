@@ -3,14 +3,35 @@
 #include <stdint.h>
 #include "AbstractGenome.h"
 #include <cstddef>
+#include <map>
 
-class Uma_NKGenome : public AbstractGenome {
+class UmaGenome : public AbstractGenome {
 private:
     // custom properties & functions
     std::vector<std::byte> sites;
+
+    // mutation rates
+    double MR_Point;
+    double MR_Insertion;
+    double MR_Deletion;
+
+    int alphabetSize;
+
+    struct site_info {
+        std::byte site_value;
+        int offset;
+        bool has_value;
+    };
+
+    std::map<int, site_info> changelog;
+    int currentGenomeSize; // size of current genome
+
+    void addChangelogEntryCLB(int key, int site_val, bool has_val);
+
 public:
-    Uma_NKGenome(size_t _size);
-    ~Uma_NKGenome() override {
+    UmaGenome(size_t _size);
+    UmaGenome(size_t _size, double MR_P, double MR_I, double MR_D, int alph_size);
+    ~UmaGenome() override {
         //std::cout << "done" << std::endl;
     }
 
@@ -36,6 +57,22 @@ public:
     }
 
     virtual void mutate() override; 
+
+    void pointMutate(int index, int value, bool use_params);
+    void insertMutate(); // not implemented yet
+    void deleteMutate(int start, int size, bool use_params);
+
+    int getAlphabetSize() {
+        return alphabetSize;
+    }
+
+    int getCurrentGenomeSize() {
+        return currentGenomeSize;
+    }
+
+    void printChangelog();
+    int getCurrentGenomeAt(int pos);
+    void reconstructGenome();
 
 };
 

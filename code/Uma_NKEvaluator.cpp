@@ -1,5 +1,5 @@
 #include <random>
-#include "Uma_NKGenome.h"
+#include "UmaGenome.h"
 #include "Uma_NKEvaluator.h"
 #include <cstddef>
 #include <algorithm>
@@ -85,7 +85,7 @@ void evolvePopulation(std::vector<NK::Organism>& population, int N, int K, bool 
         // for each genome in top 10 percent, 
         // add 1 direct copy and 9 mutated copies to the new population
         for (int count = 0; count < 10 && newpop_ind < pop_size; count++) {
-            new_population[newpop_ind].genome = new Uma_NKGenome(N);
+            new_population[newpop_ind].genome = new UmaGenome(N,0,0,0,std::pow(2,K));
             new_population[newpop_ind].score = 0.0;
 
             if (count == 0){
@@ -95,7 +95,7 @@ void evolvePopulation(std::vector<NK::Organism>& population, int N, int K, bool 
             else {
                 // mutate case
                 // make a copy of original genome and mutate it
-                AbstractGenome* copy = new Uma_NKGenome(N);
+                AbstractGenome* copy = new UmaGenome(N,0,0,0,std::pow(2,K));
                 copyGenome(population[pop_ind].genome, copy);
                 copy->mutate();
 
@@ -155,7 +155,7 @@ void runNKFitness(int N, int K, int updates, int pop_size, bool debug) {
     
     // initialize population of pop_size random genomes of size N
     for (int org = 0; org < pop_size; org++) {
-        population[org].genome = new Uma_NKGenome(N);
+        population[org].genome = new UmaGenome(N,0,0,0,std::pow(2,K));
         population[org].score = 0.0;
 
         // initialize each value in genome to random num

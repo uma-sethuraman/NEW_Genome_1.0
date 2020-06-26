@@ -4,12 +4,14 @@
 #include <vector>
 #include <bitset>
 #include "AbstractGenome.h"
-#include "Uma_NKGenome.h"
+#include "UmaGenome.h"
 #include "Uma_NKEvaluator.h"
 #include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
 #include <random>
+#include <map>
+#include "ChangelogTests.h"
 
 void runTests(AbstractGenome* genome) {
     //initialize genome to 8 sites
@@ -193,7 +195,10 @@ int main() {
     delete secondGenome;
 
     // Order of parameters: N, K, updates, population size, debug mode
-    runNKFitness(5, 2, 100, 100, 0);
+    // Need to fix mutate method to uncomment this!
+    //runNKFitness(5, 2, 10, 20, 0);
+
+    runChangelogTests(0);
 
     return(0);
 }

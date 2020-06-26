@@ -1,4 +1,4 @@
-#include "Uma_NKGenome.h"
+#include "UmaGenome.h"
 
 int getRandomInt(int min, int max);
 double getRandomDouble(double min, double max);
