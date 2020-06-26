@@ -3,6 +3,9 @@
  * \author Victoria Cao
  **/
 
+
+#include <cstdint>
+
 #include "SegmentTree.h"
 
 
@@ -88,6 +91,16 @@ void SegmentTree::Update(SegmentNode* node)
         // rebalance if necessary and move up the tree
         node = ReBalance(node)->Parent;
     }
+}
+
+/** Creates a new node in the pool 
+ * \param data creates new segment in tree
+ * \return poitner to new node
+ **/
+template < typename T >
+SegmentNode* SegmentTree::CreateNode(T data)
+{
+    return Pool->CreateNode(std::make_shared< GeneSegment >(data));
 }
 
 
@@ -310,8 +323,12 @@ void SegmentTree::Delete(size_t index)
  * \param mutation new mutation to insert
  * \param index index to insert the mutation after 
  **/
-void SegmentTree::Insert(size_t index, SegmentNode* mutation)
+template < typename T >
+void SegmentTree::Insert(size_t index, T mutation)
 {
+    /// create new node from mutation
+    SegmentNode* newNode = CreateNode(mutation);
+
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
@@ -324,13 +341,13 @@ void SegmentTree::Insert(size_t index, SegmentNode* mutation)
     if (cutNode->Right)
         cutNode->Right->Parent = cutNode;
 
-    /// change node right to mutation
-    node->Right = mutation;
-    mutation->Parent = node;
+    /// change node right to newNode
+    node->Right = newNode;
+    newNode->Parent = node;
 
-    /// change mutation right to cut node
-    mutation->Right = cutNode;
-    cutNode->Parent = mutation;
+    /// change newNode right to cut node
+    newNode->Right = cutNode;
+    cutNode->Parent = newNode;
 
     /// update the tree
     Update(cutNode);
@@ -341,8 +358,12 @@ void SegmentTree::Insert(size_t index, SegmentNode* mutation)
  * \param mutation new mutation to insert
  * \param index index to insert the mutation after 
  **/
-void SegmentTree::Point(size_t index, SegmentNode* mutation)
+template < typename T >
+void SegmentTree::Point(size_t index, T mutation)
 {
+    /// create new node from mutation
+    SegmentNode* newNode = CreateNode(mutation);
+
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
@@ -356,20 +377,18 @@ void SegmentTree::Point(size_t index, SegmentNode* mutation)
     if (cutNode->Right)
         cutNode->Right->Parent = cutNode;
 
-    /// change node right to mutation
-    node->Right = mutation;
-    mutation->Parent = node;
+    /// change node right to newNode
+    node->Right = newNode;
+    newNode->Parent = node;
 
-    /// change mutation right to cut node
-    mutation->Right = cutNode;
-    cutNode->Parent = mutation;
+    /// change newNode right to cut node
+    newNode->Right = cutNode;
+    cutNode->Parent = newNode;
 
     /// update the tree
     Update(cutNode);
     Size += 2;
 }
-
-
 
 
 /*********************************************************************************
@@ -382,7 +401,7 @@ void SegmentTree::Point(size_t index, SegmentNode* mutation)
 
 
 /** prints the tree breadth first **/
-void SegmentTree::print()
+void SegmentTree::Print()
 {
     std::cout << std::endl;
     std::queue<SegmentNode*> q;
@@ -393,7 +412,7 @@ void SegmentTree::print()
         auto root = q.front();
         q.pop();
 
-        root->print();
+        root->Print();
 
         if (root->Left)
         {
@@ -419,4 +438,22 @@ void SegmentTree::DeleteTree(SegmentNode* root)
     }
     delete root;
 }
+
+
+/*********************************************************************************
+ * 
+ * 
+ *  Delcarations of templated functions
+ * 
+ * 
+ ********************************************************************************/
+template SegmentNode* SegmentTree::CreateNode(Byte data);
+template SegmentNode* SegmentTree::CreateNode(uint16_t data);
+
+template void SegmentTree::Insert(size_t index, Byte mutation);
+template void SegmentTree::Insert(size_t index, uint16_t mutation);
+
+template void SegmentTree::Point(size_t index, Byte mutation);
+template void SegmentTree::Point(size_t index, uint16_t mutation);
+
 

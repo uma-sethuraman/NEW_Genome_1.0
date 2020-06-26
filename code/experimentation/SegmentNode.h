@@ -21,6 +21,7 @@ class SegmentNode
 {
 private:
     friend class SegmentTree;
+    friend class GenomeLite;
 
     /// Data variables
     std::shared_ptr< GeneSegment > Data;
@@ -35,10 +36,9 @@ private:
     int Height = 0;
     size_t Weight = 0;
 
-
 public:
-    /** (deleted) Default Constructor */
-    SegmentNode() = delete;
+    /** Default Constructor */
+    SegmentNode() = default;
 
     /** Constructor
      * \param start beginning of data
@@ -64,19 +64,11 @@ public:
      * \returns height of node**/
     const size_t GetHeight() { return Height; }
 
-    /** Gets size
-     * \returns size of data **/
-    SegmentNode* GetRight() { return Right; }
 
-    /** Gets size
-     * \returns size of data **/
-    SegmentNode* GetLeft() { return Left; }
-
-
-    const Byte getData(size_t index);
+    const Byte GetData(size_t index);
     void TruncateLeft(size_t cutSize = 1);
     void TruncateRight(size_t cutSize = 1);
     SegmentNode* Cut(size_t index);
-    void print();
+    void Print();
 
 };

@@ -41,21 +41,21 @@ SegmentNode* SegmentNode::Cut(size_t index)
 
 /** Gets data from Segment
  * \returns size of data **/
-const Byte SegmentNode::getData(size_t index)
+const Byte SegmentNode::GetData(size_t index)
 {
     if (index < Size)
         return *Start+index;
     else
     {
         std::cout << "Errpr: trying to get data from index " << (int)index << std::endl;
-        print();
+        Print();
         exit(1);
     }
     
 }
 
 /** prints node info **/
-void SegmentNode::print()
+void SegmentNode::Print()
 {
     std::cout << "SegmentNode " << this << std::endl;
     std::cout << "weight " << Weight << " size " << Size << " height " << Height << std::endl;
