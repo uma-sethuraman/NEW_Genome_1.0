@@ -44,17 +44,24 @@ public:
 
     /** Prints Segment list **/
     void Print() { Tree.Print(); }
+    
 
-    /** GenomeLiteHandler GenomeLiteHandler for mutating over genome **/
+    /** GenomeLite Handler for mutating over genome **/
     class Handler : public AbstractHandler
     {
     private:
-        GenomeLite* Genome;
-        SegmentNode* CurrentNode;
+        GenomeLite* Genome; ///< current genome
         size_t NodeIndex = 0;   ///< position in current Node
+        std::vector< SegmentNode* > Stack;  ///< iteration stack
 
-        /// for iterating over tree
-        std::vector< SegmentNode* > Stack;
+
+        /** Gets tree from genome
+         * \return tree **/
+        SegmentTree* GetTree() { return &(Genome->Tree); }
+
+        /** Gets root of tree from genome 
+         * \return root **/
+        SegmentNode* GetRoot() { return Genome->Tree.Root; }
 
     public:
         /** (deleted) default Constructor **/
@@ -63,25 +70,35 @@ public:
         /** Constructor
          * \param genome Genome Mutation on */
         Handler(GenomeLite* genome)
-            : Genome(genome), CurrentNode(Genome->Tree.Root) { Reset(); }
+            : Genome(genome) { Reset(); }
 
-        /** Deconstructor **/
-        ~Handler() {}
+        /** Destructor **/
+        ~Handler() override {};
 
         /** Get value at current position
          * \returns Value at Pos in the collection */
-        virtual const Byte operator *() const override { return CurrentNode->GetData(NodeIndex); }
+        virtual const Byte Data() const override { return Stack.back()->GetData(NodeIndex); }
 
         virtual void Reset() override;
         virtual void Next() override;
+        virtual bool HasNext() override;
         virtual void Prev() override;
+        virtual bool HasPrev() override;
         virtual void MoveTo(size_t index) override;
+
+
+        virtual void DeleteMutation(size_t index) override;
+        virtual void PointMutation(size_t index, Byte* mutation, size_t size) override;
+        virtual void InsertMutation(size_t index, Byte* mutation, size_t size) override;
         virtual void Print() override;
     };
 
-    virtual AbstractHandler CreateHandler() override 
+
+    /** Creates handler for genome 
+     * \return handler for this class **/
+    virtual AbstractHandler* NewHandler() override 
     { 
-        AbstractHandler newHandler = Handler(this);
+        AbstractHandler* newHandler = new Handler(this);
         return newHandler; 
     }
 
