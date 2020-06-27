@@ -1,0 +1,9 @@
+#MacOS
+.DS_Store
+Genome_ChangeLog/.DS_Store
+
+#Xcode
+Genome_ChangeLog/Genome_ChangeLog.xcodeproj/
+
+#Other
+code/map_test.cpp
