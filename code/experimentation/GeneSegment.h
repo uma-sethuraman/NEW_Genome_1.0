@@ -23,7 +23,7 @@ private:
     Byte* Gene; ///< new byte of data
     const size_t Size;
 
-    bool NewData = true;
+    bool NewData;
 
 public:
     /** (deleted) Default Constructor **/
@@ -32,7 +32,18 @@ public:
     /** Constructor 
      * \param value value to put into gene **/
     GeneSegment(Byte* gene, size_t size, bool newData = false) 
-        : Gene(gene), Size(size), NewData(newData) {}
+        : Gene(gene), Size(size), NewData(newData)
+    {
+        if (NewData)
+        {
+            Gene = new Byte[Size];
+            std::memcpy(Gene, gene, Size);
+        }
+        else
+        {
+            Gene = gene;
+        }
+    }
 
     /** Deconstructor **/
     ~GeneSegment() 
