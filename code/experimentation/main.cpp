@@ -39,7 +39,7 @@ void EndTest()
 
 /** main testing **/
 int main() {
-	// /// Tree Testing
+	// /// Tree Testing.
 	// TestTree::TestDelete();
 	// TestTree::TestInsert();
 	// TestTree::TestPoint();
@@ -53,14 +53,15 @@ int main() {
 
 	// EndTest();
 
-	/// Handler Mutation Testing
+	// Handler Mutation Testing
 	Title("HANDLER MUTATION TESTING");
 
 	TestHandlerMutations::TestDeletion();
-	// TestHandlerMutations::TestIterator();
-	// TestHandlerMutations::TestMoveTo();
+	TestHandlerMutations::TestInsertion();
+	TestHandlerMutations::TestPoint();
 
 	EndTest();
+
 
 	return(0);
 }

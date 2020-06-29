@@ -65,6 +65,8 @@ bool GenomeLite::Handler::HasPrev()
  * \param index **/
 void GenomeLite::Handler::MoveTo(size_t index)
 {
+    // GetTree()->Print();
+
     Stack.clear();
     SegmentNode* node = GetRoot();
 
