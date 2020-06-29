@@ -57,7 +57,7 @@ public:
     SegmentTree(Byte* data, size_t size) 
     {
         Pool = new SegmentPool(size/2);
-        Root = Pool->CreateNode(std::make_shared< GeneSegment >(data, size));
+        Root = Pool->CreateNode(std::make_shared< GeneSegment >(data, size, true));
     }
 
     /** Destructor **/
