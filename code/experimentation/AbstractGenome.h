@@ -24,6 +24,11 @@ public:
 
     AbstractGenome(size_t _size) :size_(_size) {}
 
+    virtual AbstractGenome* Clone() {
+        std::cout << "Clone has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
     virtual ~AbstractGenome() {}
     
     virtual size_t size() {return size_;}
@@ -65,6 +70,33 @@ public:
         std::cout << "Handler has not been created for this class" << std::endl;
         exit(1);
     }
+
+      /** Makes a delete mutation at current index **/
+    virtual void DeleteMutation(size_t index)
+    {
+        std::cout << "DeleteMutation has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+
+    /** Makes a point mutation at current index
+     * \param mutation point mutation to make**/
+    virtual void PointMutation(size_t index, Byte* mutation, size_t size)
+    {
+        std::cout << "PointMutation has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+    /** Makes a point mutation at current index
+     * \param mutation point mutation to make**/
+
+    virtual void InsertMutation(size_t index, Byte* mutation, size_t size)
+    {
+        std::cout << "InsertMutation has not been written for this Handler class" << std::endl;
+        exit(1);
+    }
+
+    virtual void Print() {}
 };
 
 namespace GN {
