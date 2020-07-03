@@ -10,27 +10,15 @@ private:
     // custom properties & functions
     std::vector<std::byte> sites;
 
-    // mutation rates
-    double MR_Point;
-    double MR_Insertion;
-    double MR_Deletion;
+    int alphabetSize; // to use when randomizing mutation values, not used yet
 
-    int alphabetSize;
-
-    struct site_info {
-        std::byte site_value;
-        int offset;
-        bool has_value;
-    };
-
-    std::map<int, site_info> changelog;
+    std::map<int, std::byte> changelog;
+    std::map<int, int> offsetMap;
     int currentGenomeSize; // size of current genome
-
-    void addChangelogEntryCLB(int key, int site_val, bool has_val);
 
 public:
     UmaGenome(size_t _size);
-    UmaGenome(size_t _size, double MR_P, double MR_I, double MR_D, int alph_size);
+    UmaGenome(size_t _size, int alph_size);
     ~UmaGenome() override {
         //std::cout << "done" << std::endl;
     }
@@ -58,9 +46,10 @@ public:
 
     virtual void mutate() override; 
 
-    void pointMutate(int index, int value, bool use_params);
-    void insertMutate(); // not implemented yet
-    void deleteMutate(int start, int size, bool use_params);
+    int getLowerBoundOffset(int key);
+    void pointMutate(int index, std::byte value);
+    void insertMutate(int start, std::vector<std::byte> values);
+    void deleteMutate(int start, int size);
 
     int getAlphabetSize() {
         return alphabetSize;
@@ -71,14 +60,15 @@ public:
     }
 
     void printChangelog();
-    int getCurrentGenomeAt(int pos);
+    void printOffsetMap();
+    std::byte getCurrentGenomeAt(int pos); // random access method
     void reconstructGenome();
-
 };
 
 namespace NK {
 
     // Represents an organism (genome, score) in a population of organisms
+    // Used in NK evaluator
     struct Organism {
         AbstractGenome* genome;
         double score;

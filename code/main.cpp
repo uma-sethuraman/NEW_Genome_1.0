@@ -198,6 +198,8 @@ int main() {
     // Need to fix mutate method to uncomment this!
     //runNKFitness(5, 2, 10, 20, 0);
 
+    // pass in 0 to just see pass/fail results of all tests
+    // pass in 1 to see pass/fail results AND debug output of all tests
     runChangelogTests(0);
 
     return(0);

@@ -87,17 +87,17 @@ inline bool P(const double probability, Generator &gen = getCommonGenerator()) {
  * @param mean The mean of the distribution.
  **/
 inline uint32_t EmpGetRandPoisson(const double mean, Generator &gen = getCommonGenerator()) {
-	// Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
-	// Uses Rejection Method
-	const double a = exp(-mean);
-	if (a <= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
-	uint32_t k = 0;
-	double u = getDouble(1.0, gen);
-	while (u >= a) {
-		u *= getDouble(1.0, gen);
-		++k;
-	}
-	return k;
+  // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
+  // Uses Rejection Method
+  const double a = exp(-mean);
+  if (a <= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
+  uint32_t k = 0;
+  double u = getDouble(1.0, gen);
+  while (u >= a) {
+    u *= getDouble(1.0, gen);
+    ++k;
+  }
+  return k;
 }
 
 /**
