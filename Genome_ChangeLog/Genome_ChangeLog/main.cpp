@@ -1,10 +1,4 @@
 
-
-#ifdef DEBUG
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-#endif
-
 #include <iostream>
 #include <map>
 #include <vector>
@@ -17,18 +11,56 @@ void print_map(const std::map<int, std::pair<int, bool>>& r_map) {
         std::cout << it->first << " : " <<
         it->second.first << " : " << it->second.second << std::endl;
     }
-    
+}
+
+void mutation_point(int ind, int number_of_sites, std::map<int, std::pair<int, bool>>& r_map) {
+    // Options:
+    // 1. change directly in parent by accessing thhrough get_ind
+    // 2. do something similar as "insert"
 }
 
 void mutation_delete(int ind, int shift, std::map<int, std::pair<int, bool>>& r_map) {
     //std::cout << "in mutation_delete" << std::endl;
+    //std::cout << "in ind " << ind << std::endl;
+    //std::cout << "in shift " << shift << std::endl;
+
     if (r_map.lower_bound(ind) == r_map.end()) {
-        // nothing equal or after ind
+        // no key is >= ind -> just add the key and shift
         r_map[ind] = std::make_pair(-shift, false);
     } else {
-        // TODO if key >= ind exists
+        auto next_key_it = r_map.lower_bound(ind);
+        //std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
+        
+        // loop over all keys > ind
+        // if key < (curr_key + shift) erase it, it is deleted
+        // if key > (curr_key + shift) replace key with (key - shift) && replace val with (val - shift)
+        
+        std::map<int, std::pair<int, bool>> temp_r_map;
+        
+        for (std::map<int, std::pair<int, bool>>::iterator it = r_map.begin(); it != next_key_it; ++it) {
+            temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
+            //std::cout << "insert: " << it->first << " : "
+            //<< it->second.first << ", " << it->second.second << std::endl;
+        }
+        
+        for (std::map<int, std::pair<int, bool>>::iterator it = next_key_it; it != r_map.end(); ++it) {
+            //std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
+
+            if (next_key_it->first == ind) { // key == curr_key
+                temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first - shift, it->second.second)));
+                //std::cout << "insert: " << it->first << " : "
+                //<< it->second.first - shift << ", " << it->second.second << std::endl;
+            } else if ((next_key_it->first  + shift) < ind) {
+                // erase, so skip - don;t add to new map
+            } else {
+                temp_r_map.insert(std::make_pair(it->first - shift, std::make_pair(it->second.first - shift, it->second.second)));
+                //std::cout << "insert: " << it->first - shift << " : "
+                //<< it->second.first - shift << ", " << it->second.second << std::endl;
+            }
+        }
+        
+        r_map = temp_r_map;
     }
-    
 }
 
 void mutation_insert(int ind, int shift, std::map<int, std::pair<int, bool>>& r_map) {
@@ -89,7 +121,11 @@ void mutation_insert(int ind, int shift, std::map<int, std::pair<int, bool>>& r_
         for (std::map<int, std::pair<int, bool>>::iterator it = next_key_it; it != r_map.end(); ++it) {
             //std::cout << "shift: " << shift << std::endl;
             //std::cout << "inserting key: " << it->first + shift << ", value: " << it->second.first + shift << std::endl;
-            temp_r_map.insert(std::make_pair(it->first + shift, std::make_pair(it->second.first + shift, it->second.second)));
+            if (it->second.second == true) {
+                temp_r_map.insert(std::make_pair(it->first + shift, std::make_pair(it->second.first, it->second.second)));
+            } else {
+                temp_r_map.insert(std::make_pair(it->first + shift, std::make_pair(it->second.first + shift, it->second.second)));
+            }
         }
             
         // the following can be optimized, as it repeats the code in "if"
@@ -130,28 +166,88 @@ int get_ind(int ind_curr, const std::map<int, std::pair<int, bool>>& r_map) {
     }
 }
 
+std::vector<int> offspring_recon(const std::vector<int>& genome_orig,
+                                const std::map<int, std::pair<int, bool>>& change_log_map) {
+        
+    if (change_log_map.empty()) return genome_orig; // no mutations
+    
+    
+    // Calculte size of the offspring genome .rbegin() will not return .rend(), because log is not empty
+    int offgen_size = genome_orig.size() + change_log_map.rbegin()->second.first;
+    std::vector<int> genome_offspring(offgen_size, -1);
+    
+    for (auto it_curr = change_log_map.begin(); it_curr != change_log_map.end(); ++it_curr) {
+        auto it_next = std::next(it_curr);
+        //if (it_next == change_log_map.end()) break; // TODO
+        
+        if (it_curr->second.second == true) {
+            // keep -1
+            // will need loop to place the values from map, which holds insertions
+        } else {
+            if (it_next == change_log_map.end()) {
+                // This loop fills out the last part of the vector
+                for (int ind = it_curr->first; ind < offgen_size; ++ind) {
+                    int ind_orig = ind - it_curr->second.first;
+                    genome_offspring[ind] = genome_orig[ind_orig];
+                }
+                
+            } else {
+                for (int ind = it_curr->first; ind < it_next->first; ++ind) {
+                    int ind_orig = ind - it_curr->second.first;
+                    genome_offspring[ind] = genome_orig[ind_orig];
+                }
+            }
+        }
+        
+    }
+    
+    
+    return genome_offspring;
+}
 
 #ifndef DEBUG
 int main()
 {
     std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
     
-    std::map<int, std::pair<int, bool>> r_map;
+    std::map<int, std::pair<int, bool>> change_log {{0, {0, false}}};
     
-    mutation_delete(3, 1, r_map); // delete 1 site at index 2
-    print_map(r_map);
+    std::map<int, std::vector<int>> insertions;
     
-    mutation_insert(4, 1, r_map); // insert 1 site at index 2
-    print_map(r_map);
     
-    mutation_delete(6, 2, r_map); // delete 2 site at index 6
-    print_map(r_map);
+    std::cout << "mutation_delete(3, 1, change_log);\n";
+    mutation_delete(3, 1, change_log);
+    print_map(change_log);
     
-    size_t new_size = genome.size() + r_map.rbegin()->second.first;
+    std::cout << "mutation_insert(4, 1, change_log);\n";
+    mutation_insert(4, 1, change_log);
+    print_map(change_log);
+    
+    std::cout << "mutation_delete(6, 2, change_log);\n";
+    mutation_delete(6, 2, change_log);
+    print_map(change_log);
+    
+    std::cout << "mutation_insert(5, 3, change_log);\n";
+    mutation_insert(5, 3, change_log);
+    print_map(change_log);
+    
+    std::cout << "mutation_delete(6, 3, change_log);\n";
+    mutation_delete(6, 3, change_log);
+    print_map(change_log);
+    
+    std::cout << "mutation_delete(6, 2, change_log);\n";
+    mutation_delete(6, 2, change_log);
+    print_map(change_log);
+    
+    std::cout << "mutation_insert(0, 3, change_log);\n";
+    mutation_insert(0, 3, change_log);
+    print_map(change_log);
+    
+    size_t new_size = genome.size() + change_log.rbegin()->second.first;
     std::cout << "size of new genome: " << new_size << std::endl;
     std::cout << "indexes:\n";
     for (int i = 0; i < new_size; ++i) {
-        std::cout << get_ind(i, r_map) << " ";
+        std::cout << get_ind(i, change_log) << " ";
     }
     std::cout << std::endl;
     
@@ -159,120 +255,3 @@ int main()
 }
 #endif
 
-
-#ifdef DEBUG
-TEST_CASE("Empty parent genome")
-{
-    std::vector<int> genome{}; // how is it different from std::vector<int> genome;
-    std::map<int, std::pair<int, bool>> r_map{};
-    
-    SECTION("Delete from empty genome") {
-        // map and index calculations do not change
-        // TODO add tests for when accessing parent genome using indexes (possible out of bound)
-        // TODO add tests for when reconstructing ancestor genome using indexes (possible out of bound)
-        mutation_delete(3, 1, r_map);
-        REQUIRE(get_ind(2, r_map) == 2);
-        REQUIRE(get_ind(3, r_map) == (3 + 1));
-        REQUIRE(get_ind(4, r_map) == (4 + 1));
-    }
-    
-    SECTION("Insert into empty genome") {
-        mutation_insert(4, 2, r_map);
-        REQUIRE(get_ind(3, r_map) == 3);
-        REQUIRE(get_ind(4, r_map) == -1);
-        REQUIRE(get_ind(5, r_map) == -1);
-        REQUIRE(get_ind(6, r_map) == (6 - 2));
-    }
-}
-
-
-TEST_CASE("Edge cases")
-{
-    std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51}; // size() is 11
-    std::map<int, std::pair<int, bool>> r_map;
-    
-    SECTION("Delete at the beginning") {
-        mutation_delete(0, 1, r_map);
-        REQUIRE(get_ind(0, r_map) == (0 + 1));
-        REQUIRE(get_ind(1, r_map) == (1 + 1));
-        REQUIRE(get_ind(7, r_map) == (7 + 1));
-    }
-    
-    SECTION("Delete at the end") {
-        mutation_delete(genome.size() - 1, 1, r_map); // Implicit conversion loses integer precision: 'unsigned long' to 'int'?
-        REQUIRE(get_ind(0, r_map) == 0);
-        REQUIRE(get_ind(5, r_map) == 5);
-        REQUIRE(get_ind(genome.size() - 2, r_map) == ((genome.size() - 2)));
-        REQUIRE(get_ind(genome.size() - 1, r_map) == ((genome.size() - 1) + 1)); // this is outside of the ancestor genome
-        // TODO add test for accessing parent genome and reconstructing ancestor genome
-    }
-    
-    SECTION("Insert at the beginning") {
-        mutation_insert(0, 2, r_map);
-        REQUIRE(r_map.size() == 2);
-        REQUIRE(r_map.begin()->first == 0);
-        REQUIRE(r_map.begin()->second.first == 0);
-        REQUIRE(r_map.begin()->second.second == true);
-        REQUIRE(std::next(r_map.begin(), 1)->first == 2); // key of the second element
-        REQUIRE(std::next(r_map.begin(), 1)->second.first == 2); // value of the second element
-        REQUIRE(std::next(r_map.begin(), 1)->second.second == false);
-        REQUIRE(get_ind(0, r_map) == -1);
-        REQUIRE(get_ind(1, r_map) == -1);
-        REQUIRE(get_ind(2, r_map) == (2 - 2));
-        REQUIRE(get_ind(5, r_map) == (5 - 2));
-    }
-    
-    SECTION("Insert at the end") {
-        mutation_insert(genome.size() - 1, 2, r_map);
-        REQUIRE(get_ind(0, r_map) == 0);
-        REQUIRE(get_ind(1, r_map) == 1);
-        REQUIRE(get_ind(10, r_map) == -1);
-        REQUIRE(get_ind(11, r_map) == -1);
-        REQUIRE(get_ind(15, r_map) == (15 - 2));
-    }
-    
-    SECTION("Delete all sites") {
-        // TODO
-    }
-    
-    
-}
-
-TEST_CASE("DeleteInsertSeparately")
-{
-    std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
-    std::map<int, std::pair<int, bool>> r_map;
-    
-    SECTION( "delete 1 site at index 3" ) {
-        mutation_delete(3, 1, r_map);
-        //print_map(r_map);
-        REQUIRE(get_ind(2, r_map) == 2);
-        REQUIRE(get_ind(3, r_map) == 4);
-        REQUIRE(get_ind(4, r_map) == 5);
-    }
-    
-    SECTION( "insert 1 site at index 4" ) {
-        mutation_insert(4, 1, r_map);
-        //print_map(r_map);
-        REQUIRE(get_ind(3, r_map) == 3);
-        REQUIRE(get_ind(4, r_map) == -1);
-        REQUIRE(get_ind(5, r_map) == 4);
-    }
-}
-
-
-TEST_CASE("DeleteInsertDelete")
-{
-    std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
-    std::map<int, std::pair<int, bool>> r_map;
-    
-    mutation_delete(3, 1, r_map);
-    mutation_insert(4, 1, r_map);
-    mutation_delete(6, 2, r_map);
-    
-    std::vector<int> inds{0, 1, 2, 4, -1, 5, 8, 9};
-    for (int i = 0; i < inds.size(); ++i) { // i < genome.size()
-        REQUIRE(get_ind(i, r_map) == inds[i]);
-    }
-}
-#endif
