@@ -25,7 +25,12 @@ public:
     
     virtual void resize(size_t new_size) {size_ = new_size;};
 
-    virtual std::byte* data() {
+    /** Gives the user a new byte array of memory
+     * \param index index into the genome
+     * \param byteSize size of memory to get (0: entire genome of contiguous memory)
+     * \returns byte pointer of contiguous memory of byteSize at index of genome
+    **/
+    virtual std::byte* data(size_t index = 0, size_t byteSize = 0) {
         std::cout << "data has not been written for this genome class" << std::endl;
         exit(1);
     }
@@ -55,7 +60,35 @@ public:
         std::cout << "getGenePositions has not been written for this genome class" << std::endl;
         exit(1);
     }
+
+    // new functions
+
+    // starting at index, write values in segement over values currently in genome
+    virtual void overwrite(size_t index, std::vector<std::byte> segment) {
+        std::cout << "overwrite has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    // starting at index, write values in segement genome between genome[index-1] and genome[index]
+    virtual void insert(size_t index, std::vector<std::byte> segment) {
+        std::cout << "insert has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    // starting at index, delete segmentSize values from genome starting at genome[index]
+    virtual void remove(size_t index, size_t segmentSize) {
+        std::cout << "remove has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    // print the whole genome
+    virtual void show()
+    {
+        std::cout << "show has not been written for this genome class :(" << std::endl;
+    }
+
 };
+
 
 namespace GN {
 
