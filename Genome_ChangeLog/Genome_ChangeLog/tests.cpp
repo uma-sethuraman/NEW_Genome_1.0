@@ -5,12 +5,13 @@
 
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 void print_map(const std::map<int, std::pair<int, bool>>& r_map);
 void mutation_point(int ind, int number_of_sites, std::map<int, std::pair<int, bool>>& r_map);
 void mutation_delete(int ind, int shift, std::map<int, std::pair<int, bool>>& r_map);
-void mutation_insert(int ind, int shift, std::map<int, std::pair<int, bool>>& r_map);
+void mutation_insert(int ind, const std::vector<int>& ins_vals, std::map<int, std::pair<int, bool>>& r_map, std::unordered_map<int, std::vector<int>>& insertions);
 int get_ind(int ind_curr, const std::map<int, std::pair<int, bool>>& r_map);
 
 std::vector<int> offspring_recon(const std::vector<int>& genome_orig,
@@ -18,10 +19,10 @@ std::vector<int> offspring_recon(const std::vector<int>& genome_orig,
 
 
 #ifdef DEBUG
-TEST_CASE("Empty parent genome")
-{
+TEST_CASE("Empty parent genome") {
     std::vector<int> genome{}; // how is it different from std::vector<int> genome;
     std::map<int, std::pair<int, bool>> r_map{};
+    std::unordered_map<int, std::vector<int>> insertions;
     
     SECTION("Delete from empty genome") {
         // map and index calculations do not change
@@ -34,7 +35,7 @@ TEST_CASE("Empty parent genome")
     }
     
     SECTION("Insert into empty genome") {
-        mutation_insert(4, 2, r_map);
+        mutation_insert(4, std::vector<int>{1, 2}, r_map, insertions);
         REQUIRE(get_ind(3, r_map) == 3);
         REQUIRE(get_ind(4, r_map) == -1);
         REQUIRE(get_ind(5, r_map) == -1);
@@ -47,6 +48,7 @@ TEST_CASE("Edge cases")
 {
     std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51}; // size() is 11
     std::map<int, std::pair<int, bool>> r_map;
+    std::unordered_map<int, std::vector<int>> insertions;
     
     SECTION("Delete at the beginning") {
         mutation_delete(0, 1, r_map);
@@ -65,7 +67,7 @@ TEST_CASE("Edge cases")
     }
     
     SECTION("Insert at the beginning") {
-        mutation_insert(0, 2, r_map);
+        mutation_insert(0, std::vector<int>{1, 2}, r_map, insertions);
         REQUIRE(r_map.size() == 2);
         REQUIRE(r_map.begin()->first == 0);
         REQUIRE(r_map.begin()->second.first == 0);
@@ -80,7 +82,7 @@ TEST_CASE("Edge cases")
     }
     
     SECTION("Insert at the end") {
-        mutation_insert(genome.size() - 1, 2, r_map);
+        mutation_insert(genome.size() - 1, std::vector<int>{1, 2}, r_map, insertions);
         REQUIRE(get_ind(0, r_map) == 0);
         REQUIRE(get_ind(1, r_map) == 1);
         REQUIRE(get_ind(10, r_map) == -1);
@@ -99,6 +101,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
         
         std::vector<int> genome_orig{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
         std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}};
+        std::unordered_map<int, std::vector<int>> insertions;
         
         //REQUIRE();
         
@@ -134,7 +137,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
         WHEN("del 1 site at ind 4 && ins 1 site at ind 3") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
 
             THEN("both offspring genome and change log are updated") {
 
@@ -166,7 +169,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
         WHEN("del 1 site at ind 4 && ins 1 site at ind 3 && del 2 sites at ind 6") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
             mutation_delete(6, 2, change_log);
             
             THEN("both offspring genome and change log are updated") {
@@ -200,9 +203,9 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
         WHEN("del 1 site at ind 4 && ins 1 site at ind 3 && del 2 sites at ind 6 && ins 3 sites at ind 5") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
             mutation_delete(6, 2, change_log);
-            mutation_insert(5, 3, change_log);
+            mutation_insert(5, std::vector<int>{1, 2, 3}, change_log, insertions);
 
             THEN("both offspring genome and change log are updated") {
                 
@@ -237,9 +240,9 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
              "&& ins 3 sites at ind 5 && del 3 sites at ind 6") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
             mutation_delete(6, 2, change_log);
-            mutation_insert(5, 3, change_log);
+            mutation_insert(5, std::vector<int>{1, 2, 3}, change_log, insertions);
             mutation_delete(6, 3, change_log);
 
             THEN("both offspring genome and change log are updated") {
@@ -274,9 +277,9 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
              "&& ins 3 sites at ind 5 && del 3 sites at ind 6 && del 2 sites at ind 6") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
             mutation_delete(6, 2, change_log);
-            mutation_insert(5, 3, change_log);
+            mutation_insert(5, std::vector<int>{1, 2, 3}, change_log, insertions);
             mutation_delete(6, 3, change_log);
             mutation_delete(6, 2, change_log);
             
@@ -313,12 +316,12 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
              "&& ins 3 sites at ind 0") {
             
             mutation_delete(3, 1, change_log);
-            mutation_insert(4, 1, change_log);
+            mutation_insert(4, std::vector<int>{1}, change_log, insertions);
             mutation_delete(6, 2, change_log);
-            mutation_insert(5, 3, change_log);
+            mutation_insert(5, std::vector<int>{1, 2, 3}, change_log, insertions);
             mutation_delete(6, 3, change_log);
             mutation_delete(6, 2, change_log);
-            mutation_insert(0, 3, change_log);
+            mutation_insert(0, std::vector<int>{1, 2, 3}, change_log, insertions);
             
             THEN("both offspring genome and change log are updated") {
                 
@@ -370,10 +373,11 @@ SCENARIO("Insert within insert") {
         
         std::vector<int> genome_orig{21, 35, 43, 84, 12};
         std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}};
+        std::unordered_map<int, std::vector<int>> insertions;
                 
         WHEN("ins 4 sites at ind 2") {
             
-            mutation_insert(2, 4, change_log);
+            mutation_insert(2, std::vector<int>{1, 2, 3, 4}, change_log, insertions);
             
             THEN("both offspring genome and change log are updated") {
                 
@@ -404,8 +408,8 @@ SCENARIO("Insert within insert") {
         
         WHEN("ins 4 sites at ind 2 && ins 2 sites at ind 3") {
             
-            mutation_insert(2, 4, change_log);
-            mutation_insert(3, 2, change_log);
+            mutation_insert(2, std::vector<int>{1, 2, 3, 4}, change_log, insertions);
+            mutation_insert(3, std::vector<int>{5, 6}, change_log, insertions);
             
             THEN("both offspring genome and change log are updated") {
                 
