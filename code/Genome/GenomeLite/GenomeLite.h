@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <iostream>
 
-#include "../AbstractHandler.h"
 #include "../AbstractGenome.h"
 #include "SegmentTree.h"
 
@@ -31,7 +30,11 @@ public:
     GenomeLite() = delete;
 
     /** size constructor **/
-    GenomeLite(size_t size) : AbstractGenome(size) {}
+    GenomeLite(size_t size) 
+        : AbstractGenome(size), Tree(new SegmentTree(size)) {}
+
+    /** destructor **/
+    ~GenomeLite() { delete Tree; }
 
     /** Gets size of genome sites
      * \return size of tree **/

@@ -6,29 +6,44 @@
  **/
 
 #pragma once
+
 #include <cstdint>
+#include <vector>
 
 // define Byte
 typedef char Byte;
 // define 
-#define N 10
+#define N 4
 
 /** struct for Byte array pair **/
 struct GeneSegment
 {
     Byte* Gene;
-    size_t size;
+    size_t Size;
 };
 
 /** struct for a SegmentNode **/
-struct SegmentNode
+class SegmentNode
 {
+private:
     // variables
-    static GeneSegment Keys[N - 1];
-    static SegmentNode Children[N];
+    static std::vector< GeneSegment > Keys;
+    static std::vector< SegmentNode* > Children;
 
     bool Leaf = true;
-    int Size = 0; /// number of items in node
+    size_t Size = 0; /// number of items in node
+    size_t Weight = 0; /// weight of all sums of nodes to left
 
     size_t Parent;  /// parent location in memory pool
+
+public:
+    /** default constructor **/
+    SegmentNode() 
+    {
+        Keys.reserve(N-1);
+        Children.reserve(N);
+    }
+
+
+friend class SegmentTree;
 };

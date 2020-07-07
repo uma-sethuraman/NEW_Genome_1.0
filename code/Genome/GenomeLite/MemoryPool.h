@@ -7,6 +7,7 @@
  **/
 #pragma once
 #include <cstdint>
+#include <cstring>
 
 #include "SegmentNode.h"
 
@@ -16,7 +17,7 @@ class MemoryPool
 {
 private:
     /// pool of memory
-    static T* Pool; 
+    T* Pool; 
     const size_t Size;
     size_t Tail = 0;
 
@@ -32,7 +33,7 @@ public:
     /** Copy constructor 
      * \param pool to copy from **/
     MemoryPool(const MemoryPool &pool)
-        : Pool(new T[pool.Size]), Size(pool.Size) {}
+        : Pool(new T[pool.Size]), Size(pool.Size)
     {
         std::memcpy(Pool, pool, Size*sizeof(T));
     }

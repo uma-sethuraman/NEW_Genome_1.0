@@ -9,18 +9,21 @@
 #include <cstdint>
 
 #include "SegmentNode.h"
+#include "MemoryPool.h"
 
 /** class for a memory pool object **/
 class SegmentTree
 {
 private:
     /// memory allocation
-    MemoryPool* Pool;
+    MemoryPool< SegmentNode >* NodePool;
+    SegmentNode* Root;
 
-    size_t Size;
-    size_t SiteCount;
+    size_t Size = 0;
+    size_t SiteCount = 0;
 
     void SplitChild(SegmentNode* node, size_t index);
+    std::pair<SegmentNode*, size_t> Find(size_t index);
 
 public:
     /** (deleted) default constructor **/
@@ -29,10 +32,13 @@ public:
     /** Constructor 
      * \param size **/
     SegmentTree(size_t size) 
-        : Pool(size*(3/4)) {}
+        : NodePool(new MemoryPool< SegmentNode >(size*(3/4))) {}
 
     /** destructor **/
-    ~SegmentTree() { delete Pool; }
+    ~SegmentTree() 
+    { 
+        delete NodePool;   
+    }
 
     /** Gets number gene references in tree
      * \return size **/
@@ -42,7 +48,6 @@ public:
      * \return sitecount **/
     const size_t GetSiteCount() { return SiteCount; }
 
-    SegmentNode* Find(size_t index);
     void Insert(GeneSegment &segment, size_t index);
 
 };

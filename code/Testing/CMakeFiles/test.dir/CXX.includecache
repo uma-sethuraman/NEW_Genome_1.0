@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
+cstdint
+-
+cstring
+-
+SegmentNode.h
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
+
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
+cstdint
+-
+vector
+-
+
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp
+algorithm
+-
+SegmentTree.h
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
+
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
+cstdint
+-
+SegmentNode.h
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
+MemoryPool.h
+/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
+
