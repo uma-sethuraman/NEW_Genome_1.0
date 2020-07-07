@@ -14,7 +14,7 @@ public:
 		std::cout << "done" << std::endl;
 	}
 
-	std::byte* data() override;
+	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
 	virtual void resize(size_t new_size) override;
 

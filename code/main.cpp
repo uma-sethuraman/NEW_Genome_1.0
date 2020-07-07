@@ -13,6 +13,23 @@
 #include <map>
 #include "ChangelogTests.h"
 
+
+void testData(AbstractGenome* genome)
+{
+	for (size_t i(0); i < genome->size(); i++)
+	{
+		*genome->data(i) = (std::byte)(i*2);
+		// std::cout << (int)*genome->data(i) << std::endl;
+	}
+
+	auto data = genome->data(2, 2);
+	std::cout << (int)*data << std::endl;
+	assert(*data == (std::byte)4);
+	assert(*(data+1) == (std::byte)6);
+	
+}
+
+
 void runTests(AbstractGenome* genome) {
     //initialize genome to 8 sites
     genome->resize(8);
@@ -185,8 +202,9 @@ int main() {
     AbstractGenome* genome = new TestGenome(8);
     // AbstractGenome  & y = *(new TestGenome);
 
-    runTests(genome);
-    delete genome;
+	runTests(genome);
+	testData(genome);
+	delete genome;
 
     AbstractGenome* secondGenome = new TestGenome(200);
 
