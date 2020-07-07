@@ -81,6 +81,12 @@ public:
         exit(1);
     }
 
+    // print the whole genome
+    virtual void show()
+    {
+        std::cout << "show has not been written for this genome class :(" << std::endl;
+    }
+
 };
 
 
