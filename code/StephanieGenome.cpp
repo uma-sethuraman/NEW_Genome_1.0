@@ -3,14 +3,7 @@
 #include <typeinfo>
 #include <stdlib.h>
 
-//TODO: implement printing all sites from original genome and modified genome
-/*
-	loop through original genome
-	if site exists in map
-	modify offset get value
-*/
 //TODO: implement random access - aka can you get to any point in the genome
-//TODO: improve code, make it more readable and reduce the memory/performance
 // :~)
 
 StephanieGenome::StephanieGenome(size_t _size): AbstractGenome(_size),sites(_size){
@@ -67,12 +60,35 @@ void StephanieGenome::insertMutation(size_t index, std::byte value) {
 		changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
 	}
 	else { 
-		//std::cout << "insert: key does not exist" << std::endl;
-		//std::cout << "\tindex " << index << " value " << (int)value << std::endl;
-		ChangelogStruct c = ChangelogStruct();
-		c.value = value;
-		c.offset = 1;
-		changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
+		std::cout << "insert: key does not exist" << std::endl;
+		std::cout << "\tindex " << index << " value " << (int)value << std::endl;
+		keys.clear();
+		
+		if (changelog.count(index)) {
+			std::cout << " is present " << std::endl;
+			std::map<size_t, ChangelogStruct>::iterator site = changelog.begin();
+			for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+				std::cout << "\t" << it->first << ", " << (int)it->second.value << " " << it->second.offset << std::endl;
+				keys.push_back(it->first);
+			}
+			for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
+				auto keyIndex = *rit;
+				auto nh = changelog.extract(keyIndex);
+				keyIndex = keyIndex + (size_t)1;
+				nh.key() = keyIndex;
+				changelog.insert(move(nh));
+			}
+			ChangelogStruct c = ChangelogStruct();
+			c.value = value;
+			c.offset = 1;
+			changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
+		}
+		else {
+			ChangelogStruct c = ChangelogStruct();
+			c.value = value;
+			c.offset = 1;
+			changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
+		}
 	}
 }
 
@@ -80,62 +96,178 @@ void StephanieGenome::deleteMutation(size_t index, int siteOffset) {
 	if (changelog.count(index)) {
 		//std::cout << "delete: key exists" << std::endl;
 		//std::cout << "\tindex " << index << " siteOffset " << siteOffset << std::endl;
-		for (int i = 0; i < abs(siteOffset); i++) {
-			keys.clear();
-			std::map<size_t, ChangelogStruct>::iterator site = changelog.find(index);
-			//std::cout << "\t(" << index << ") sites added to key vector  ";
-			for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
-				keys.push_back(it->first);
-				//std::cout << it->first << " ";
+
+		std::map<size_t, ChangelogStruct>::iterator site = changelog.find(index);
+		keys.clear();
+		bool deleteSiteFlag = false;
+		int deleteSiteIndex = 0;
+		int deleteSiteOffset = -99;
+		for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+			keys.push_back(it->first);
+			if (it->second.offset < 0) {
+				deleteSiteIndex = it->first;
+				deleteSiteOffset = it->second.offset;
+				deleteSiteFlag = true;
+
 			}
-			//std::cout << std::endl;
-			changelog.erase(index);
-			keys.erase(keys.begin());
-			for (auto it = keys.begin(); it != keys.end(); ++it) {
-				auto keyIndex = *it;
-				auto nh = changelog.extract(keyIndex);
-				keyIndex = keyIndex - (size_t)1;
-				nh.key() = keyIndex;
-				changelog.insert(move(nh));
+			//std::cout << it->first << " ";
+		}
+		//std::cout << std::endl;
+		if (!deleteSiteFlag) {
+			for (int i = 0; i < abs(siteOffset); i++) {
+				////std::cout << "\t loop deleting from changelog " << index << " deleting from keys " << *keys.begin() << std::endl;
+				changelog.erase(index);
+				keys.erase(keys.begin());
+				////std::cout << "\t new key vector begin pointer " << *keys.begin() << std::endl;
+				for (auto it = keys.begin(); it != keys.end(); ++it) {
+					////std::cout << "\t key vector  " << *it << std::endl;
+					auto keyIndex = *it;
+					auto nh = changelog.extract(keyIndex);
+					keyIndex = keyIndex - (size_t)1;
+					nh.key() = keyIndex;
+					changelog.insert(move(nh));
+				}
+				keys.clear();
+				site = changelog.find(index);
+				////std::cout << "\t(" << index << ") sites added to key vector  ";
+				for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+					keys.push_back(it->first);
+					////std::cout << it->first << " ";
+				}
+			}
+		}
+		else {
+			auto siteIndex = index;
+			for (int i = 0; i < abs(siteOffset); i++) {
+				if (changelog[*keys.begin()].offset != deleteSiteOffset) {
+					//std::cout << "\tchangelog.offset: " << changelog[*keys.begin()].offset << " deleteSiteOffset: " << deleteSiteOffset << std::endl;
+					//std::cout << "\tindex: " << siteIndex << std::endl;
+					changelog.erase(siteIndex);
+					keys.erase(keys.begin());
+					for (auto it = keys.begin(); it != keys.end(); ++it) {
+						auto keyIndex = *it;
+						auto nh = changelog.extract(keyIndex);
+						keyIndex = keyIndex - (size_t)1;
+						nh.key() = keyIndex;
+						changelog.insert(move(nh));
+					}
+					keys.clear();
+					site = changelog.find(siteIndex);
+					//std::cout << "\t(" << index << ") sites added to key vector  ";
+					for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+						keys.push_back(it->first);
+						if (it->second.offset < 0) {
+							deleteSiteIndex = it->first;
+							deleteSiteOffset = it->second.offset;
+						}
+						//std::cout << it->first << " ";
+					}
+				}
+				else {
+					//std::cout << "\tchangelog.offset: " << changelog[*keys.begin()].offset << " deleteSiteOffset: " << deleteSiteOffset << std::endl;
+					//std::cout << "\tindex: " << siteIndex << std::endl;
+					auto siteOffset = changelog[*keys.begin()].offset;
+					changelog[*keys.begin()].offset = siteOffset - 1;
+					keys.clear();
+					site = changelog.find(siteIndex);
+					auto nextIndex = std::next(site, 1);
+					siteIndex = nextIndex->first;
+					//std::cout << "\tnew index: " << siteIndex << std::endl;
+					site = changelog.find(siteIndex);
+					//std::cout << "\t(" << index << ") sites added to key vector  ";
+					for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+						keys.push_back(it->first);
+						if (it->second.offset < 0) {
+							deleteSiteIndex = it->first;
+							deleteSiteOffset = it->second.offset;
+						}
+						//std::cout << it->first << " ";
+					}
+				}
 			}
 		}
 	}
 	else {
-		//std::cout << "delete: key does not exist" << std::endl;
-		//std::cout << "\tindex " << index << " siteOffset " << siteOffset << std::endl;
+		//std::cout<< "\ndelete: key does not exist" << std::endl;
+		//std::cout<< "\tindex " << index << " siteOffset " << siteOffset << std::endl;
 		ChangelogStruct c = ChangelogStruct();
 		c.offset = siteOffset;
 		c.value = (std::byte)0;
 		changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
-
-		auto deletedSites = index + 1;
-		for (int i = 0; i < (abs(siteOffset) - 1); i++) {
-			if (changelog.count(deletedSites) && changelog[deletedSites].offset < 0) {
-				//std::cout << "\t(" << index << ") " << " site affected " << deletedSites << " has deletion node of " << changelog[deletedSites].offset << std::endl;
-				changelog[index].offset = changelog[index].offset + changelog[deletedSites].offset;
-				changelog.erase(deletedSites);
+		auto affectedSite = index + 1;
+		for (int i = 1; i < abs(siteOffset); i++) {
+			//std::cout<< "\t affected site: " << affectedSite << std::endl;
+			if (changelog.count(affectedSite) && changelog[affectedSite].offset < 0) {
+				//std::cout<< "\t" << affectedSite << " site affected exists in map and has deletion node of " << changelog[affectedSite].offset << std::endl;
+				changelog[index].offset = changelog[index].offset + changelog[affectedSite].offset;
+				changelog.erase(affectedSite);
 			}
-			deletedSites++;
+			else if (changelog.count(affectedSite)) {
+				//std::cout<< "\t" << affectedSite << " site affected exists in map" << std::endl;
+				std::map<size_t, ChangelogStruct>::iterator site = changelog.find(affectedSite);
+				keys.clear();
+				for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+					keys.push_back(it->first);
+					//std::cout<< "\t site added to key vector " << it->first << std::endl;
+				}
+				//std::cout<< "\t deleting site " << affectedSite << std::endl;
+				changelog.erase(affectedSite);
+				keys.erase(keys.begin());
+				for (auto it = keys.begin(); it != keys.end(); ++it) {
+					auto keyIndex = *it;
+					auto nh = changelog.extract(keyIndex);
+					keyIndex = keyIndex - (size_t)1;
+					nh.key() = keyIndex;
+					changelog.insert(move(nh));
+				}
+				changelog[index].offset = changelog[index].offset + 1;
+				affectedSite--;
+			}
+			affectedSite++;
 		}
 	}
 
 	for (auto site : changelog) {
-		if (changelog.count(site.first + abs(siteOffset)) && changelog[site.first + abs(siteOffset)].offset < 0){
-			if (changelog[site.first].offset < 0) {
-				auto nextSite = site.first + abs(siteOffset);
-				//std::cout << "\t(" << site.first << ") " << "next site " << nextSite << " has deletion " << changelog[nextSite].offset << std::endl;
-				changelog[site.first].offset = changelog[index].offset + changelog[nextSite].offset;
-				changelog.erase(nextSite);
+		auto affectedSite = site.first + 1;
+		for (int i = 0; i < abs(site.second.offset) - 1; i++) {
+			if (changelog.count(affectedSite) && changelog[affectedSite].offset < 0) {
+				//std::cout<< "deleted site " << affectedSite << " has deletion node of " << changelog[affectedSite].offset << std::endl;
+				//std::cout<< "\t(" << index << ") " << "site offset " << changelog[affectedSite].offset << std::endl;
+				changelog[index].offset = changelog[index].offset + changelog[affectedSite].offset;
+				changelog.erase(affectedSite);
 			}
+			affectedSite++;
+		}
+
+		auto checkNextSite = site.first + abs(site.second.offset);
+		if ((changelog.count(checkNextSite) && site.second.offset < 0) && !changelog.count(site.first + 1)) {
+			//std::cout<< "\tsite " << site.first << " site offset " << site.second.offset << std::endl;
+			//std::cout<< "\t\tsite " << checkNextSite << " site offset " << changelog[checkNextSite].offset << std::endl;
+			auto currentSiteIndex = site.first;
+			ChangelogStruct currentSite = ChangelogStruct();
+			currentSite.offset = site.second.offset;
+			currentSite.value = site.second.value;
+			changelog.erase(site.first);
+			auto keyIndex = checkNextSite;
+			auto nh = changelog.extract(keyIndex);
+			keyIndex = currentSiteIndex;
+			nh.key() = keyIndex;
+			changelog.insert(move(nh));
+			auto nextSiteIndex = currentSiteIndex + 1;
+			changelog.insert(std::pair<size_t, ChangelogStruct>(nextSiteIndex, currentSite));
 		}
 	}
 }
 
 void StephanieGenome::pointMutation(size_t index, std::byte value) {
 	if(changelog.count(index)) {
+		//std::cout<< "point: key exists" << std::endl;
+		//std::cout<< "\tindex " << index << " value " << (int)value << std::endl;
 		changelog[index].value = value;
 	}
 	else {
+		//std::cout<< "point: key does not exist" << std::endl;
+		//std::cout<< "\tindex " << index << " value " << (int)value << std::endl;
 		ChangelogStruct c = ChangelogStruct();
 		c.value = value;
 		c.offset = 0;
@@ -144,7 +276,7 @@ void StephanieGenome::pointMutation(size_t index, std::byte value) {
 }
 
 void StephanieGenome::printChangelog() {
-	std::cout << "--- start of map ---" << std::endl;
+	std::cout << "\n--- start of map ---" << std::endl;
 	for (auto site : changelog) {
 		std::cout << site.first;
 		std::byte siteValue = site.second.value;
@@ -159,11 +291,8 @@ void StephanieGenome::generateGenome(AbstractGenome* genome) {
 	int sum = 0;
 	for (auto site : changelog) {
 		auto offset = site.second.offset;
-		//std::cout << "offset: " << offset << std::endl;
 		sum = sum + offset;
 	}
-	//std::cout << "sum: " << sum << std::endl;
-	//std::cout << "genome size: " << genome->size() << std::endl;
 	sum = genome->size() + sum;
 	std::vector<std::byte> modifiedSites;
 	modifiedSites.resize(sum);
@@ -203,18 +332,18 @@ void StephanieGenome::generateGenome(AbstractGenome* genome) {
 		}
 		else if (changelog.count(i) && changelog[i].offset < 0) { //delete mutation
 			//std::cout<< i << " is a delete mutation" << std::endl;
-			//std::cout<< "i: " << i << std::endl;
-			//std::cout<< "offset: " << abs(changelog[i].offset) << std::endl;
+			//std::cout<< "\ti: " << i << std::endl;
+			//std::cout<< "\toffset: " << abs(changelog[i].offset) << std::endl;
 			genomeIndex = genomeIndex + abs(changelog[i].offset);
-			//std::cout<< "genome index: " << genomeIndex << std::endl;
-			//std::cout<< "modified index: " << modifiedIndex << std::endl;
-			//std::cout<< "value: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
+			//std::cout<< "\tgenome index: " << genomeIndex << std::endl;
+			//std::cout<< "\tmodified index: " << modifiedIndex << std::endl;
+			//std::cout<< "\tvalue: " << (int)GN::genomeRead<std::byte>(genome, genomeIndex) << std::endl;
 			modifiedSites[i] = GN::genomeRead<std::byte>(genome, genomeIndex);
 			genomeIndex++;
 			modifiedIndex++;
 		}
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
 	for (int i = 0; i < modifiedSites.size(); i++) {
 		std::cout << (int)modifiedSites[i] << " ";
 	}

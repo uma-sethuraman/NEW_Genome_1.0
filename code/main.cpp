@@ -89,6 +89,7 @@ void stephanie_runNKFitnessTests(AbstractGenome* genome) {
 
 void stephanie_runTestOne(AbstractGenome* genome) {
 	std::cout << "---- test one ----" << std::endl;
+
 	genome->resize(10);
 	auto readHead = genome->data();
 	for (size_t i(0); i < genome->size(); ++i)
@@ -96,6 +97,7 @@ void stephanie_runTestOne(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
+
 	genome->pointMutation((size_t)2, (std::byte)44);
 	genome->deleteMutation((size_t)4, -2);
 	genome->insertMutation((size_t)2, (std::byte)66);
@@ -129,10 +131,11 @@ void stephanie_runTestThree(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->deleteMutation((size_t)6, -4);
+	genome->deleteMutation((size_t)7, -4);
 	genome->insertMutation((size_t)0, std::vector<std::byte>{ (std::byte)44, (std::byte)55 });
 	genome->deleteMutation((size_t)2, -1);
 	genome->pointMutation((size_t)0, (std::byte)66);
+	genome->printChangelog();
 	genome->generateGenome(genome);
 }
 
@@ -148,6 +151,49 @@ void stephanie_runTestFour(AbstractGenome* genome) {
 	genome->deleteMutation((size_t)3, -2);
 	genome->deleteMutation((size_t)5, -2);
 	genome->deleteMutation((size_t)1, -4);
+	genome->printChangelog();
+	genome->generateGenome(genome);
+}
+
+void stephanie_runTestFive(AbstractGenome* genome) {
+	std::cout << "---- test five ----" << std::endl;
+	genome->resize(10);
+	auto readHead = genome->data();
+	for (size_t i(0); i < genome->size(); ++i)
+		readHead[i] = (std::byte)(Random::getInt(99));
+	for (size_t i(0); i < genome->size(); ++i)
+		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
+	std::cout << std::endl << std::endl;
+	genome->insertMutation((size_t)5, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66 });
+	genome->deleteMutation((size_t)2, -5);
+	genome->printChangelog();
+	genome->generateGenome(genome);
+}
+
+void stephanie_runTestSix(AbstractGenome* genome) {
+	std::cout << "---- test six ----" << std::endl;
+	genome->resize(10);
+	auto readHead = genome->data();
+	for (size_t i(0); i < genome->size(); ++i)
+		readHead[i] = (std::byte)(Random::getInt(99));
+	for (size_t i(0); i < genome->size(); ++i)
+		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
+	std::cout << std::endl << std::endl;
+	genome->insertMutation((size_t)5, std::vector<std::byte>{ (std::byte)11, (std::byte)22, (std::byte)33 });
+	genome->deleteMutation((size_t)1, -5);
+	genome->insertMutation((size_t)4, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 });
+	genome->insertMutation((size_t)6, std::vector<std::byte>{ (std::byte)13, (std::byte)23, (std::byte)33, (std::byte)43 });
+	genome->deleteMutation((size_t)5, -4); //***
+	//genome->printChangelog();
+	//genome->generateGenome(genome);
+	genome->insertMutation((size_t)1, std::vector<std::byte>{ (std::byte)42, (std::byte)52, (std::byte)62 });
+	//genome->printChangelog();
+	//genome->generateGenome(genome);
+	genome->deleteMutation((size_t)4, -7); //***
+	genome->printChangelog();
+	genome->generateGenome(genome);
+	genome->insertMutation((size_t)6, (std::byte)79);
+	genome->printChangelog();
 	genome->generateGenome(genome);
 }
 
@@ -324,7 +370,9 @@ int main() {
 //	stephanie_runTestOne(genome);
 //	stephanie_runTestTwo(genome);
 //	stephanie_runTestThree(genome);
-	stephanie_runTestFour(genome);
+//	stephanie_runTestFour(genome);
+//	stephanie_runTestFive(genome);
+	stephanie_runTestSix(genome);
 
 	delete genome;
 
