@@ -197,6 +197,22 @@ void stephanie_runTestSix(AbstractGenome* genome) {
 	genome->generateGenome(genome);
 }
 
+
+void testData(AbstractGenome* genome)
+{
+	for (size_t i(0); i < genome->size(); i++)
+	{
+		*genome->data(i) = (std::byte)(i*2);
+		// std::cout << (int)*genome->data(i) << std::endl;
+	}
+
+	auto data = genome->data(2, 2);
+	std::cout << (int)*data << std::endl;
+	assert(*data == (std::byte)4);
+	assert(*(data+1) == (std::byte)6);
+	
+}
+
 void runTests(AbstractGenome* genome) {
 	//initialize genome to 8 sites
 	genome->resize(8);
@@ -367,6 +383,8 @@ void runGeneTest(AbstractGenome* genome) {
 
 int main() {
 	AbstractGenome* genome = new StephanieGenome(100);
+//  AbstractGenome  & y = *(new TestGenome);
+
 //	stephanie_runTestOne(genome);
 //	stephanie_runTestTwo(genome);
 //	stephanie_runTestThree(genome);
@@ -374,13 +392,16 @@ int main() {
 //	stephanie_runTestFive(genome);
 	stephanie_runTestSix(genome);
 
+
+	//runTests(genome);
+	//testData(genome);
 	delete genome;
 
-	{
-		//AbstractGenome  & y = *(new StephanieGenome);
-		//AbstractGenome* secondGenome = new StephanieGenome(200);
-		//runGeneTest(secondGenome);
-		//delete secondGenome;
-	}
+	//AbstractGenome* secondGenome = new TestGenome(200);
+
+	//runGeneTest(secondGenome);
+
+	//delete secondGenome;
+
 	return(0);
 }

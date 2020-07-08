@@ -5,8 +5,8 @@ TestGenome::TestGenome(size_t _size): AbstractGenome(_size),sites(_size){
 	sites.resize(_size);
 }
 
-std::byte* TestGenome::data() {
-	return static_cast<std::byte*>(sites.data()); // cast is for demonstration
+std::byte* TestGenome::data(size_t index, size_t byteSize) {
+	return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
 }
 
 void TestGenome::resize(size_t new_size) {
