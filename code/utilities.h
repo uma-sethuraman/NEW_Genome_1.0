@@ -2,6 +2,7 @@
 
 #include <ostream> // operator<<
 #include <cstring> // memset
+#include <valarray>
 
 // convenience output for understanding std::byte
 std::ostream& operator<<(std::ostream& os, std::byte& byte) {
