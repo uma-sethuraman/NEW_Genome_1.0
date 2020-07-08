@@ -45,3 +45,9 @@ void GenomeLite::remove(size_t index, size_t segmentSize)
 {
 
 }
+
+/** Prints the tree **/
+void GenomeLite::show()
+{
+    Tree->Print();
+}

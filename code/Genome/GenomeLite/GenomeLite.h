@@ -14,7 +14,7 @@
 #include "SegmentTree.h"
 
 
-typedef char Byte; // c++17 std::byte doesn't always work
+typedef std::byte Byte;
 
 
 /** Implementation of a genomeLite object **/
@@ -44,6 +44,6 @@ public:
     virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
     virtual void insert(size_t index, std::vector<std::byte> segment) override;
     virtual void remove(size_t index, size_t segmentSize) override;
-
+    virtual void show() override;
 
 };
