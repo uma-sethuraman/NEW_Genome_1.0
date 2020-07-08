@@ -7,6 +7,7 @@
 
 #pragma once
 #include <cstdint>
+#include <memory>
 
 #include "SegmentNode.h"
 #include "MemoryPool.h"
@@ -15,13 +16,13 @@
 class SegmentTree
 {
 private:
-    /// memory allocation
     MemoryPool< SegmentNode >* NodePool;
     SegmentNode* Root;
 
     size_t Size = 0;
     size_t SiteCount = 0;
 
+    SegmentNode* CreateNode();
     void SplitChild(SegmentNode* node, size_t index);
     std::pair<SegmentNode*, size_t> Find(size_t index);
 
@@ -31,8 +32,7 @@ public:
 
     /** Constructor 
      * \param size **/
-    SegmentTree(size_t size) 
-        : NodePool(new MemoryPool< SegmentNode >(size*(3/4))) {}
+    SegmentTree(size_t size);
 
     /** destructor **/
     ~SegmentTree() 
@@ -48,6 +48,9 @@ public:
      * \return sitecount **/
     const size_t GetSiteCount() { return SiteCount; }
 
-    void Insert(GeneSegment &segment, size_t index);
+    void Insert(size_t index, std::vector<std::byte> segment);
+
+
+    void Print();
 
 };

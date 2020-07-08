@@ -19,7 +19,7 @@ private:
     /// pool of memory
     T* Pool; 
     const size_t Size;
-    size_t Tail = 0;
+    size_t Tail = 1;
 
 public:
     /** (deleted) default constructor **/
@@ -44,6 +44,11 @@ public:
     /** Gets the index for next node to allocate
      * \return tail **/
     const size_t GetTail() { return Tail; }
+
+    /** Gets node at index
+     * \param index
+     * \returns node at index **/
+    T* At(size_t index) { return &Pool[index]; }
 
     /** Allocates new node **/
     T* Allocate() { return &Pool[Tail++]; }
