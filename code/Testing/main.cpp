@@ -8,7 +8,7 @@
 
 #include "TestGenomeLite.h"
 
-typedef char Byte; // c++17 Byte doesn't always work
+typedef std::byte Byte; // c++17 Byte doesn't always work
 
 
 #define RESET   "\033[0m"

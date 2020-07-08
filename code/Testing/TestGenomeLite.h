@@ -12,7 +12,7 @@
 #include "../Genome/AbstractGenome.h"
 #include "../Genome/GenomeLite/GenomeLite.h"
 
-typedef char Byte; ///< Byte for easy viewing
+typedef std::byte Byte; ///< Byte for easy viewing
 
 #define RESET   "\033[0m"
 #define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
@@ -26,6 +26,7 @@ namespace TestGenomeLite
         size_t size = 100;
         AbstractGenome* genome = new GenomeLite(size);
 
+        genome->show();
 
 
         delete genome;
