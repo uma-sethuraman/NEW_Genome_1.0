@@ -4,7 +4,7 @@
 #include <vector>
 #include <bitset>
 #include "AbstractGenome.h"
-//#include "TestGenome.h"
+#include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
 #include "TetianaGenome.h"
@@ -195,6 +195,83 @@ void runGeneTest(AbstractGenome* genome) {
 		"16-23 logic (bitset), 24-31 anwser (double)\n" << std::endl;
 }
 
+void find_patterns_tests() {
+	AbstractGenome* test_genome = new TestGenome(30);
+	size_t i(0);
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(5) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(7) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(2) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(2) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(2) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(5) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(2) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(5) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(4) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
+
+	std::vector<std::byte> pattern1({ (std::byte)2,(std::byte)3,(std::byte)4 });
+	std::vector<std::byte> pattern2({ (std::byte)3,(std::byte)4,(std::byte)5,(std::byte)3 });
+	std::vector<std::byte> pattern3({ (std::byte)3,(std::byte)3,(std::byte)3 });
+
+
+	assert(test_genome->find_all(pattern1) == std::vector<size_t>({6, 10, 15}));
+	assert(test_genome->find_all(pattern2) == std::vector<size_t>({ 0,11,16 }));
+	assert(test_genome->find_all(pattern3) == std::vector<size_t>({ 21,22,26,27 }));
+
+	std::cout << "all find pattern tests passed" << std::endl;
+	/*	
+	for (auto& pat : std::vector< std::vector<std::byte>>({ pattern1,pattern2,pattern3 })) {
+		std::cout << "looking for pattern: ";
+		for (auto& v : pat) {
+			std::cout << (int)v << " ";
+		}
+		std::cout << std::endl;
+		auto gene_indexes = test_genome->find_all(pat);
+		std::cout << "found locations: ";
+		for (auto v : gene_indexes) {
+			std::cout << v << " ";
+		}
+		std::cout << std::endl << std::endl;
+	}
+	*/
+}
+
+void test_alterations() {
+	std::cout << "----------------------------" << std::endl;
+	std::cout << "-- begin test_alterations --" << std::endl;
+	AbstractGenome* test_genome = new TestGenome(0);
+	test_genome->show();
+	test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
+	test_genome->show();
+	test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
+	test_genome->show();
+	test_genome->overwrite(2, std::vector<std::byte>{ (std::byte)4, (std::byte)4, (std::byte)4 });
+	test_genome->show();
+	test_genome->remove(1, 2);
+	test_genome->show();
+	std::cout << "-- done test_alterations --" << std::endl;
+	std::cout << "---------------------------" << std::endl << std::endl;
+}
 int main() {
     
     //AbstractGenome* genome = new TetianaGenome(8);
@@ -203,6 +280,11 @@ int main() {
     //evolve_NK();
     
 	AbstractGenome* genome = new TetianaGenome(8);
+	test_alterations();
+
+	find_patterns_tests();
+
+	//AbstractGenome* genome = new TestGenome(8);
 	// AbstractGenome  & y = *(new TestGenome);
 
 	runTests(genome);
@@ -213,6 +295,9 @@ int main() {
 	runGeneTest(secondGenome);
 
 	delete secondGenome;
+	//AbstractGenome* secondGenome = new TestGenome(200);
+	//runGeneTest(secondGenome);
+	//delete secondGenome;
 
 	return(0);
 }
