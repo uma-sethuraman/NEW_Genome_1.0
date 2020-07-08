@@ -20,47 +20,76 @@ void mutation_point(int ind, int number_of_sites, std::map<int, std::pair<int, b
     // 2. do something similar as "insert"
 }
 
-void mutation_delete(int ind, int shift, std::map<int, std::pair<int, bool>>& r_map) {
-    //std::cout << "in mutation_delete" << std::endl;
-    //std::cout << "in ind " << ind << std::endl;
-    //std::cout << "in shift " << shift << std::endl;
+void mutation_delete(int ind, int shift, std::map<int, std::pair<int, bool>>& change_log) {
+    std::cout << "in mutation_delete" << std::endl;
+    std::cout << "in ind " << ind << std::endl;
+    std::cout << "in shift " << shift << std::endl;
 
-    if (r_map.lower_bound(ind) == r_map.end()) {
+    if (change_log.lower_bound(ind) == change_log.end()) {
         // no key is >= ind -> just add the key and shift
-        r_map[ind] = std::make_pair(-shift, false);
+        change_log[ind] = std::make_pair(-shift, false);
     } else {
-        auto next_key_it = r_map.lower_bound(ind);
-        //std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
+        auto next_key_it = change_log.lower_bound(ind);
+        std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
         
         // loop over all keys > ind
+        // if change_log
         // if key < (curr_key + shift) erase it, it is deleted
         // if key > (curr_key + shift) replace key with (key - shift) && replace val with (val - shift)
         
         std::map<int, std::pair<int, bool>> temp_r_map;
         
-        for (std::map<int, std::pair<int, bool>>::iterator it = r_map.begin(); it != next_key_it; ++it) {
-            temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-            //std::cout << "insert: " << it->first << " : "
-            //<< it->second.first << ", " << it->second.second << std::endl;
+        for (std::map<int, std::pair<int, bool>>::iterator it = change_log.begin(); it != next_key_it; ++it) {
+            //if (it->second.second == false) {
+                temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
+            //} else {
+                // TODO
+            //}
+            std::cout << "insert: " << it->first << " : "
+            << it->second.first << ", " << it->second.second << std::endl;
         }
         
-        for (std::map<int, std::pair<int, bool>>::iterator it = next_key_it; it != r_map.end(); ++it) {
-            //std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
-
-            if (next_key_it->first == ind) { // key == curr_key
-                temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first - shift, it->second.second)));
-                //std::cout << "insert: " << it->first << " : "
-                //<< it->second.first - shift << ", " << it->second.second << std::endl;
-            } else if ((next_key_it->first  + shift) < ind) {
-                // erase, so skip - don;t add to new map
+        for (std::map<int, std::pair<int, bool>>::iterator it = next_key_it; it != change_log.end(); ++it) {
+            std::cout << "next_key_it->first: " << next_key_it->first << std::endl;
+            
+            if (it->first == ind) {
+                if (it->second.second == true) {
+                    temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
+                    std::cout << "insert if: " << it->first << " : "
+                    << it->second.first - shift << ", " << it->second.second << std::endl;
+                } else {
+                    temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first - shift, it->second.second)));
+                    std::cout << "insert if: " << it->first - shift << " : "
+                    << it->second.first - shift << ", " << it->second.second << std::endl;
+                }
+            } else if (it->first < (ind + shift)) {
+                std::cout << "in else if" << std::endl;
+                // There can be a situaltion when even thoug the key is within (ind + shift),
+                // there is no next key to represent the indexes which are to the right from the deletion
+                // In this case, we nee to keep the key and update it
+                if (std::next(it) == change_log.end() &&
+                    (it->first + it->second.first) > (ind + shift)) {
+                    // last key in the map and there are still indexes to the right of the deletion
+                    int num_deleted = it->first - ind; // how many deleted sites between ind and key
+                    temp_r_map.insert(std::make_pair(it->first - num_deleted, std::make_pair(it->second.first - shift, it->second.second)));
+                }
+                if (it->second.second == true) {
+                    // merge the insert intervals
+                    // replace key with ind, because ind < key && key is within (ind + shift)
+                    // and interval that starts at ind continues at key
+                    temp_r_map.insert(std::make_pair(ind, std::make_pair(0/*it->second.first*/, true/*it->second.second*/)));
+                } else {
+                    // erase, so skip - don't add to new map
+                }
+                //std::cout << "else if - nothing to insert" << std::endl;
             } else {
                 temp_r_map.insert(std::make_pair(it->first - shift, std::make_pair(it->second.first - shift, it->second.second)));
-                //std::cout << "insert: " << it->first - shift << " : "
-                //<< it->second.first - shift << ", " << it->second.second << std::endl;
+                std::cout << "insert else: " << it->first - shift << " : "
+                << it->second.first - shift << ", " << it->second.second << std::endl;
             }
         }
         
-        r_map = temp_r_map;
+        change_log = temp_r_map;
     }
 }
 
@@ -98,27 +127,29 @@ void mutation_insert(int ind, const std::vector<int>& ins_vals, std::map<int, st
                                       // starting from ind_shift the val =  + shift (take previous shift and add new one)
         
         // Insert current ind
+        // Merge keys in the map if insertions overlap - Don;t need this here, read below
         auto inserted = r_map.insert(std::make_pair(ind, std::make_pair(0, true))); // emplace_hint instead of insert, as it is always inserted at the end?
-        if (inserted.first == r_map.begin()) {
+//        if (inserted.first == r_map.begin()) {
             // first inserted element - nothing else to check
-            insertions.insert(std::make_pair(ind, ins_vals));
-        } else {
-            // Check if previous key is insertion
-            auto prev_it = std::prev(inserted.first);
-            if (prev_it->second.second == true) {
-                // insertion
-                if ((inserted.first->first - prev_it->first) > shift) {
-                    // don't change previous - they don't overlap
-                    insertions.insert(std::make_pair(ind, ins_vals));
-                } else {
-                    // overlap with previous insertion (TODO replace copying)
-                    std::vector<int> temp_vec = insertions.at(prev_it->first);
-                    auto temp_shift = inserted.first->first - prev_it->first;
-                    temp_vec.insert(temp_vec.begin() + temp_shift, ins_vals.begin(), ins_vals.end());
-                }
-            }
-            
-        }
+        // Add inserted values to the unordered_map
+        insertions.insert(std::make_pair(ind, ins_vals));
+        // In this case (insertion index is largest key in the map), there will never be a situation when the previous key is also insersion, because insertion is always followed bu the key shifted by the size of insertion.
+//        } else {
+//            // Check if previous key is insertion
+//            auto prev_it = std::prev(inserted.first);
+//            if (prev_it->second.second == true) { // this will never happen
+//                // insertion
+//                if ((inserted.first->first - prev_it->first) > shift) {
+//                    // don't change previous - they don't overlap
+//                    insertions.insert(std::make_pair(ind, ins_vals));
+//                } else {
+//                    // overlap with previous insertion (TODO replace copying)
+//                    std::vector<int> temp_vec = insertions.at(prev_it->first);
+//                    auto temp_shift = inserted.first->first - prev_it->first;
+//                    temp_vec.insert(temp_vec.begin() + temp_shift, ins_vals.begin(), ins_vals.end());
+//                }
+//            }
+//        }
         
         // Move the ones after it
         if (inserted.first == r_map.begin()) // map was empty just before the previous line
@@ -138,10 +169,13 @@ void mutation_insert(int ind, const std::vector<int>& ins_vals, std::map<int, st
         
         std::map<int, std::pair<int, bool>> temp_r_map;
         
+        // Insert all keys < ind into new map
         for (std::map<int, std::pair<int, bool>>::iterator it = r_map.begin(); it != next_key_it; ++it) {
             //std::cout << "inserting key: " << it->first << ", value: " << it->second.first << std::endl;
             temp_r_map.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
         }
+        
+        // Insert all keys >= ind into new map
         for (std::map<int, std::pair<int, bool>>::iterator it = next_key_it; it != r_map.end(); ++it) {
             //std::cout << "shift: " << shift << std::endl;
             //std::cout << "inserting key: " << it->first + shift << ", value: " << it->second.first + shift << std::endl;
@@ -153,8 +187,33 @@ void mutation_insert(int ind, const std::vector<int>& ins_vals, std::map<int, st
         }
             
         // the following can be optimized, as it repeats the code in "if"
-        temp_r_map.insert(std::make_pair(ind, std::make_pair(0, true))); // emplace_hint instead of insert?
-                                                                    //r_map.insert(std::make_pair(ind + shift, std::make_pair(shift, false))); // dont need this because I already shifter all prev keys
+        auto inserted = temp_r_map.insert(std::make_pair(ind, std::make_pair(0, true)));
+        
+        if (inserted.first == temp_r_map.begin()) {
+            // first inserted element - nothing else to check
+            // Add inserted values to the unordered_map
+            insertions.insert(std::make_pair(ind, ins_vals));
+            // In this case (insertion index is largest key in the map), there will never be a situation when the previous key is also insersion, because insertion is always followed bu the key shifted by the size of insertion.
+        } else {
+            // Check if previous key is insertion
+            auto prev_it = std::prev(inserted.first);
+            if (prev_it->second.second == true) {
+                // insertion
+                if ((inserted.first->first - prev_it->first) > shift) {
+                    // don't change previous - they don't overlap
+                    // Add inserted values to the unordered_map
+                    insertions.insert(std::make_pair(ind, ins_vals));
+                } else {
+                    // overlap with previous insertion (TODO replace copying)
+                    std::vector<int> temp_vec = insertions.at(prev_it->first);
+                    auto temp_shift = inserted.first->first - prev_it->first;
+                    temp_vec.insert(temp_vec.begin() + temp_shift, ins_vals.begin(), ins_vals.end());
+                    temp_r_map.erase(ind);
+                }
+            }
+        }
+            
+        
         r_map = temp_r_map;
         
     }
@@ -184,7 +243,7 @@ int get_ind(int ind_curr, const std::map<int, std::pair<int, bool>>& r_map) {
         if (it_curr->second.second == true) { // insertion
             return -1; // TODO replace with inserted vals
         }
-        else {// deletion
+        else { // deletion
             return ind_curr - it_curr->second.first;
         }
     }
@@ -232,42 +291,66 @@ std::vector<int> offspring_recon(const std::vector<int>& genome_orig,
 #ifndef DEBUG
 int main()
 {
-    std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
+//    std::vector<int> genome{21, 35, 43, 84, 12, 15, 19, 28, 39, 45, 51};
+//
+//    std::map<int, std::pair<int, bool>> change_log {{0, {0, false}}};
+//
+//    std::unordered_map<int, std::vector<int>> insertions;
+//
+//
+//    std::cout << "mutation_delete(3, 1, change_log);\n";
+//    mutation_delete(3, 1, change_log);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_insert(4, 1, change_log);\n";
+//    mutation_insert(4, 1, change_log, insertions);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_delete(6, 2, change_log);\n";
+//    mutation_delete(6, 2, change_log);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_insert(5, 3, change_log);\n";
+//    mutation_insert(5, 3, change_log, insertions);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_delete(6, 3, change_log);\n";
+//    mutation_delete(6, 3, change_log);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_delete(6, 2, change_log);\n";
+//    mutation_delete(6, 2, change_log);
+//    print_map(change_log);
+//
+//    std::cout << "mutation_insert(0, 3, change_log);\n";
+//    mutation_insert(0, 3, change_log, insertions);
+//    print_map(change_log);
     
-    std::map<int, std::pair<int, bool>> change_log {{0, {0, false}}};
-    
+    std::vector<int> genome_orig{21, 35, 43, 84, 12};
+    std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}};
     std::unordered_map<int, std::vector<int>> insertions;
     
-    
-    std::cout << "mutation_delete(3, 1, change_log);\n";
-    mutation_delete(3, 1, change_log);
+    std::cout << "mutation_insert(2, std::vector<int>{1, 2, 3, 4}, change_log, insertions)\n";
+    mutation_insert(2, std::vector<int>{1, 2, 3, 4}, change_log, insertions);
     print_map(change_log);
     
-    std::cout << "mutation_insert(4, 1, change_log);\n";
-    mutation_insert(4, 1, change_log, insertions);
+    std::cout << "mutation_insert(3, std::vector<int>{5, 6}, change_log, insertions)\n";
+    mutation_insert(3, std::vector<int>{5, 6}, change_log, insertions);
     print_map(change_log);
     
-    std::cout << "mutation_delete(6, 2, change_log);\n";
-    mutation_delete(6, 2, change_log);
+    std::cout << "mutation_delete(1, 3, change_log)\n";
+    mutation_delete(1, 3, change_log);
     print_map(change_log);
     
-    std::cout << "mutation_insert(5, 3, change_log);\n";
-    mutation_insert(5, 3, change_log, insertions);
+    //std::cout << "mutation_delete(3, 4, change_log);\n";
+    //mutation_delete(3, 4, change_log);
+    //print_map(change_log);
+    
+    std::cout << "mutation_delete(1, 3, change_log)\n";
+    mutation_delete(1, 3, change_log);
     print_map(change_log);
     
-    std::cout << "mutation_delete(6, 3, change_log);\n";
-    mutation_delete(6, 3, change_log);
-    print_map(change_log);
-    
-    std::cout << "mutation_delete(6, 2, change_log);\n";
-    mutation_delete(6, 2, change_log);
-    print_map(change_log);
-    
-    std::cout << "mutation_insert(0, 3, change_log);\n";
-    mutation_insert(0, 3, change_log, insertions);
-    print_map(change_log);
-    
-    size_t new_size = genome.size() + change_log.rbegin()->second.first;
+    size_t new_size = genome_orig.size() + change_log.rbegin()->second.first;
     std::cout << "size of new genome: " << new_size << std::endl;
     std::cout << "indexes:\n";
     for (int i = 0; i < new_size; ++i) {

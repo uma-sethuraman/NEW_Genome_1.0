@@ -4,10 +4,10 @@
 #include <vector>
 #include <bitset>
 #include "AbstractGenome.h"
-#include "TestGenome.h"
+//#include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
-//#include "TetianaGenome.h"
+#include "TetianaGenome.h"
 #include "TD_NKFitnessEvaluator.h"
 
 
@@ -16,7 +16,7 @@ void testData(AbstractGenome* genome)
 	for (size_t i(0); i < genome->size(); i++)
 	{
 		*genome->data(i) = (std::byte)(i*2);
-		// std::cout << (int)*genome->data(i) << std::endl;
+		std::cout << (int)*genome->data(i) << std::endl;
 	}
 
 	auto data = genome->data(2, 2);
@@ -200,23 +200,19 @@ int main() {
     //AbstractGenome* genome = new TetianaGenome(8);
     //delete genome;
     
-    evolve_NK();
+    //evolve_NK();
     
-	/*AbstractGenome* genome = new TestGenome(8);
+	AbstractGenome* genome = new TetianaGenome(8);
 	// AbstractGenome  & y = *(new TestGenome);
 
 	runTests(genome);
 	testData(genome);
 	delete genome;
 
-	AbstractGenome* secondGenome = new TestGenome(200);
-
+	AbstractGenome* secondGenome = new TetianaGenome(200);
 	runGeneTest(secondGenome);
 
 	delete secondGenome;
-     */
-    
-
 
 	return(0);
 }

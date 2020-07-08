@@ -7,3 +7,6 @@ Genome_ChangeLog/Genome_ChangeLog.xcodeproj/
 
 #Other
 code/map_test.cpp
+build/
+TetianaGenome_Project/
+Genome_ChangeLog/

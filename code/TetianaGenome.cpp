@@ -4,8 +4,8 @@ TetianaGenome::TetianaGenome(size_t _size): AbstractGenome(_size),sites(_size){
 	sites.resize(_size);
 }
 
-std::byte* TetianaGenome::data() {
-	return static_cast<std::byte*>(sites.data()); // cast is for demonstration
+std::byte* TetianaGenome::data(size_t index, size_t byteSize) {
+	return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
 }
 
 void TetianaGenome::resize(size_t new_size) {
@@ -30,9 +30,8 @@ void TetianaGenome::mutate() {
     //std::cout << "sites[random_site]: " << std::to_integer<int>(sites[random_site]) << std::endl;
 }
 
-
-//GeneView TetianaGenome::geneView() {
-//  //GeneView gv;
-//  //...
-//  //return gv;
-//}
+// starting at index, write values in segement genome between genome[index-1] and genome[index]
+void TetianaGenome::insert(size_t index, std::vector<std::byte> segment) {
+    std::cout << "insert has not been written for this genome class" << std::endl;
+    exit(1);
+}
