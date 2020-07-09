@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp.o"
   "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp.o"
+  "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp.o"
   "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp.o"
   "/home/victoria/WAVES/newgenome/code/Testing/main.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/main.cpp.o"
   )

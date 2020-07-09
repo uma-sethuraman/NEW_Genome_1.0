@@ -40,7 +40,7 @@ public:
      * \return size of tree **/
     virtual size_t size() { return Tree->GetSiteCount(); }
 
-    virtual void initalize() override;
+    virtual Byte* data(size_t index = 0, size_t byteSize = 0) override;
     virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
     virtual void insert(size_t index, std::vector<std::byte> segment) override;
     virtual void remove(size_t index, size_t segmentSize) override;

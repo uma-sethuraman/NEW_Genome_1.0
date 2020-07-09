@@ -12,11 +12,14 @@ void GenomeLite::Reallocate()
 
 }
 
-/** Initializes the genome
+/** Gets contiguous data from genome
+ * \param index to start
+ * \param byteSize number of bytes
+ * \returns start of memory
  **/
-void GenomeLite::initalize()
+Byte* GenomeLite::data(size_t index, size_t byteSize)
 {
-
+    return Tree->GetData(index, byteSize);
 }
 
 /** Overwrites an index in the gene
@@ -25,7 +28,7 @@ void GenomeLite::initalize()
  **/
 void GenomeLite::overwrite(size_t index, std::vector<std::byte> segment)
 {
-
+    Tree->Overwrite(index, segment);
 }
 
 /** Inserts at index in the gene

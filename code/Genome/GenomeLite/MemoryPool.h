@@ -6,18 +6,22 @@
  * memory allocations
  **/
 #pragma once
+
+#include <memory>
 #include <cstdint>
 #include <cstring>
+#include <vector>
 
 #include "SegmentNode.h"
 
+typedef std::byte Byte;
+
 /** class for a memory pool object **/
-template < class T >
 class MemoryPool
 {
 private:
     /// pool of memory
-    T* Pool; 
+    SegmentNode* Pool; 
     const size_t Size;
     size_t Tail = 1;
 
@@ -28,14 +32,14 @@ public:
     /** Constructor 
      * \param size **/
     MemoryPool(size_t size) 
-        : Pool(new T[size]), Size(size) {}
+        : Pool(new SegmentNode[size]), Size(size) {}
 
     /** Copy constructor 
      * \param pool to copy from **/
     MemoryPool(const MemoryPool &pool)
-        : Pool(new T[pool.Size]), Size(pool.Size)
+        : Pool(new SegmentNode[pool.Size]), Size(pool.Size)
     {
-        std::memcpy(Pool, pool, Size*sizeof(T));
+        std::memcpy(Pool, pool.Pool, Size*sizeof(SegmentNode));
     }
 
     /** Destructor **/
@@ -48,8 +52,28 @@ public:
     /** Gets node at index
      * \param index
      * \returns node at index **/
-    T* At(size_t index) { return &Pool[index]; }
+    SegmentNode* At(size_t index) { return &Pool[index]; }
 
     /** Allocates new node **/
-    T* Allocate() { return &Pool[Tail++]; }
+    SegmentNode* Allocate(std::shared_ptr< GeneSegment > gene, Byte* start, size_t size) 
+    { 
+        Pool[Tail] = SegmentNode(gene, Tail, start, size);
+        return &Pool[Tail++]; 
+    }
+
+    /** Allocates new node **/
+    SegmentNode* Allocate(size_t maxSize, size_t size) 
+    { 
+        Pool[Tail] = SegmentNode(maxSize, size, Tail);
+        return &Pool[Tail++]; 
+    }
+
+        /** Allocates new node **/
+    SegmentNode* Allocate(size_t size) 
+    { 
+        Pool[Tail] = SegmentNode(size, Tail);
+        return &Pool[Tail++]; 
+    }
+
+
 };

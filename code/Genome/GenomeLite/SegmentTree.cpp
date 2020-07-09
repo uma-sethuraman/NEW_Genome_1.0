@@ -3,133 +3,551 @@
  * \author Victoria Cao
  **/
 
-#include <algorithm>
-#include <iostream>
-#include <queue>
+#define nodeSize 3000
+#define pageSize 4000
+
+#include <cstdint>
+#include <vector>
 
 #include "SegmentTree.h"
-#include "../../utilities.h"
-
 
 
 /** Constructor 
- * \param size **/
+ * \param genome new root of tree 
+ * **/
 SegmentTree::SegmentTree(size_t size) 
-    : NodePool(new MemoryPool< SegmentNode >(size*(3/4)))
+    : Pool(new MemoryPool(size*(3/4)))
 {
-    Root = CreateNode();
-    Root->Leaf = false;
-
-    auto newNode = CreateNode();
-    newNode->Parent = Root->Position;
-
-    Root->Children[0] = newNode->Position;
-    Root->Size = 1;
+    Root = Initialize(size);
 }
 
-SegmentNode* SegmentTree::CreateNode()
+/** Initializes a tree of size
+ * \param size to initialize
+ * \returns root of tree 
+ * **/
+SegmentNode* SegmentTree::Initialize(size_t size)
 {
-    auto newNode = NodePool->Allocate();
-    newNode->Position = NodePool->GetTail()-1;
+    if (!size)
+        return nullptr;
 
-    return newNode;
+    SegmentNode* root;
+    if (nodeSize < size)
+    {
+        root = Pool->Allocate(nodeSize);
+        size -= nodeSize;
+    }
+    else
+    {
+        root = Pool->Allocate(size);
+        size = 0;
+    }
+
+    auto left = ((size/nodeSize)/2)*nodeSize;
+    root->SetLeft(Initialize(left));
+    root->SetLeft(Initialize(size-left));
+
+    return root;
 }
 
 
-/** Splits the child node
- * \param index to split at
+/*********************************************************************************
+ *  PRIVATE
+ * 
+ *  Helper functions for getting and updating nodes
+ * 
+ * 
+ ********************************************************************************/
+
+
+/** Gets height of node
+ * \param node to get height of
+ * \return height of node of -1 if null
  **/
-void SegmentTree::SplitChild(SegmentNode* node, size_t index)
+int SegmentTree::GetHeight(SegmentNode* node)
 {
-
+    if (node)
+        return node->GetHeight();
+    else
+        return -1;
+    
 }
 
-/** Finds the index 
- * \returns SegmentNode that index is within
- * and the starting index of the node **/
+/** Calculates the balance factor of node
+ * \param node to get the balance factor of 
+ * \return balance factor of the node
+ **/
+int SegmentTree::GetBalance(SegmentNode* node)
+{
+    auto left = GetHeight(node->GetLeft(Pool));
+    auto right = GetHeight(node->GetRight(Pool));
+
+    return left - right;
+}
+
+/** Updates height of Node
+ * \param node to update height of
+ **/
+void SegmentTree::UpdateHeight(SegmentNode* node)
+{
+    if (node)
+    {   
+        // node height is one plus the taller subtree
+        node->SetHeight(std::max(GetHeight(node->GetLeft(Pool)), GetHeight(node->GetRight(Pool))) +1);
+    }
+}
+
+/** Updates weight of node
+ * \param node to update weight of
+ **/
+void SegmentTree::UpdateWeight(SegmentNode* node)
+{
+    if (node)
+    {   
+        size_t right = 0;
+        size_t left = 0;
+        if (node->GetRight(Pool))
+            right = node->GetRight(Pool)->GetWeight();
+        if (node->GetLeft(Pool))
+            left = node->GetLeft(Pool)->GetWeight();
+
+        // node weight is sum of left and right subtrees and it's own weight
+        node->SetWeight(node->GetSize() + right + left);
+    }
+}
+
+/** Updates the tree from node to root
+ * \param node to start updating from
+ **/
+void SegmentTree::Update(SegmentNode* node)
+{
+    while (node)
+    {
+        // update weight and height of node
+        UpdateWeight(node);
+        UpdateHeight(node);
+
+        // rebalance if necessary and move up the tree
+        node = ReBalance(node)->GetParent(Pool);
+    }
+}
+
+/*********************************************************************************
+ *  PRIVATE
+ * 
+ *  Rebalancing functions
+ * 
+ * 
+ ********************************************************************************/
+
+
+/** Rotates subtree right
+ * \param root root of subtree to rotate on
+ * \return new root of the subtree
+ **/
+SegmentNode* SegmentTree::RotateRight(SegmentNode* root)
+{
+    SegmentNode* newRoot = root->GetLeft(Pool); // new newRoot 
+    SegmentNode* rootAdopt = newRoot->GetRight(Pool);
+
+    if (root->GetParent(Pool))   /// change root parent
+    {
+        if (root->GetParent(Pool)->GetLeft(Pool) == root)
+        {
+            newRoot->SetParent(root->GetParent(Pool));
+            newRoot->GetParent(Pool)->SetLeft(newRoot);
+        }
+        else
+        {
+            newRoot->SetParent(root->GetParent(Pool));
+            newRoot->GetParent(Pool)->SetRight(newRoot);
+        }
+    }
+    else    /// changing newRoot 
+    {
+        newRoot->SetParent(nullptr);
+        Root = newRoot;
+    }
+
+    // change root and new root
+    root->SetParent(newRoot);
+    newRoot->SetRight(root);
+
+    // change root and root adopt
+    root->SetLeft(rootAdopt);
+    if (rootAdopt)
+        rootAdopt->SetParent(root);
+
+    // update heights and weight
+    UpdateHeight(root);
+    UpdateHeight(newRoot);
+
+    UpdateWeight(root);
+    UpdateWeight(newRoot);  
+
+    return newRoot;
+}
+
+/** Rotates subtree left
+ * \param root root of subtree to rotate on
+ * \return new root of the subtree
+ **/
+SegmentNode* SegmentTree::RotateLeft(SegmentNode* root)
+{
+    SegmentNode* newRoot = root->GetRight(Pool); // new newRoot 
+    SegmentNode* rootAdopt = newRoot->GetLeft(Pool);
+
+    if (root->GetParent(Pool))   /// change root parent
+    {
+        if (root->GetParent(Pool)->GetLeft(Pool) == root)
+        {
+            newRoot->SetParent(root->GetParent(Pool));
+            newRoot->GetParent(Pool)->SetLeft(newRoot);
+        }
+        else
+        {
+            newRoot->SetParent(root->GetParent(Pool));
+            newRoot->GetParent(Pool)->SetRight(newRoot);
+        }
+    }
+    else    /// changing newRoot 
+    {
+        newRoot->SetParent(nullptr);
+        Root = newRoot;
+    }
+
+    // change root and new root
+    root->SetParent(newRoot);
+    newRoot->SetLeft(root);
+
+    // change root and root adopt
+    root->SetRight(rootAdopt);
+    if (rootAdopt)
+        rootAdopt->SetParent(root);
+
+    // update heights and weight
+    UpdateHeight(root);
+    UpdateHeight(newRoot);
+
+    UpdateWeight(root);
+    UpdateWeight(newRoot);    
+
+    return newRoot;
+}
+
+
+
+/** Rebalances at the node if needed
+ * \param node to check for rebalancing
+ * \return new node that replaces node if rebalanced
+ **/
+SegmentNode* SegmentTree::ReBalance(SegmentNode* node)
+{
+    auto balance = GetBalance(node); // Balance factor for node
+
+    if (balance == 2) // Right case
+    {
+        if (GetBalance(node->GetLeft(Pool)) == -1) // Right Left case
+            RotateLeft(node->GetLeft(Pool));
+        return RotateRight(node);
+    }
+    else if (balance == -2) // Left case
+    {
+        if (GetBalance(node->GetRight(Pool)) == 1) // Left Right case
+            RotateRight(node->GetRight(Pool));
+        return RotateLeft(node);
+    }
+
+    return node;
+}
+
+
+
+/*********************************************************************************
+ *  PUBLIC
+ * 
+ *  Mutation functions
+ * 
+ * 
+ ********************************************************************************/
+
+
+/** Finds the index in the tree
+ * \param index to find
+ * \return node that the index lies within, local index into the segment
+ * that the index is at
+ **/
 std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
 {
     SegmentNode* node = Root;
-    size_t LeftBound = 0;
 
-    // find leaf node with index
-    while(!node->Leaf)
+    /// boundary variables
+    size_t left = 0;    // Left boundary of node
+    if (node->GetLeft(Pool))
+        left = node->GetLeft(Pool)->GetWeight();
+    
+    /// Find the segment that index lies within
+    while(index < left || index >= left+node->Size)
     {
-        auto nodeIndex = node->UpperBound(index);
-
-        node = NodePool->At(node->Children[nodeIndex]);
-        if (nodeIndex)
-            LeftBound += node->Keys[nodeIndex-1].Size;
+        if (index >= left+node->Size)
+        { 
+            left += node->Size;
+            node = node->GetRight(Pool);
+        }  
+        else
+        {
+            left -= node->Size;
+            node = node->GetLeft(Pool);
+        }           
     }
 
-    return {node, LeftBound};
+    return {node, left};
 }
 
-/** Inserts Gene segment at index
- * \param segment to insert
- * \param index to insert at
+/** Gets data from Tree
+ * \param index in tree
+ * \param byteSize number of bytes
+ * \returns pointer to data
  **/
-void SegmentTree::Insert(size_t index, std::vector<std::byte> segment)
+Byte* SegmentTree::GetData(size_t index, size_t byteSize)
 {
-    auto foundPair = Find(index);
-    auto node = foundPair.first;
-    GeneSegment newSegment = std::make_shared< std::vector<Byte> >(segment);
+    auto found = Find(index);
+    auto node = found.first;
+    size_t offset = index-found.second;
 
-    // insert into non-full node
-    if (node->Size < NODE_SIZE)
+    return node->GetData(offset);
+}
+
+
+/** Deletes site at index in the tree
+ * \param index index to delete site
+ **/
+void SegmentTree::Delete(size_t index, size_t segmentSize)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto node = found.first;
+    auto offset = index-found.second;
+
+    if (node->Gene.use_count() == 1)
     {
-        
-        auto offset = index - foundPair.second;
-        node->Insert(offset, newSegment);
+        node->Delete(index, segmentSize);
+        Update(node);
     }
 
-    // inserting into full node
     else
     {
-        /* code */
+        if (offset && offset != node->GetSize()-1)    // Middle case
+        {
+            SegmentNode* cutNode = node->Cut(Pool, offset);
+            cutNode->TruncateLeft();    // remove value at index
+
+            /// adopt nodes right
+            cutNode->SetRight(node->GetRight(Pool));
+            if (cutNode->GetRight(Pool))
+                cutNode->GetRight(Pool)->SetParent(cutNode);
+
+            /// change node right to cut node
+            node->SetRight(cutNode);
+            cutNode->SetParent(node);
+
+            /// update the tree
+            ++Size;
+            Update(cutNode);
+        }
+        else if (!offset) // Front case
+        {
+            node->TruncateLeft();
+            Update(node);
+        }
+        else // Back case
+        {
+            node->TruncateRight();
+            Update(node);
+        }
     }
-    
 
-
-    // update tree
-    ++Size;
-    SiteCount += segment.size();
 }
 
-/** Prints the tree **/
+/** Point mutation into index in the tree
+ * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
+ **/
+void SegmentTree::Insert(size_t index, std::vector<Byte> segment)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto node = found.first;
+    auto offset = index-found.second;
+
+    if (node->Gene.use_count() == 1)
+    {
+        node->Insert(index, segment);
+        Update(node);   
+    }
+
+    else
+    {
+        /// create new node from mutation
+        SegmentNode* newNode = nullptr;
+
+        if (offset)
+        {
+            SegmentNode* cutNode = node->Cut(Pool, offset);
+
+            /// adopt nodes right
+            cutNode->SetRight(node->GetRight(Pool));
+            if (cutNode->GetRight(Pool))
+                cutNode->GetRight(Pool)->SetParent(cutNode);
+
+            /// change node right to newNode
+            node->SetRight(newNode);
+            newNode->SetParent(node);
+
+            /// change newNode right to cut node
+            newNode->SetRight(cutNode);
+            cutNode->SetParent(newNode);
+
+            /// update the tree
+            Update(cutNode);
+            ++Size;
+        }
+        else
+        {
+            /// adopt nodes right
+            newNode->SetLeft(node->GetLeft(Pool));
+            if (node->GetLeft(Pool))
+                newNode->GetLeft(Pool)->SetParent(newNode);
+
+            /// change node Left to newNode
+            node->SetLeft(newNode);
+            newNode->SetParent(node);
+
+            // balance tree
+            Update(newNode);
+        }
+    
+        ++Size;
+    }
+    
+ 
+}
+
+/** Point mutation into index in the tree
+ * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
+ **/
+void SegmentTree::Overwrite(size_t index, std::vector<Byte> segment)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto node = found.first;
+    auto offset = index-found.second;
+
+    if (node->Gene.use_count() == 1)
+    {
+        node->Overwrite(index, segment); 
+    }
+
+    else
+    {
+        /// create new node from mutation
+        SegmentNode* newNode = nullptr;
+        
+        if (offset && offset != node->GetSize()-1) // middle case
+        {
+            SegmentNode* cutNode = node->Cut(Pool, offset);
+            cutNode->TruncateLeft();    // remove value at index
+
+            /// adopt nodes right
+            cutNode->SetRight(node->GetRight(Pool));
+            if (cutNode->GetRight(Pool))
+                cutNode->GetRight(Pool)->SetParent(cutNode);
+
+            /// change node right to newNode
+            node->SetRight(newNode);
+            newNode->SetParent(node);
+
+            /// change newNode right to cut node
+            newNode->SetRight(cutNode);
+            cutNode->SetParent(newNode);
+
+            /// update the tree
+            Update(cutNode);
+            Size += 1;
+        }
+        else if (!offset) // Front case
+        {
+            node->TruncateLeft();
+
+            /// adopt nodes right
+            newNode->SetLeft(node->GetLeft(Pool));
+            if (node->GetLeft(Pool))
+                newNode->GetLeft(Pool)->SetParent(newNode);
+
+            /// change node right to newNode
+            node->SetLeft(newNode);
+            newNode->SetParent(node);
+
+            // balance tree
+            Update(newNode);
+        }
+        else // Back case
+        {
+            node->TruncateRight();
+
+            /// adopt nodes right
+            newNode->SetRight(node->GetRight(Pool));
+            if (node->GetRight(Pool))
+                newNode->GetRight(Pool)->SetParent(newNode);
+
+            /// change node right to newNode
+            node->SetRight(newNode);
+            newNode->SetParent(node);
+
+            // balance tree
+            Update(newNode);
+        }
+    
+
+        // update size of tree
+        Size += 1;  
+    }
+}
+
+
+/*********************************************************************************
+ * 
+ * 
+ *  Misc printing and helper destructor functions
+ * 
+ * 
+ ********************************************************************************/
+
+
+/** prints the tree breadth first **/
 void SegmentTree::Print()
 {
     std::cout << std::endl;
-    std::queue<SegmentNode*> q;
+    std::queue< SegmentNode* > q;
     q.push(Root);
 
     while(q.size() > 0)
     {
-        auto node = q.front();
+        auto root = q.front();
         q.pop();
 
-        std::cout << "\nNode: " << node << std::endl;
-        std::cout << "Weight" << node->Weight << "\tPos: " << node->Position << std::endl;
-        
-        
-        std::cout << "Keys: ";
-        for (size_t i(0); i < node->Size; ++i)
-        {
-            if (node->Leaf)
-                std::cout << "Gene: " << node->Keys[i-1].Gene.get();
-            std::cout << " Size" << node->Keys[i-1].Size << "\t";
-        }
-        
-        
-        std::cout << "\nChildren: ";
+        root->Print();
 
-        for (size_t i(0); i < node->Size; i++)
+        if (root->GetLeft(Pool))
         {
-            std::cout << node->Children[i] << "\t";
-            q.push(NodePool->At(node->Children[i]));
+            q.push(root->GetLeft(Pool));
         }
-
-        std::cout << std::endl;
+        if (root->GetRight(Pool))
+        {
+            q.push(root->GetRight(Pool));
+        }
     }
     std::cout << std::endl;
 

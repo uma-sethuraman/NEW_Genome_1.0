@@ -5,19 +5,26 @@ CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp
  /home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp.o
  /home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.h
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp.o
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp.o
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
- /home/victoria/WAVES/newgenome/code/utilities.h
 CMakeFiles/test.dir/main.cpp.o
  /home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.h
+ /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/MemoryPool.h
  /home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
