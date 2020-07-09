@@ -64,13 +64,13 @@ public:
     // new functions
 
     // starting at index, write values in segement over values currently in genome
-    virtual void overwrite(size_t index, std::vector<std::byte> segment) {
+    virtual void overwrite(size_t index, const std::vector<std::byte>& segment) {
         std::cout << "overwrite has not been written for this genome class" << std::endl;
         exit(1);
     }
 
     // starting at index, write values in segement genome between genome[index-1] and genome[index]
-    virtual void insert(size_t index, std::vector<std::byte> segment) {
+    virtual void insert(size_t index, const std::vector<std::byte>& segment) {
         std::cout << "insert has not been written for this genome class" << std::endl;
         exit(1);
     }
