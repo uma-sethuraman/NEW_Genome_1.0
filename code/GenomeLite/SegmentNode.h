@@ -85,7 +85,8 @@ public:
     void TruncateLeft(size_t cutSize = 1);
     void TruncateRight(size_t cutSize = 1);
     SegmentNode* Cut(SegmentPool* pool, size_t index);
-    void Overwrite(size_t index, std::vector< Byte > &segment, size_t segmentStart = 0);
+    size_t Overwrite(size_t index, const std::vector<std::byte>& segment, size_t segmentStart);
+    size_t Insert(size_t index, const std::vector<std::byte>& segment, size_t segmentStart);
     void Print();
 
 };

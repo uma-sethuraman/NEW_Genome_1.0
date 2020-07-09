@@ -6,19 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.h
-stdint.h
--
-vector
--
-iostream
--
-unordered_map
--
-cstddef
--
-
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/GeneSegment.h
 memory
 -
 iostream
@@ -30,17 +18,7 @@ cstdint
 cstring
 -
 
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.h
-cstdint
--
-iostream
--
-../AbstractGenome.h
-/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.h
-SegmentTree.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
-
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
 cstdint
 -
 cstddef
@@ -52,9 +30,9 @@ iostream
 vector
 -
 GeneSegment.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/GeneSegment.h
 
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentPool.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentPool.h
 memory
 -
 iostream
@@ -66,9 +44,17 @@ cstdint
 cstring
 -
 SegmentNode.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
 
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp
+cstdint
+-
+vector
+-
+SegmentTree.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.h
+
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.h
 memory
 -
 iostream
@@ -84,25 +70,9 @@ queue
 cmath
 -
 GeneSegment.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GeneSegment.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/GeneSegment.h
 SegmentPool.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentPool.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentPool.h
 SegmentNode.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.h
-
-/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
-cassert
--
-../Genome/AbstractGenome.h
-/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.h
-../Genome/GenomeLite/GenomeLite.h
-/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.h
-
-/home/victoria/WAVES/newgenome/code/Testing/main.cpp
-iostream
--
-string
--
-TestGenomeLite.h
-/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
 

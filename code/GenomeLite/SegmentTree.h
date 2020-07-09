@@ -39,7 +39,6 @@ private:
     void UpdateHeight(SegmentNode* node);
     void UpdateWeight(SegmentNode* node);
     void Update(SegmentNode* node);
-    SegmentNode* CreateNode(size_t size);
 
     ///.rebalancing functions
     SegmentNode* RotateRight(SegmentNode* node);
@@ -68,7 +67,7 @@ public:
         : Size(tree.Size), Pool(new SegmentPool(*(tree.Pool))) 
     {
         size_t index = tree.Root->GetPos();
-        Root = Pool->GetNode(index);
+        Root = Pool->At(index);
     }
 
     /** Destructor **/
@@ -90,9 +89,11 @@ public:
 
     /// mutation functions
     std::pair<SegmentNode*, size_t> Find(size_t index);
-    void Delete(size_t index, size_t segmentSize);
-    void Insert(size_t index, std::vector<std::byte> &segment);
-    void Overwrite(size_t index, std::vector<std::byte> &segment);
+    void Remove(size_t index, size_t segmentSize);
+    void Insert(size_t index, const std::vector<std::byte>& segment);
+    SegmentNode* IndirectInsert(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment);
+    void Overwrite(size_t index, const std::vector<std::byte>& segment);
+    SegmentNode* IndirectOverwrite(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment);
     void Print();
 
 };

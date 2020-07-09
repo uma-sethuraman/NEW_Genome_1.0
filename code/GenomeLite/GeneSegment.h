@@ -20,19 +20,32 @@ typedef std::byte Byte; // c++17 std::byte doesn't always work
 class GeneSegment
 {
 private:
-    friend class GenomeLite; 
+    friend class SegmentNode; 
     
     Byte* Gene; ///< new byte of data
-    const size_t Size;
+    const size_t MaxSize;
+    size_t Size;
+    
 
 public:
 
     /** (deleted) Default Constructor **/
     GeneSegment() = delete;
 
-
+    /** Constructor 
+     * \param size of the gene segment **/
     GeneSegment(size_t size)
-        : Gene(new Byte[size]), Size(size) {};
+        : Gene(new Byte[size]), MaxSize(size), Size(size) {}
+
+
+    GeneSegment(size_t maxSize, size_t size)
+        : Gene(new Byte[maxSize]), MaxSize(maxSize), Size(size) {}
+
+    GeneSegment(const std::vector< Byte > &segment, size_t size, size_t maxSize, size_t startSegment = 0)
+        : Gene(new Byte[maxSize]), MaxSize(maxSize), Size(size) 
+    {
+        std::memcpy(Gene, &segment[startSegment], Size);
+    }
 
 
     /** Deconstructor **/

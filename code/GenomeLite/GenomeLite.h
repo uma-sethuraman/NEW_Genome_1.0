@@ -41,9 +41,10 @@ public:
     virtual size_t size() { return Tree->GetSiteCount(); }
 
     virtual Byte* data(size_t index = 0, size_t byteSize = 0) override;
-    virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
-    virtual void insert(size_t index, std::vector<std::byte> segment) override;
+    virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
+    virtual void insert(size_t index, const std::vector<std::byte>& segment) override;
     virtual void remove(size_t index, size_t segmentSize) override;
     virtual void show() override;
+    virtual std::vector<size_t> find_all(std::vector<std::byte>& pattern) override;
 
 };

@@ -9,8 +9,8 @@
 #include <cassert>
 
 
-#include "../Genome/AbstractGenome.h"
-#include "../Genome/GenomeLite/GenomeLite.h"
+#include "../AbstractGenome.h"
+#include "../GenomeLite/GenomeLite.h"
 
 typedef std::byte Byte; ///< Byte for easy viewing
 
@@ -23,25 +23,31 @@ namespace TestGenomeLite
 {
     void TestConstructor()
     {
+        // test size 100
         size_t size = 100;
-        AbstractGenome* genome = new GenomeLite(size);
+        // AbstractGenome* genome = new GenomeLite(size);
 
-        genome->show();
+        // std::vector< Byte > segment(size, (Byte)10);
+        // genome->overwrite(0, segment);
 
-        // for (size_t i(0); i < size; i++)
-        // {
-        //     *genome->data(i) = (Byte)10;            
-        // }
+        // delete genome;
 
-        std::vector< Byte > segment(size, (Byte)size);
-        genome->overwrite(0, segment);
+        // std::cout << "Test Constructor " << size << ": " BOLDGREEN << "PASSED" << RESET << std::endl;
 
-        genome->show();
+        // test size 5000
+        size = 5000;
+        AbstractGenome* genome2 = new GenomeLite(size);
 
+        genome2->show();
 
-        delete genome;
+        std::vector< Byte > segment2(size, (Byte)10);
+        genome2->overwrite(0, segment2);
 
-        std::cout << "Test Constructor: " << BOLDGREEN << "PASSED" << RESET << std::endl;
+        genome2->show();
+
+        delete genome2;
+
+        std::cout << "Test Constructor: " << size << BOLDGREEN << "PASSED" << RESET << std::endl;
     }
 
 }

@@ -4,6 +4,7 @@
  **/
 
 #define nodeSize 3000
+#define pageSize 4098
 
 #include <cstdint>
 #include <vector>
@@ -31,18 +32,21 @@ SegmentNode* SegmentTree::Initialize(size_t size)
     SegmentNode* root;
     if (nodeSize < size)
     {
-        root = CreateNode(nodeSize);
+        root = Pool->Allocate(std::make_shared< GeneSegment >(pageSize, nodeSize));
         size -= nodeSize;
     }
     else
     {
-        root = CreateNode(size);
+        root = Pool->Allocate(std::make_shared< GeneSegment >(pageSize, size));
         size = 0;
     }
 
     auto left = ((size/nodeSize)/2)*nodeSize;
     root->SetLeft(Initialize(left));
     root->SetLeft(Initialize(size-left));
+
+    UpdateWeight(root);
+    UpdateHeight(root);
 
     return root;
 }
@@ -126,16 +130,6 @@ void SegmentTree::Update(SegmentNode* node)
         // rebalance if necessary and move up the tree
         node = ReBalance(node)->GetParent(Pool);
     }
-}
-
-/** Creates a new node in the pool 
- * \param data creates new segment in tree
- * \param size of data
- * \return pointer to new node
- **/
-SegmentNode* SegmentTree::CreateNode(size_t size)
-{
-    return Pool->CreateNode(std::make_shared< GeneSegment >(size));
 }
 
 /*********************************************************************************
@@ -293,18 +287,23 @@ std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
         left = node->GetLeft(Pool)->GetWeight();
     
     /// Find the segment that index lies within
-    while(index < left || index >= left+node->Size)
+    while( true )
     {
         if (index >= left+node->Size)
         { 
             left += node->Size;
             node = node->GetRight(Pool);
         }  
+        else if (index < left)
+        {
+            node = node->GetLeft(Pool);
+            left -= node->Size;
+        }  
         else
         {
-            left -= node->Size;
-            node = node->GetLeft(Pool);
-        }           
+            break;
+        }
+                 
     }
 
     return {node, left};
@@ -314,14 +313,174 @@ std::pair<SegmentNode*, size_t> SegmentTree::Find(size_t index)
 /** Deletes site at index in the tree
  * \param index index to delete site
  **/
-void SegmentTree::Delete(size_t index, size_t segmentSize)
+void SegmentTree::Remove(size_t index, size_t segmentSize)
 {
     /// cut up the node at the index
     auto found = Find(index);
     auto node = found.first;
     auto offset = index-found.second;
 
-    if (offset && offset != node->GetSize()-1)    // Middle case
+    if (node->Unique())
+    {
+
+    }
+
+    else 
+    {
+        /// cut up the node at the index
+        auto found = Find(index);
+        auto node = found.first;
+        auto offset = index-found.second;
+
+        if (offset && offset != node->GetSize()-1)    // Middle case
+        {
+            SegmentNode* cutNode = node->Cut(Pool, offset);
+            cutNode->TruncateLeft();    // remove value at index
+
+            /// adopt nodes right
+            cutNode->SetRight(node->GetRight(Pool));
+            if (cutNode->GetRight(Pool))
+                cutNode->GetRight(Pool)->SetParent(cutNode);
+
+            /// change node right to cut node
+            node->SetRight(cutNode);
+            cutNode->SetParent(node);
+
+            /// update the tree
+            ++Size;
+            Update(cutNode);
+        }
+        else if (!offset) // Front case
+        {
+            node->TruncateLeft();
+            Update(node);
+        }
+        else // Back case
+        {
+            node->TruncateRight();
+            Update(node);
+        }
+    }
+
+}
+
+/** Point mutation into index in the tree
+ * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
+ **/
+void SegmentTree::Insert(size_t index, const std::vector<std::byte>& segment)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto startNode = found.first;
+    auto offset = index-found.second;
+
+
+    size_t startSegment = 0;
+
+    while (startSegment < segment.size())
+    {
+        if (startNode->Unique())
+        {
+            startSegment = startNode->Insert(offset, segment, startSegment);
+        }
+
+        else 
+        {
+
+        }
+    }
+}
+
+SegmentNode* SegmentTree::IndirectInsert(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment)
+{
+    /// create new node from mutation
+    size_t segmentSize = segment.size() ? segment.size() < nodeSize : nodeSize;
+    size_t maxSize = segment.size()*2 ? segment.size()*2 < pageSize : pageSize;
+
+    SegmentNode* newNode = Pool->Allocate(std::make_shared< GeneSegment >(segment, segmentSize, maxSize, startSegment));
+
+    if (offset)
+    {
+        SegmentNode* cutNode = node->Cut(Pool, offset);
+
+        /// adopt nodes right
+        cutNode->SetRight(node->GetRight(Pool));
+        if (cutNode->GetRight(Pool))
+            cutNode->GetRight(Pool)->SetParent(cutNode);
+
+        /// change node right to newNode
+        node->SetRight(newNode);
+        newNode->SetParent(node);
+
+        /// change newNode right to cut node
+        newNode->SetRight(cutNode);
+        cutNode->SetParent(newNode);
+
+        /// update the tree
+        Update(cutNode);
+        ++Size;
+    }
+    else
+    {
+        /// adopt nodes right
+        newNode->SetLeft(node->GetLeft(Pool));
+        if (node->GetLeft(Pool))
+            newNode->GetLeft(Pool)->SetParent(newNode);
+
+        /// change node Left to newNode
+        node->SetLeft(newNode);
+        newNode->SetParent(node);
+
+        // balance tree
+        Update(newNode);
+    }
+
+    ++Size;
+}
+
+/** Point mutation into index in the tree
+ * \param index index to insert the mutation after 
+ * \param mutation new mutation to insert
+ * \param size of mutation
+ **/
+void SegmentTree::Overwrite(size_t index, const std::vector<std::byte>& segment)
+{
+    /// cut up the node at the index
+    auto found = Find(index);
+    auto startNode = found.first;
+    auto offset = index-found.second;
+
+    size_t startSegment = 0;
+
+
+    while (startSegment < segment.size())
+    {
+        if (startNode->Unique())
+        {
+            startSegment = startNode->Overwrite(offset, segment, startSegment);
+        }
+
+        else
+        {
+            /* code */
+        }
+        
+    }
+
+}
+
+SegmentNode* SegmentTree::IndirectOverwrite(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment)
+{
+    /// create new node from mutation
+    size_t segmentSize = segment.size() ? segment.size() < nodeSize : nodeSize;
+    size_t maxSize = segment.size()*2 ? segment.size()*2 < pageSize : pageSize;
+
+    /// create new node from mutation
+    SegmentNode* newNode = Pool->Allocate(std::make_shared< GeneSegment >(segment, segmentSize, maxSize, startSegment));
+
+    if (offset && offset != node->GetSize()-1) // middle case
     {
         SegmentNode* cutNode = node->Cut(Pool, offset);
         cutNode->TruncateLeft();    // remove value at index
@@ -331,170 +490,53 @@ void SegmentTree::Delete(size_t index, size_t segmentSize)
         if (cutNode->GetRight(Pool))
             cutNode->GetRight(Pool)->SetParent(cutNode);
 
-        /// change node right to cut node
-        node->SetRight(cutNode);
-        cutNode->SetParent(node);
+        /// change node right to newNode
+        node->SetRight(newNode);
+        newNode->SetParent(node);
 
-        /// update the tree
-        ++Size;
-        Update(cutNode);
+        /// change newNode right to cut node
+        newNode->SetRight(cutNode);
+        cutNode->SetParent(newNode);
+
+        Size += 2;
+
+        return cutNode;
     }
     else if (!offset) // Front case
     {
         node->TruncateLeft();
-        Update(node);
+
+        /// adopt nodes right
+        newNode->SetLeft(node->GetLeft(Pool));
+        if (node->GetLeft(Pool))
+            newNode->GetLeft(Pool)->SetParent(newNode);
+
+        /// change node right to newNode
+        node->SetLeft(newNode);
+        newNode->SetParent(node);
+
+        Size += 1;  
+
+        return newNode;
     }
     else // Back case
     {
         node->TruncateRight();
-        Update(node);
+
+        /// adopt nodes right
+        newNode->SetRight(node->GetRight(Pool));
+        if (node->GetRight(Pool))
+            newNode->GetRight(Pool)->SetParent(newNode);
+
+        /// change node right to newNode
+        node->SetRight(newNode);
+        newNode->SetParent(node);
+
+        Size += 1;  
+
+        return newNode;
     }
 
-}
-
-/** Point mutation into index in the tree
- * \param index index to insert the mutation after 
- * \param mutation new mutation to insert
- * \param size of mutation
- **/
-void SegmentTree::Insert(size_t index, std::vector<std::byte> &segment)
-{
-    /// cut up the node at the index
-    auto found = Find(index);
-    auto node = found.first;
-    auto offset = index-found.second;
-
-    if (node->Unique())
-    {
-
-    }
-
-    else 
-    {
-        // /// create new node from mutation
-        // SegmentNode* newNode = CreateNode(mutation, size);
-
-        // if (offset)
-        // {
-        //     SegmentNode* cutNode = node->Cut(Pool, offset);
-
-        //     /// adopt nodes right
-        //     cutNode->SetRight(node->GetRight(Pool));
-        //     if (cutNode->GetRight(Pool))
-        //         cutNode->GetRight(Pool)->SetParent(cutNode);
-
-        //     /// change node right to newNode
-        //     node->SetRight(newNode);
-        //     newNode->SetParent(node);
-
-        //     /// change newNode right to cut node
-        //     newNode->SetRight(cutNode);
-        //     cutNode->SetParent(newNode);
-
-        //     /// update the tree
-        //     Update(cutNode);
-        //     ++Size;
-        // }
-        // else
-        // {
-        //     /// adopt nodes right
-        //     newNode->SetLeft(node->GetLeft(Pool));
-        //     if (node->GetLeft(Pool))
-        //         newNode->GetLeft(Pool)->SetParent(newNode);
-
-        //     /// change node Left to newNode
-        //     node->SetLeft(newNode);
-        //     newNode->SetParent(node);
-
-        //     // balance tree
-        //     Update(newNode);
-        // }
-    
-        // ++Size;
-    }
-}
-
-/** Point mutation into index in the tree
- * \param index index to insert the mutation after 
- * \param mutation new mutation to insert
- * \param size of mutation
- **/
-void SegmentTree::Overwrite(size_t index, std::vector<std::byte> &segment)
-{
-    /// cut up the node at the index
-    auto found = Find(index);
-    auto node = found.first;
-    auto offset = index-found.second;
-
-    if (node->Unique())
-    {
-        node->Overwrite(offset, segment);
-    }
-
-    else 
-    {
-        // /// create new node from mutation
-        // SegmentNode* newNode = CreateNode(mutation, size);
-
-        // if (offset && offset != node->GetSize()-1) // middle case
-        // {
-        //     SegmentNode* cutNode = node->Cut(Pool, offset);
-        //     cutNode->TruncateLeft();    // remove value at index
-
-        //     /// adopt nodes right
-        //     cutNode->SetRight(node->GetRight(Pool));
-        //     if (cutNode->GetRight(Pool))
-        //         cutNode->GetRight(Pool)->SetParent(cutNode);
-
-        //     /// change node right to newNode
-        //     node->SetRight(newNode);
-        //     newNode->SetParent(node);
-
-        //     /// change newNode right to cut node
-        //     newNode->SetRight(cutNode);
-        //     cutNode->SetParent(newNode);
-
-        //     /// update the tree
-        //     Update(cutNode);
-        //     Size += 1;
-        // }
-        // else if (!offset) // Front case
-        // {
-        //     node->TruncateLeft();
-
-        //     /// adopt nodes right
-        //     newNode->SetLeft(node->GetLeft(Pool));
-        //     if (node->GetLeft(Pool))
-        //         newNode->GetLeft(Pool)->SetParent(newNode);
-
-        //     /// change node right to newNode
-        //     node->SetLeft(newNode);
-        //     newNode->SetParent(node);
-
-        //     // balance tree
-        //     Update(newNode);
-        // }
-        // else // Back case
-        // {
-        //     node->TruncateRight();
-
-        //     /// adopt nodes right
-        //     newNode->SetRight(node->GetRight(Pool));
-        //     if (node->GetRight(Pool))
-        //         newNode->GetRight(Pool)->SetParent(newNode);
-
-        //     /// change node right to newNode
-        //     node->SetRight(newNode);
-        //     newNode->SetParent(node);
-
-        //     // balance tree
-        //     Update(newNode);
-        // }
-    
-
-        // // update size of tree
-        // Size += 1;  
-    }
 }
 
 

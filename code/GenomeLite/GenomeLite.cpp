@@ -26,7 +26,7 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  * \param index
  * \param segment
  **/
-void GenomeLite::overwrite(size_t index, std::vector<std::byte> segment)
+void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
     Tree->Overwrite(index, segment);
 }
@@ -35,9 +35,9 @@ void GenomeLite::overwrite(size_t index, std::vector<std::byte> segment)
  * \param index
  * \param segment
  **/
-void GenomeLite::insert(size_t index, std::vector<std::byte> segment)
+void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
-
+    Tree->Insert(index, segment);
 }
 
 /** Removes at index in the gene
@@ -46,11 +46,20 @@ void GenomeLite::insert(size_t index, std::vector<std::byte> segment)
  **/
 void GenomeLite::remove(size_t index, size_t segmentSize)
 {
-
+    Tree->Remove(index, segmentSize);
 }
 
 /** Prints the tree **/
 void GenomeLite::show()
 {
     Tree->Print();
+}
+
+/** Finds all instances of pattern in genome
+ * \param pattern to find
+ * \return vector of indexes 
+ **/
+std::vector<size_t> GenomeLite::find_all(std::vector<std::byte>& pattern)
+{
+    exit(0);
 }

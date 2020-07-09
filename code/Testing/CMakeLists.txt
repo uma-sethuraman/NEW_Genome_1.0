@@ -11,5 +11,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
 project(test)
 
 # get all *.cpp files recursively
-file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/../Genome/*.cpp main.cpp)
+file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/../GenomeLite/*.cpp main.cpp)
 add_executable(test ${SRC_FILES})

@@ -29,7 +29,7 @@ SegmentNode* SegmentNode::GetLeft(SegmentPool* pool)
 {
     if (Left == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->GetNode(Left);
+    return pool->At(Left);
 }
 
 
@@ -39,7 +39,7 @@ SegmentNode* SegmentNode::GetRight(SegmentPool* pool)
 {
     if (Right == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->GetNode(Right);
+    return pool->At(Right);
 }
 
 
@@ -49,7 +49,7 @@ SegmentNode* SegmentNode::GetParent(SegmentPool* pool)
 {
     if (Parent == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->GetNode(Parent);
+    return pool->At(Parent);
 }
 
 /** Sets Left node
@@ -110,7 +110,7 @@ void SegmentNode::TruncateRight(size_t cutSize)
  **/
 SegmentNode* SegmentNode::Cut(SegmentPool* pool, size_t index)
 {
-    SegmentNode* cutSegment = pool->CreateNode(Data, Start+index, Size-index);
+    SegmentNode* cutSegment = pool->Allocate(Data, Start+index, Size-index);
     TruncateRight(Size-index);
 
     return cutSegment;
@@ -120,12 +120,31 @@ SegmentNode* SegmentNode::Cut(SegmentPool* pool, size_t index)
  * \param index to start overwriting
  * \param segment to overwrite with
  **/
-void SegmentNode::Overwrite(size_t index, std::vector< Byte > &segment, size_t segmentStart)
+size_t SegmentNode::Overwrite(size_t index, const std::vector<std::byte>& segment, size_t segmentStart)
 {
-    size_t size = segment.size();
+    size_t size = segment.size()-segmentStart;
     if (size > Size)
         size = Size;
     std::memcpy(Start+index, &segment[segmentStart], size);
+
+    return segmentStart + size;
+}
+
+/** Overwrites segmentNode
+ * \param index to start overwriting
+ * \param segment to overwrite with
+ **/
+size_t SegmentNode::Insert(size_t index, const std::vector<std::byte>& segment, size_t segmentStart)
+{
+    size_t insertSize = segment.size()-segmentStart;
+    if (Size+insertSize > Data->MaxSize)
+        insertSize = Data->MaxSize - Size;
+
+    
+    std::memcpy(Start+index+insertSize, Start+index, Size-index);
+    std::memcpy(Start+index, &segment[segmentStart], insertSize);
+
+    return segmentStart + insertSize;
 }
 
 

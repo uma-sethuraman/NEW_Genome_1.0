@@ -61,27 +61,18 @@ public:
 
     /** Gets node at index from array
      * \return node at index **/
-    SegmentNode* GetNode(size_t index) 
+    SegmentNode* At(size_t index) 
     { 
-        if (index == std::numeric_limits<size_t>::max())
-            return nullptr;
         return &Pool[index]; 
     }
 
     /** Creates a new node in the pool
      * \param data to make SegmentNOde from
      * \return pointer to newly allocated node **/
-    SegmentNode* CreateNode(std::shared_ptr< GeneSegment> data)
+    SegmentNode* Allocate(std::shared_ptr< GeneSegment> data)
     {
-        if (Tail < Size)
-        {
-            SegmentNode* newNode = &Pool[Tail]; // give out next open space for node
-            *newNode = SegmentNode(data, Tail); // assign node the data
-
-            ++Tail; // move tail
-
-            return newNode;
-        }
+        Pool[Tail] = SegmentNode(data, Tail); // assign node the data
+        return &Pool[Tail++];
 
         return nullptr;
     }
@@ -91,17 +82,10 @@ public:
      * \param start Start of data within the segment
      * \param size of data
      * \return pointer to newly allocated node **/
-    SegmentNode* CreateNode(std::shared_ptr< GeneSegment> data, Byte* start, size_t size) 
+    SegmentNode* Allocate(std::shared_ptr< GeneSegment> data, Byte* start, size_t size) 
     {
-        if (Tail < Size)
-        {
-            SegmentNode* newNode = &Pool[Tail]; // give out next open space for node
-            *newNode = SegmentNode(data, Tail, start, size); // assign node the data
-
-            ++Tail; // move tail
-
-            return newNode;
-        }
+        Pool[Tail] = SegmentNode(data, Tail, start, size); // assign node the data
+        return &Pool[Tail++];
 
         return nullptr;
     }

@@ -4,10 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/AbstractGenome.cpp.o"
-  "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/GenomeLite.cpp.o"
-  "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentNode.cpp.o"
-  "/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/Genome/GenomeLite/SegmentTree.cpp.o"
+  "/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.o"
+  "/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o"
+  "/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o"
   "/home/victoria/WAVES/newgenome/code/Testing/main.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
