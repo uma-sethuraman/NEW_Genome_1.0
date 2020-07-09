@@ -89,6 +89,12 @@ public:
         std::cout << "show has not been written for this genome class :(" << std::endl;
     }
 
+    virtual std::vector<size_t> find_all(std::vector<std::byte>& pattern)
+    {
+        std::cout << "find_all has not been write for this genome type. returning empty vector for now..." << std::endl;
+        return std::vector<size_t>({});
+    }
+
 };
 
 
