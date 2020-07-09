@@ -1,6 +1,7 @@
-#include "UmaGenome.h"
+#include "AbstractGenome.h"
+#include <string>
 
-void printDebugOutput(UmaGenome* genome);
+void printResults(std::vector<std::byte> answer, AbstractGenome* gen, std::string testName);
 void pointTest1(bool debug);
 void deleteTest1(bool debug);
 void deleteTest2(bool debug);
@@ -18,7 +19,7 @@ void insertTest4(bool debug);
 void insertTest5(bool debug);
 void allMutationsTest1(bool debug);
 void allMutationsTest2(bool debug);
-void demoTest(bool debug);
+void allMutationsTest3(bool debug);
 void runPointTests(bool debug);
 void runDeleteTests(bool debug);
 void runInsertTests(bool debug);

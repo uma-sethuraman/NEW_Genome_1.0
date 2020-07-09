@@ -1,31 +1,31 @@
 #include "UmaGenome.h"
 #include <cstddef>
+#include <string>
+#include "AbstractGenome.h"
 
-// prints original genome, new genome, and changelog
-// when debug is turned on
-void printDebugOutput(UmaGenome* genome) {
-    std::cout << "ORIGINAL GENOME: ";
-    for (int index = 0; index < genome->size(); index++) {
-        std::byte& num = GN::genomeRead<std::byte>(genome, index);
-        std::cout << " " << (int)num;
+void printResults(std::vector<std::byte> answer, AbstractGenome* gen, std::string testName) {
+    bool failed = false;
+    if (gen->size() != answer.size())
+        failed = true;
+    else {
+        auto genomeData = gen->data(0,0);
+        for(int i = 0; i < answer.size() && !failed; i++) {
+            if(genomeData[i] != answer[i]){
+                failed = true;
+            }
+        }
     }
-    std::cout << std::endl;
 
-    std::cout << "\nCHANGELOG: " << std::endl;
-    genome->printChangelog(); 
-
-    std::cout << "\nOFFSET MAP: " << std::endl;
-    genome->printOffsetMap();
-
-    std::cout << "\nCURRENT GENOME: ";
-    genome->reconstructGenome();
-
-    std::cout << "\n--------------------------" << std::endl;
+    std::cout << testName;
+    if(failed) 
+        std::cout << "failed" << std::endl;
+    else
+        std::cout << "passed" << std::endl;
 }
 
 // simple point mutations
 void pointTest1(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -37,35 +37,29 @@ void pointTest1(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+    
     std::vector<std::byte> answer{(std::byte)4,(std::byte)4,(std::byte)2,(std::byte)4,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)2,(std::byte)1,(std::byte)0};
-    genome->pointMutate(1, (std::byte)(4));
-    genome->pointMutate(7, (std::byte)(2));
-    genome->pointMutate(3, (std::byte)(4));
+    genome->overwrite(1, {(std::byte)(4)});
+    genome->overwrite(7, {(std::byte)(2)});
+    genome->overwrite(3, {(std::byte)(4)});
 
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
     }
 
-    std::cout << "Point Test: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    printResults(answer, genome, "Point Test 1: ");
+    
     delete genome;
 }
 
 // just one deletion
 void deleteTest1(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -77,34 +71,28 @@ void deleteTest1(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->deleteMutate(5,3);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->remove(5,3);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(3),(std::byte)(2),(std::byte)(0),(std::byte)(1),(std::byte)(1),(std::byte)(0)};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 1: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 1: ");
 
     delete genome;
 }
 
 // only point and deletion mutations
 void deleteTest2(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -116,40 +104,33 @@ void deleteTest2(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->pointMutate(1,(std::byte)(1));
-    genome->pointMutate(3,(std::byte)(2));
-    genome->pointMutate(7,(std::byte)(2));
-    genome->pointMutate(9,(std::byte)(4));
-    genome->deleteMutate(1,1);
-    genome->deleteMutate(3,2);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(1,{(std::byte)(1)});
+    genome->overwrite(3,{(std::byte)(2)});
+    genome->overwrite(7,{(std::byte)(2)});
+    genome->overwrite(9,{(std::byte)(4)});
+    genome->remove(1,1);
+    genome->remove(3,2);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
 
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 2: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    printResults(answer, genome, "Delete Test 2: ");
 
     delete genome;
 }
 
 // only point and deletion mutations
 void deleteTest3(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -161,38 +142,32 @@ void deleteTest3(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->pointMutate(1,(std::byte)(1));
-    genome->pointMutate(3,(std::byte)(2));
-    genome->pointMutate(7,(std::byte)(2));
-    genome->pointMutate(9,(std::byte)(4));
-    genome->deleteMutate(3,2);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(1,{(std::byte)(1)});
+    genome->overwrite(3,{(std::byte)(2)});
+    genome->overwrite(7,{(std::byte)(2)});
+    genome->overwrite(9,{(std::byte)(4)});
+    genome->remove(3,2);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(1),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 3: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 3: ");
 
     delete genome;
 }
 
 // delete a key that's already in map
 void deleteTest4(bool debug) {
-    UmaGenome* genome = new UmaGenome(10,5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -204,39 +179,33 @@ void deleteTest4(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->pointMutate(1,(std::byte)(1));
-    genome->pointMutate(3,(std::byte)(2));
-    genome->pointMutate(4,(std::byte)(3));
-    genome->pointMutate(7,(std::byte)(2));
-    genome->pointMutate(9,(std::byte)(4));
-    genome->deleteMutate(1,1);
-    genome->deleteMutate(3,2);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(1,{(std::byte)(1)});
+    genome->overwrite(3,{(std::byte)(2)});
+    genome->overwrite(4,{(std::byte)(3)});
+    genome->overwrite(7,{(std::byte)(2)});
+    genome->overwrite(9,{(std::byte)(4)});
+    genome->remove(1,1);
+    genome->remove(3,2);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 4: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 4: ");
 
     delete genome;
 }
 
 void deleteTest5(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -248,36 +217,30 @@ void deleteTest5(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->pointMutate(2,(std::byte)(3));
-    genome->pointMutate(5,(std::byte)(4));
-    genome->deleteMutate(4,1);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(2,{(std::byte)(3)});
+    genome->overwrite(5,{(std::byte)(4)});
+    genome->remove(4,1);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(3),(std::byte)3,(std::byte)0,(std::byte)4,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 5: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 5: ");
 
     delete genome;
 }
 
 // delete last element in genome
 void deleteTest6(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -289,34 +252,28 @@ void deleteTest6(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->deleteMutate(9,1);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->remove(9,1);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)2,(std::byte)0,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 6: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 6: ");
 
     delete genome;
 }
 
 // delete first element in genome
 void deleteTest7(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -328,34 +285,28 @@ void deleteTest7(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->deleteMutate(0,1);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->remove(0,1);
+    
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)3,(std::byte)2,(std::byte)0,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 7: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 7: ");
 
     delete genome;
 }
 
 // delete series of 4 elements starting at index 0
 void deleteTest8(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -367,34 +318,28 @@ void deleteTest8(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->deleteMutate(0,4);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->remove(0,4);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 8: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 8: ");
 
     delete genome;
 }
 
 // alternating point and delete mutations
 void deleteTest9(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 5); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
@@ -406,37 +351,31 @@ void deleteTest9(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 1);
     GN::genomeWrite<uint8_t>(genome, 9, 0);
 
-    genome->pointMutate(2,(std::byte)3);
-    genome->deleteMutate(4,2);
-    genome->pointMutate(5,(std::byte)4);
-    genome->deleteMutate(5,3);
-    genome->pointMutate(3,(std::byte)4);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(2,{(std::byte)3});
+    genome->remove(4,2);
+    genome->overwrite(5,{(std::byte)4});
+    genome->remove(5,3);
+    genome->overwrite(3,{(std::byte)4});
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)3,(std::byte)4,(std::byte)4};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 9: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 9: ");
 
     delete genome;
 }
 
 void deleteTest10(bool debug) {
-    UmaGenome* genome = new UmaGenome(10,100); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 40);
     GN::genomeWrite<uint8_t>(genome, 1, 34);
     GN::genomeWrite<uint8_t>(genome, 2, 21);
@@ -448,222 +387,186 @@ void deleteTest10(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 8, 48);
     GN::genomeWrite<uint8_t>(genome, 9, 12);
 
-    genome->pointMutate(4,(std::byte)70);
-    genome->deleteMutate(0,1);
-    genome->pointMutate(1,(std::byte)49);
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(4,{(std::byte)70});
+    genome->remove(0,1);
+    genome->overwrite(1,{(std::byte)49});
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)34,(std::byte)49,(std::byte)9,(std::byte)70,(std::byte)2,(std::byte)11,(std::byte)67,(std::byte)48,(std::byte)12};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Delete Test 10: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Delete Test 10: ");
 
     delete genome;
 }
 
 void insertTest1(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 100); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 11);
     GN::genomeWrite<uint8_t>(genome, 1, 22);
     GN::genomeWrite<uint8_t>(genome, 2, 33);
     GN::genomeWrite<uint8_t>(genome, 3, 44);
     GN::genomeWrite<uint8_t>(genome, 4, 55);
 
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
     std::vector<std::byte> vals{(std::byte)(99)};
-    genome->insertMutate(1,vals);
+    genome->insert(1,vals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)99,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Insert Test 1: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Insert Test 1: ");
 
     delete genome;
-
 }
 
 void insertTest2(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 100); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 11);
     GN::genomeWrite<uint8_t>(genome, 1, 22);
     GN::genomeWrite<uint8_t>(genome, 2, 33);
     GN::genomeWrite<uint8_t>(genome, 3, 44);
     GN::genomeWrite<uint8_t>(genome, 4, 55);
 
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
-    genome->insertMutate(1,vals);
+    genome->insert(1,vals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)99,(std::byte)66,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Insert Test 2: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Insert Test 2: ");
 
     delete genome;
-
 }
 
 // insert at beginning of genome
 void insertTest3(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 100); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 11);
     GN::genomeWrite<uint8_t>(genome, 1, 22);
     GN::genomeWrite<uint8_t>(genome, 2, 33);
     GN::genomeWrite<uint8_t>(genome, 3, 44);
     GN::genomeWrite<uint8_t>(genome, 4, 55);
 
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
-    genome->insertMutate(0,vals);
+    genome->insert(0,vals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)99,(std::byte)66,(std::byte)11,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Insert Test 3: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Insert Test 3: ");
 
     delete genome;
-
 }
 
 // insert at end of genome
 void insertTest4(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 100); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 11);
     GN::genomeWrite<uint8_t>(genome, 1, 22);
     GN::genomeWrite<uint8_t>(genome, 2, 33);
     GN::genomeWrite<uint8_t>(genome, 3, 44);
     GN::genomeWrite<uint8_t>(genome, 4, 55);
 
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
-    genome->insertMutate(5,vals);
+    genome->insert(5,vals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55,(std::byte)99,(std::byte)66};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Insert Test 4: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Insert Test 4: ");
 
     delete genome;
-
 }
 
 // point and insert mutations
 void insertTest5(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 5); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
     GN::genomeWrite<uint8_t>(genome, 3, 0);
     GN::genomeWrite<uint8_t>(genome, 4, 1);
 
-    genome->pointMutate(1,(std::byte)1);
-    genome->pointMutate(3,(std::byte)2);
-    genome->pointMutate(4,(std::byte)3);
-    genome->insertMutate(1,{(std::byte)(3)});
-    genome->insertMutate(3,{(std::byte)(4), (std::byte)(4)});
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->overwrite(1,{(std::byte)1});
+    genome->overwrite(3,{(std::byte)2});
+    genome->overwrite(4,{(std::byte)3});
+    genome->insert(1,{(std::byte)(3)});
+    genome->insert(3,{(std::byte)(4), (std::byte)(4)});
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)4,(std::byte)4,(std::byte)2,(std::byte)2,(std::byte)3};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "Insert Test 5: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "Insert Test 5: ");
 
     delete genome;
-
 }
 
 // point,insert,and delete mutations
 void allMutationsTest1(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 5); 
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 4);
     GN::genomeWrite<uint8_t>(genome, 1, 3);
     GN::genomeWrite<uint8_t>(genome, 2, 2);
     GN::genomeWrite<uint8_t>(genome, 3, 0);
     GN::genomeWrite<uint8_t>(genome, 4, 1);
+
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
 
     // 4 3 2 0 1
     // 4 1 2 0 1
@@ -673,42 +576,29 @@ void allMutationsTest1(bool debug) {
     // 4 3 1 4 4 2 2 3
     // 4 3 1 4 2 2 2 3
     // 4 3 1 4 2 3
-    genome->pointMutate(1,(std::byte)1);
-    genome->pointMutate(3,(std::byte)2);
-    genome->pointMutate(4,(std::byte)3);
-    genome->insertMutate(1,{(std::byte)(3)});
-    genome->insertMutate(3,{(std::byte)(4), (std::byte)(4)});
-    genome->pointMutate(4,(std::byte)2);
-    genome->deleteMutate(5,2);
+    genome->overwrite(1,{(std::byte)1});
+    genome->overwrite(3,{(std::byte)2});
+    genome->overwrite(4,{(std::byte)3});
+    genome->insert(1,{(std::byte)(3)});
+    genome->insert(3,{(std::byte)(4), (std::byte)(4)});
+    genome->overwrite(4,{(std::byte)2});
+    genome->remove(5,2);
 
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)4,(std::byte)2,(std::byte)3};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "All-Mutations Test 1: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "All-Mutations Test 1: ");
 
     delete genome;
-
 }
 
 // point,insert,and delete mutations
 void allMutationsTest2(bool debug) {
-    UmaGenome* genome = new UmaGenome(10, 100); 
+    AbstractGenome* genome = new UmaGenome(10); 
     GN::genomeWrite<uint8_t>(genome, 0, 40);
     GN::genomeWrite<uint8_t>(genome, 1, 34);
     GN::genomeWrite<uint8_t>(genome, 2, 21);
@@ -719,6 +609,11 @@ void allMutationsTest2(bool debug) {
     GN::genomeWrite<uint8_t>(genome, 7, 67);
     GN::genomeWrite<uint8_t>(genome, 8, 48);
     GN::genomeWrite<uint8_t>(genome, 9, 12);
+
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
 
     // parent: 40,34,21,9,0,2,11,67,48,12
     // after mutation 1: 60,50,51,40,34,21,9,0,2,11,67,48,12 - CORRECT
@@ -731,73 +626,55 @@ void allMutationsTest2(bool debug) {
     // after mutation 8: 50,49,40,99,70,21,9,0,2,11,67,48,42
     // current: 50,49,40,99,70,21,9,0,2,11,67,48,42
 
-    genome->insertMutate(0,{(std::byte)(60), (std::byte)(50), (std::byte)(51)});
-    genome->pointMutate(4,(std::byte)70);
-    genome->deleteMutate(0,1);
-    genome->insertMutate(12,{(std::byte)(62), (std::byte)(52), (std::byte)(42)});
-    genome->deleteMutate(12,2);
-    genome->insertMutate(3,{(std::byte)(99)});
-    genome->deleteMutate(12,1);
-    genome->pointMutate(1,(std::byte)49);
+    genome->insert(0,{(std::byte)(60), (std::byte)(50), (std::byte)(51)});
+    genome->overwrite(4,{(std::byte)70});
+    genome->remove(0,1);
+    genome->insert(12,{(std::byte)(62), (std::byte)(52), (std::byte)(42)});
+    genome->remove(12,2);
+    genome->insert(3,{(std::byte)(99)});
+    genome->remove(12,1);
+    genome->overwrite(1,{(std::byte)49});
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)50,(std::byte)49,(std::byte)40,(std::byte)99,(std::byte)70,(std::byte)21,(std::byte)9,(std::byte)0,(std::byte)2,(std::byte)11,(std::byte)67,(std::byte)48,(std::byte)42};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    for(int i = 0; i < answer.size() && !failed; i++) {
-        if(genome->getCurrentGenomeAt(i) != answer[i]){
-            failed = true;
-        }
-    }
-
-    std::cout << "All-Mutations Test 2: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "All-Mutations Test 2: ");
 
     delete genome;
 
 }
 
-void demoTest(bool debug) {
-    UmaGenome* genome = new UmaGenome(5, 100); 
+// example from powerpoint demo
+void allMutationsTest3(bool debug) {
+    AbstractGenome* genome = new UmaGenome(5); 
     GN::genomeWrite<uint8_t>(genome, 0, 11);
     GN::genomeWrite<uint8_t>(genome, 1, 22);
     GN::genomeWrite<uint8_t>(genome, 2, 33);
     GN::genomeWrite<uint8_t>(genome, 3, 44);
     GN::genomeWrite<uint8_t>(genome, 4, 55);
 
-    genome->insertMutate(1, {(std::byte)(99)});
-    genome->deleteMutate(2, 2);
-    genome->pointMutate(2, (std::byte)(65));
-    genome->insertMutate(2, {(std::byte)(88), (std::byte)(77)});
+    if (debug) {
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+    }
+
+    genome->insert(1, {(std::byte)(99)});
+    genome->remove(2, 2);
+    genome->overwrite(2, {(std::byte)(65)});
+    genome->insert(2, {(std::byte)(88), (std::byte)(77)});
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+    }
 
     std::vector<std::byte> answer{(std::byte)(11),(std::byte)(99),(std::byte)(88),(std::byte)(77),(std::byte)(65),(std::byte)(55)};
-    bool failed = false;
-    if (genome->getCurrentGenomeSize() != answer.size())
-        failed = true;
-    else {
-        for(int i = 0; i < answer.size() && !failed; i++) {
-            if(genome->getCurrentGenomeAt(i) != answer[i]){
-                failed = true;
-            }
-        }
-    }
-
-    std::cout << "Demo Test: ";
-    if(failed) 
-        std::cout << "failed\n";
-    else
-        std::cout << "passed\n";
-
-    if(debug){
-        printDebugOutput(genome);
-    }
+    
+    printResults(answer, genome, "All-Mutations Test 3: ");
 
     delete genome;
 }
@@ -838,6 +715,7 @@ void runAllMutationsTests(bool debug) {
    std::cout << "RUNNING ALL-MUTATIONS TESTS: " << std::endl;
    allMutationsTest1(debug);
    allMutationsTest2(debug);
+   allMutationsTest3(debug);
 }
 
 void runChangelogTests(bool debug) {

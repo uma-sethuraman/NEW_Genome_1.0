@@ -10,20 +10,17 @@ private:
     // custom properties & functions
     std::vector<std::byte> sites;
 
-    int alphabetSize; // to use when randomizing mutation values, not used yet
-
     std::map<int, std::byte> changelog;
     std::map<int, int> offsetMap;
-    int currentGenomeSize; // size of current genome
+    bool mutationsOccurred; // false if no mutations have occurred on sites yet
 
 public:
     UmaGenome(size_t _size);
-    UmaGenome(size_t _size, int alph_size);
     ~UmaGenome() override {
         //std::cout << "done" << std::endl;
     }
 
-    std::byte* data() override;
+    std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
     virtual void resize(size_t new_size) override;
 
@@ -46,23 +43,17 @@ public:
 
     virtual void mutate() override; 
 
+    void pointMutate(size_t index, std::byte value);
+    virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
+    virtual void insert(size_t index, std::vector<std::byte> segment) override;
+    virtual void remove(size_t index, size_t segmentSize) override;
+    virtual void show() override;
+
     int getLowerBoundOffset(int key);
-    void pointMutate(int index, std::byte value);
-    void insertMutate(int start, std::vector<std::byte> values);
-    void deleteMutate(int start, int size);
-
-    int getAlphabetSize() {
-        return alphabetSize;
-    }
-
-    int getCurrentGenomeSize() {
-        return currentGenomeSize;
-    }
 
     void printChangelog();
     void printOffsetMap();
     std::byte getCurrentGenomeAt(int pos); // random access method
-    void reconstructGenome();
 };
 
 namespace NK {
