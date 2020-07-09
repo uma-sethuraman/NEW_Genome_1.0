@@ -26,19 +26,17 @@ namespace TestGenomeLite
         size_t size = 100;
         AbstractGenome* genome = new GenomeLite(size);
 
-        // genome->show();
+        genome->show();
 
-        // for (size_t i(0); i < 40; i++)
+        // for (size_t i(0); i < size; i++)
         // {
-        //     *genome->data(i) = (Byte)10;
-        //     std::cout << i << std::endl;
-        //     genome->show();
-            
+        //     *genome->data(i) = (Byte)10;            
         // }
-        // std::vector< Byte > segment(size, (Byte)size);
-        // genome->overwrite(0, segment);
 
-        // genome->show();
+        std::vector< Byte > segment(size, (Byte)size);
+        genome->overwrite(0, segment);
+
+        genome->show();
 
 
         delete genome;

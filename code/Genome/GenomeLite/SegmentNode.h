@@ -2,24 +2,22 @@
  * \file SegmentNode.h
  * \author Victoria Cao
  * 
- * \brief struct definition for a SegmentNode
+ * \brief Segment node class for segmentation of data
+ * implementation
  **/
 
 #pragma once
-
-#include <limits>
-#include <memory>
 #include <cstdint>
-#include <vector>
-#include <iostream>
 #include <cstddef>
+#include <memory>
+#include <iostream>
+#include <vector>
 
 #include "GeneSegment.h"
 
-// define Byte
-typedef std::byte Byte;
+typedef std::byte Byte; // c++17 std::byte doesn't always work
 
-class MemoryPool;
+class SegmentPool;
 
 /** Implementation of a genome object **/
 class SegmentNode
@@ -30,15 +28,14 @@ private:
     friend class SegmentTree;
 
     /// Data variables
-    std::shared_ptr< GeneSegment > Gene;
-    Byte* Start;
-    size_t Size;
-
+    std::shared_ptr< GeneSegment > Data;
+	Byte* Start; ///< Start of memory
+    size_t Size; ///< Size of data
 
     /// Linked list variables
-    size_t Left = 0;
-    size_t Right = 0;
-    size_t Parent = 0;
+    size_t Left = std::numeric_limits<size_t>::max();
+    size_t Right = std::numeric_limits<size_t>::max();
+    size_t Parent = std::numeric_limits<size_t>::max();
 
     int Height = 0;
     size_t Weight = 0;
@@ -51,68 +48,35 @@ public:
     /** Constructor
      * \param start beginning of data
      * \param size size of data */
-    SegmentNode(size_t maxSize, size_t size, size_t pos) 
-        : Gene(std::make_shared< GeneSegment >(maxSize, size)), Size(size), Weight(size), Pos(pos) 
-    {
-        Start = Gene->Gene;
-    }
-
-    /** Constructor
-     * \param start beginning of data
-     * \param size size of data */
-    SegmentNode(size_t size, size_t pos) 
-        : Gene(std::make_shared< GeneSegment >(size, size)), Size(size), Weight(size), Pos(pos)
-    {
-        Start = Gene->Gene;
-    }
+    SegmentNode(std::shared_ptr< GeneSegment> data, size_t pos) 
+        : Data(data), Start(data->GetData()), Size(data->GetSize()), Weight(data->GetSize()), Pos(pos) {}
 
 
     /** Constructor
      * \param start beginning of data
      * \param size size of data */
-    SegmentNode(std::shared_ptr< GeneSegment> gene, size_t pos) 
-        : Gene(gene), Start(gene->Gene), Size(gene->Size), Weight(gene->Size), Pos(pos) {}
-
-
-    /** Constructor
-     * \param start beginning of gene
-     * \param size size of gene */
-    SegmentNode(std::shared_ptr< GeneSegment> gene, size_t pos, Byte* start, size_t size) 
-        : Gene(gene), Start(start), Size(size), Weight(size), Pos(pos) {}
+    SegmentNode(std::shared_ptr< GeneSegment> data, size_t pos, Byte* start, size_t size) 
+        : Data(data), Start(start), Size(size), Weight(size), Pos(pos) {}
 
     /** Deconstructor **/
-    ~SegmentNode() {}
+    ~SegmentNode() { }
 
-    /** Gets size
-     * \returns size of data **/
     const size_t GetPos() { return Pos; }
-
-    /** Gets size
-     * \returns size of data **/
     const size_t GetSize() { return Size; }
-
-    /** Gets size
-     * \returns size of data **/
     const size_t GetWeight() { return Weight; }
-
-    /** Gets height
-     * \returns height of node**/
     const size_t GetHeight() { return Height; }
 
     Byte* GetData(size_t index);
-    SegmentNode* GetLeft(MemoryPool* pool);
-    SegmentNode* GetRight(MemoryPool* pool);
-    SegmentNode* GetParent(MemoryPool* pool);
+    SegmentNode* GetLeft(SegmentPool* pool);
+    SegmentNode* GetRight(SegmentPool* pool);
+    SegmentNode* GetParent(SegmentPool* pool);
 
-    /** Gets size
-     * \returns size of data **/
+    /** Gets use count 
+     * \returns use count of the smart pointer **/
+    bool Unique() { return Data.use_count() == 1; }
+
     void SetWeight(size_t weight) { Weight = weight; }
-
-    /** Gets size
-     * \returns size of data **/
     void SetHeight(int height) { Height = height; }
-
-
     void SetLeft(SegmentNode* node);
     void SetRight(SegmentNode* node);
     void SetParent(SegmentNode* node);
@@ -120,12 +84,8 @@ public:
 
     void TruncateLeft(size_t cutSize = 1);
     void TruncateRight(size_t cutSize = 1);
-    void Delete(size_t index, size_t segmentSize);
-    void Insert(size_t index, std::vector<Byte> segment);
-    void Overwrite(size_t index, std::vector<Byte> segment);
-
-
-    SegmentNode* Cut(MemoryPool* pool, size_t index);
+    SegmentNode* Cut(SegmentPool* pool, size_t index);
+    void Overwrite(size_t index, std::vector< Byte > &segment, size_t segmentStart = 0);
     void Print();
 
 };

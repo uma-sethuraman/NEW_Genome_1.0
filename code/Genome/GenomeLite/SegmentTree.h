@@ -15,7 +15,8 @@
 #include <queue>
 #include <cmath>
 
-#include "MemoryPool.h"
+#include "GeneSegment.h"
+#include "SegmentPool.h"
 #include "SegmentNode.h"
 
 typedef std::byte Byte; // easy reading
@@ -29,23 +30,25 @@ private:
     /// member variables
     SegmentNode* Root; ///< Root node of tree
     size_t Size = 1;    ///< Size of tree
-    MemoryPool* Pool; ///< allocation pool for nodes
+    SegmentPool* Pool; ///< allocation pool for nodes
 
 
     /// helper functions
-    SegmentNode* Initialize(size_t size);
-
     int GetHeight(SegmentNode* node);
     int GetBalance(SegmentNode* node);
     void UpdateHeight(SegmentNode* node);
     void UpdateWeight(SegmentNode* node);
     void Update(SegmentNode* node);
+    SegmentNode* CreateNode(size_t size);
 
     ///.rebalancing functions
     SegmentNode* RotateRight(SegmentNode* node);
     SegmentNode* RotateLeft(SegmentNode* node);
     SegmentNode* ReBalance(SegmentNode* node);
 
+    /// helper function
+    void DeleteTree(SegmentNode* node);
+    SegmentNode* Initialize(size_t size);
 
 public:
     /** (deleted) Default constructor **/
@@ -53,15 +56,19 @@ public:
 
     /** Constructor 
      * \param genome new root of tree **/
-    SegmentTree(size_t size);
+    SegmentTree(size_t size) 
+        : Pool(new SegmentPool(size*3/4))
+    {
+        Root = Initialize(size);
+    }
 
     /** Copy constructor
      * \param tree **/
     SegmentTree(const SegmentTree &tree)
-        : Size(tree.Size), Pool(new MemoryPool(*(tree.Pool))) 
+        : Size(tree.Size), Pool(new SegmentPool(*(tree.Pool))) 
     {
         size_t index = tree.Root->GetPos();
-        Root = Pool->At(index);
+        Root = Pool->GetNode(index);
     }
 
     /** Destructor **/
@@ -79,13 +86,13 @@ public:
      * \return size **/
     const size_t GetSiteCount() { return Root->GetWeight(); };
 
-    Byte* GetData(size_t index = 0, size_t byteSize = 0);
+    Byte* GetData(size_t index);
 
     /// mutation functions
     std::pair<SegmentNode*, size_t> Find(size_t index);
     void Delete(size_t index, size_t segmentSize);
-    void Insert(size_t index, std::vector<Byte > segment);
-    void Overwrite(size_t index, std::vector<Byte > segment);
+    void Insert(size_t index, std::vector<std::byte> &segment);
+    void Overwrite(size_t index, std::vector<std::byte> &segment);
     void Print();
 
 };

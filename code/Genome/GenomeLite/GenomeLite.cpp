@@ -19,7 +19,7 @@ void GenomeLite::Reallocate()
  **/
 Byte* GenomeLite::data(size_t index, size_t byteSize)
 {
-    return Tree->GetData(index, byteSize);
+    return Tree->GetData(index);
 }
 
 /** Overwrites an index in the gene

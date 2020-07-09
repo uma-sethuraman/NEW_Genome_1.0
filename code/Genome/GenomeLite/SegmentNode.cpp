@@ -4,10 +4,9 @@
  **/
 
 #include <iostream>
-
 #include "SegmentNode.h"
-#include "MemoryPool.h"
 
+#include "SegmentPool.h"
 
 /** Gets data from Segment
  * \returns size of data **/
@@ -24,34 +23,33 @@ Byte* SegmentNode::GetData(size_t index)
     
 }
 
-
 /** Gets left node reference
  * \returns node reference **/
-SegmentNode* SegmentNode::GetLeft(MemoryPool* pool)
+SegmentNode* SegmentNode::GetLeft(SegmentPool* pool)
 {
-    if (!Left)
+    if (Left == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->At(Left);
+    return pool->GetNode(Left);
 }
 
 
 /** Gets right node referencet
  * \returns node reference **/
-SegmentNode* SegmentNode::GetRight(MemoryPool* pool)
+SegmentNode* SegmentNode::GetRight(SegmentPool* pool)
 {
-    if (!Right)
+    if (Right == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->At(Right);
+    return pool->GetNode(Right);
 }
 
 
 /** Gets right node referencet
  * \returns node reference **/
-SegmentNode* SegmentNode::GetParent(MemoryPool* pool)
+SegmentNode* SegmentNode::GetParent(SegmentPool* pool)
 {
-    if (!Parent)
+    if (Parent == std::numeric_limits<size_t>::max())
         return nullptr;
-    return pool->At(Parent);
+    return pool->GetNode(Parent);
 }
 
 /** Sets Left node
@@ -61,7 +59,7 @@ void SegmentNode::SetLeft(SegmentNode* node)
     if (node)
         Left = node->GetPos();
     else
-        Left = 0;
+        Left = std::numeric_limits<size_t>::max();
 }
 
 /** Sets Right node
@@ -71,7 +69,7 @@ void SegmentNode::SetRight(SegmentNode* node)
     if (node)
         Right = node->GetPos();
     else
-        Right = 0;
+        Right = std::numeric_limits<size_t>::max();
 }
 
 /** Sets Parent node
@@ -81,7 +79,7 @@ void SegmentNode::SetParent(SegmentNode* node)
     if (node)
         Parent = node->GetPos();
     else
-        Parent = 0;
+        Parent = std::numeric_limits<size_t>::max();
 }
 
 
@@ -104,48 +102,31 @@ void SegmentNode::TruncateRight(size_t cutSize)
     Weight -= (int)cutSize;
 }
 
-/** 
- * \param index 
- **/
-void SegmentNode::Delete(size_t index, size_t segmentSize)
-{
-
-}
-
-
-/** 
- * \param index 
- **/
-void SegmentNode::Insert(size_t index, std::vector<Byte> segment)
-{
-
-}
-
-/** 
- * \param index 
- **/
-void SegmentNode::Overwrite(size_t index, std::vector<Byte> segment)
-{
-    for (size_t i(0); i < segment.size(); i++)
-    {
-        *(Start+index+i) = segment[i];
-    }
-}
-
 
 /** Subdivide segment at index
  * \param pool The pool of memory to make a pointer from
  * \param index Index to cut the segment
  * \return pair of two new SegmentNodes to the cut segments 
  **/
-SegmentNode* SegmentNode::Cut(MemoryPool* pool, size_t index)
+SegmentNode* SegmentNode::Cut(SegmentPool* pool, size_t index)
 {
-    SegmentNode* cutSegment = pool->Allocate(Gene, Start+index, Size-index);
+    SegmentNode* cutSegment = pool->CreateNode(Data, Start+index, Size-index);
     TruncateRight(Size-index);
 
     return cutSegment;
 }
 
+/** Overwrites segmentNode
+ * \param index to start overwriting
+ * \param segment to overwrite with
+ **/
+void SegmentNode::Overwrite(size_t index, std::vector< Byte > &segment, size_t segmentStart)
+{
+    size_t size = segment.size();
+    if (size > Size)
+        size = Size;
+    std::memcpy(Start+index, &segment[segmentStart], size);
+}
 
 
 /** prints node info **/
@@ -154,8 +135,8 @@ void SegmentNode::Print()
     std::cout << "SegmentNode " << this << std::endl;
     std::cout << "weight " << std::dec << Weight << " size " << Size << " height " << Height << std::endl;
     std::cout << "left " << Left << std::endl;
-    std::cout << "B " << Start << std::endl;
-    std::cout << "E " << Start+Size << std::endl;
+    std::cout << "B " << (unsigned long)Start << std::endl;
+    std::cout << "E " << (unsigned long)Start+Size << std::endl;
     
     for (size_t i = 0; i < Size; i++)
     {
