@@ -23,64 +23,26 @@ Byte* SegmentNode::GetData(size_t index)
     
 }
 
-/** Gets left node reference
- * \returns node reference **/
-SegmentNode* SegmentNode::GetLeft(SegmentPool* pool)
-{
-    if (Left == std::numeric_limits<size_t>::max())
-        return nullptr;
-    return pool->At(Left);
-}
 
+// /** Gets right node referencet
+//  * \returns node reference **/
+// SegmentNode* SegmentNode::GetParent(SegmentPool* pool)
+// {
+//     if (Parent == std::numeric_limits<size_t>::max())
+//         return nullptr;
+//     return pool->At(Parent);
+// }
 
-/** Gets right node referencet
- * \returns node reference **/
-SegmentNode* SegmentNode::GetRight(SegmentPool* pool)
-{
-    if (Right == std::numeric_limits<size_t>::max())
-        return nullptr;
-    return pool->At(Right);
-}
+// /** Sets Left node
+//  * \param node **/
+// void SegmentNode::SetLeft(SegmentNode* node)
+// {
+//     if (node)
+//         Left = node->GetPos();
+//     else
+//         Left = std::numeric_limits<size_t>::max();
+// }
 
-
-/** Gets right node referencet
- * \returns node reference **/
-SegmentNode* SegmentNode::GetParent(SegmentPool* pool)
-{
-    if (Parent == std::numeric_limits<size_t>::max())
-        return nullptr;
-    return pool->At(Parent);
-}
-
-/** Sets Left node
- * \param node **/
-void SegmentNode::SetLeft(SegmentNode* node)
-{
-    if (node)
-        Left = node->GetPos();
-    else
-        Left = std::numeric_limits<size_t>::max();
-}
-
-/** Sets Right node
- * \param node **/
-void SegmentNode::SetRight(SegmentNode* node)
-{
-    if (node)
-        Right = node->GetPos();
-    else
-        Right = std::numeric_limits<size_t>::max();
-}
-
-/** Sets Parent node
- * \param node **/
-void SegmentNode::SetParent(SegmentNode* node)
-{
-    if (node)
-        Parent = node->GetPos();
-    else
-        Parent = std::numeric_limits<size_t>::max();
-}
 
 
 /** Truncates Data from left 

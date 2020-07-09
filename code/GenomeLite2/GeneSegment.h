@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <vector>
 
 typedef std::byte Byte; // c++17 std::byte doesn't always work
 
@@ -22,41 +23,16 @@ class GeneSegment
 private:
     friend class SegmentNode; 
     
-    Byte* Gene; ///< new byte of data
-    const size_t MaxSize;
-    size_t Size;
+    std::vector< Byte > Gene;
     
 
 public:
-
-    /** (deleted) Default Constructor **/
-    GeneSegment() = delete;
-
-    /** Constructor 
-     * \param size of the gene segment **/
-    GeneSegment(size_t size)
-        : Gene(new Byte[size]), MaxSize(size), Size(size) {}
-
-
-    GeneSegment(size_t maxSize, size_t size)
-        : Gene(new Byte[maxSize]), MaxSize(maxSize), Size(size) {}
-
-    GeneSegment(const std::vector< Byte > &segment, size_t size, size_t maxSize, size_t startSegment = 0)
-        : Gene(new Byte[maxSize]), MaxSize(maxSize), Size(size) 
-    {
-        std::memcpy(Gene, &segment[startSegment], Size);
-    }
-
 
     /** Deconstructor **/
     ~GeneSegment() 
     { 
         delete[] Gene; 
     }
-
-    /** Gets data of gene 
-     * \return pointer to data **/
-    Byte* GetData() { return Gene; }
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
@@ -67,7 +43,7 @@ public:
     void Print()
     {
         std::cout << "size: " << Size << " Values: ";
-        for (size_t i = 0; i < Size; i++)
+        for (size_t i = 0; i < Gene.size(); i++)
         {
             std::cout << (int)Gene[i] << ", ";
         }

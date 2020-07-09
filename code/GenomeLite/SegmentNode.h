@@ -32,12 +32,9 @@ private:
 	Byte* Start; ///< Start of memory
     size_t Size; ///< Size of data
 
-    /// Linked list variables
-    size_t Left = std::numeric_limits<size_t>::max();
-    size_t Right = std::numeric_limits<size_t>::max();
-    size_t Parent = std::numeric_limits<size_t>::max();
+    
 
-    int Height = 0;
+
     size_t Weight = 0;
     size_t Pos;
 
@@ -67,9 +64,7 @@ public:
     const size_t GetHeight() { return Height; }
 
     Byte* GetData(size_t index);
-    SegmentNode* GetLeft(SegmentPool* pool);
-    SegmentNode* GetRight(SegmentPool* pool);
-    SegmentNode* GetParent(SegmentPool* pool);
+    SegmentNode* GetNode(size_t index, SegmentPool* pool);
 
     /** Gets use count 
      * \returns use count of the smart pointer **/
@@ -77,9 +72,6 @@ public:
 
     void SetWeight(size_t weight) { Weight = weight; }
     void SetHeight(int height) { Height = height; }
-    void SetLeft(SegmentNode* node);
-    void SetRight(SegmentNode* node);
-    void SetParent(SegmentNode* node);
 
 
     void TruncateLeft(size_t cutSize = 1);

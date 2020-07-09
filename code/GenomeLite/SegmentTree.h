@@ -33,67 +33,7 @@ private:
     SegmentPool* Pool; ///< allocation pool for nodes
 
 
-    /// helper functions
-    int GetHeight(SegmentNode* node);
-    int GetBalance(SegmentNode* node);
-    void UpdateHeight(SegmentNode* node);
-    void UpdateWeight(SegmentNode* node);
-    void Update(SegmentNode* node);
-
-    ///.rebalancing functions
-    SegmentNode* RotateRight(SegmentNode* node);
-    SegmentNode* RotateLeft(SegmentNode* node);
-    SegmentNode* ReBalance(SegmentNode* node);
-
-    /// helper function
-    void DeleteTree(SegmentNode* node);
-    SegmentNode* Initialize(size_t size);
-
 public:
-    /** (deleted) Default constructor **/
-    SegmentTree() = delete;
-
-    /** Constructor 
-     * \param genome new root of tree **/
-    SegmentTree(size_t size) 
-        : Pool(new SegmentPool(size*3/4))
-    {
-        Root = Initialize(size);
-    }
-
-    /** Copy constructor
-     * \param tree **/
-    SegmentTree(const SegmentTree &tree)
-        : Size(tree.Size), Pool(new SegmentPool(*(tree.Pool))) 
-    {
-        size_t index = tree.Root->GetPos();
-        Root = Pool->At(index);
-    }
-
-    /** Destructor **/
-    ~SegmentTree() { delete Pool; }
-
-    /** Gets root
-     * \return root **/
-    SegmentNode* GetRoot() { return Root; };
-
-    /** Gets size
-     * \return size **/
-    const size_t GetSize() { return Size; };
-
-    /** Gets number of sites
-     * \return size **/
-    const size_t GetSiteCount() { return Root->GetWeight(); };
-
-    Byte* GetData(size_t index);
-
-    /// mutation functions
-    std::pair<SegmentNode*, size_t> Find(size_t index);
-    void Remove(size_t index, size_t segmentSize);
-    void Insert(size_t index, const std::vector<std::byte>& segment);
-    SegmentNode* IndirectInsert(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment);
-    void Overwrite(size_t index, const std::vector<std::byte>& segment);
-    SegmentNode* IndirectOverwrite(SegmentNode* node, size_t offset, const std::vector<std::byte>& segment, size_t startSegment);
-    void Print();
+    
 
 };

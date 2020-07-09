@@ -66,25 +66,9 @@ public:
         return &Pool[index]; 
     }
 
-    /** Creates a new node in the pool
-     * \param data to make SegmentNOde from
-     * \return pointer to newly allocated node **/
-    SegmentNode* Allocate(std::shared_ptr< GeneSegment> data)
+    SegmentNode* Allocate() 
     {
-        Pool[Tail] = SegmentNode(data, Tail); // assign node the data
-        return &Pool[Tail++];
-
-        return nullptr;
-    }
-
-    /** Creates a new node in the pool
-     * \param data to make SegmentNOde from
-     * \param start Start of data within the segment
-     * \param size of data
-     * \return pointer to newly allocated node **/
-    SegmentNode* Allocate(std::shared_ptr< GeneSegment> data, Byte* start, size_t size) 
-    {
-        Pool[Tail] = SegmentNode(data, Tail, start, size); // assign node the data
+        Pool[Tail] = SegmentNode(); // assign node the data
         return &Pool[Tail++];
 
         return nullptr;
