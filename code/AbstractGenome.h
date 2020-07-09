@@ -26,11 +26,6 @@ public:
     
     virtual void resize(size_t new_size) {size_ = new_size;};
 
-    /** Gives the user a new byte array of memory
-     * \param index index into the genome
-     * \param byteSize size of memory to get (0: entire genome of contiguous memory)
-     * \returns byte pointer of contiguous memory of byteSize at index of genome
-    **/
     virtual std::byte* data(size_t index = 0, size_t byteSize = 0) {
         std::cout << "data has not been written for this genome class" << std::endl;
         exit(1);
@@ -43,26 +38,6 @@ public:
 
     virtual void mutate() {
         std::cout << "mutate has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    virtual void insertMutation(size_t index, std::vector<std::byte> values) {
-        std::cout << "insertMutation has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    virtual void insertMutation(size_t index, std::byte value) {
-        std::cout << "insertMutation has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    virtual void deleteMutation(size_t index, int delta) {
-        std::cout << "deleteMutation has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    virtual void pointMutation(size_t index, std::byte value) {
-        std::cout << "pointMutation has not been written for this genome class" << std::endl;
         exit(1);
     }
 
@@ -94,15 +69,15 @@ public:
 
     // new functions
 
-    // starting at index, write values in segement over values currently in genome
+    // starting at index, write values in segment over values currently in genome
     virtual void overwrite(size_t index, std::vector<std::byte> segment) {
         std::cout << "overwrite has not been written for this genome class" << std::endl;
         exit(1);
     }
 
-    // starting at index, write values in segement genome between genome[index-1] and genome[index]
+    // starting at index, write values in segment genome between genome[index-1] and genome[index]
     virtual void insert(size_t index, std::vector<std::byte> segment) {
-        std::cout << "insert has not been written for this genome class" << std::endl;
+        std::cout << "insert vector has not been written for this genome class" << std::endl;
         exit(1);
     }
 
@@ -111,15 +86,7 @@ public:
         std::cout << "remove has not been written for this genome class" << std::endl;
         exit(1);
     }
-
-    // print the whole genome
-    virtual void show()
-    {
-        std::cout << "show has not been written for this genome class :(" << std::endl;
-    }
-
 };
-
 
 namespace GN {
 

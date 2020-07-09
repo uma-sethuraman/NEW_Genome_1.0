@@ -10,7 +10,8 @@ class StephanieGenome : public AbstractGenome {
 private:
 	struct ChangelogStruct {
 		std::byte value;
-		int offset;
+		size_t insertOffset;
+		size_t removeOffset;
 	};
 	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
@@ -22,17 +23,15 @@ public:
 		std::cout << "\ndone" << std::endl;
 	}
 
-	std::byte* data() override;
+	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
 	virtual void resize(size_t new_size) override;
 
-	virtual void insertMutation(size_t index, std::vector<std::byte> values) override;
+	virtual void insert(size_t index, std::vector<std::byte> segment) override;
 
-	virtual void insertMutation(size_t index, std::byte value) override;
+	virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
 
-	virtual void deleteMutation(size_t index, int offset) override;
-
-	virtual void pointMutation(size_t index, std::byte value) override;
+	virtual void remove(size_t index, size_t segmentSize) override;
 
 	virtual void printChangelog() override;
 
