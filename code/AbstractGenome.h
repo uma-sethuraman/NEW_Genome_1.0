@@ -20,12 +20,17 @@ public:
 
     AbstractGenome(size_t _size) :size_(_size) {}
 
-    virtual ~AbstractGenome() {} // member function that you expect to be redefined in derived classes
+    virtual ~AbstractGenome() {} 
     
     virtual size_t size() {return size_;}
     
     virtual void resize(size_t new_size) {size_ = new_size;};
 
+    /** Gives the user a new byte array of memory
+    * \param index index into the genome
+    * \param byteSize size of memory to get (0: entire genome of contiguous memory)
+    * \returns byte pointer of contiguous memory of byteSize at index of genome
+    **/
     virtual std::byte* data(size_t index = 0, size_t byteSize = 0) {
         std::cout << "data has not been written for this genome class" << std::endl;
         exit(1);
@@ -41,18 +46,20 @@ public:
         exit(1);
     }
 
+    virtual void initalize() {
+        std::cout << "initalize has not been written for this genome class" << std::endl;
+        exit(1);
+    }
+
+    // defined by stephanie
     virtual void printChangelog() {
         std::cout << "printChangelog has not been written for this genome class" << std::endl;
         exit(1);
     }
 
+    //defined by stephanie
     virtual void generateGenome(AbstractGenome* genome) {
         std::cout << "generateGenome has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    virtual void initalize() {
-        std::cout << "initalize has not been written for this genome class" << std::endl;
         exit(1);
     }
 
@@ -86,6 +93,17 @@ public:
         std::cout << "remove has not been written for this genome class" << std::endl;
         exit(1);
     }
+
+    // print the whole genome
+    virtual void show() {
+        std::cout << "show has not been written for this genome class :(" << std::endl;
+    }
+
+    virtual std::vector<size_t> find_all(std::vector<std::byte>& pattern) {
+        std::cout << "find_all has not been write for this genome type. returning empty vector for now..." << std::endl;
+        return std::vector<size_t>({});
+    }
+
 };
 
 namespace GN {
