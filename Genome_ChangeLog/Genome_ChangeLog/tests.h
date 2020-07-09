@@ -1,7 +1,6 @@
-#ifdef DEBUG
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
+
 #include "catch.hpp"
-#endif
 
 #include <iostream>
 #include <map>
@@ -15,10 +14,10 @@ void mutation_insert(int ind, const std::vector<int>& ins_vals, std::map<int, st
 int get_ind(int ind_curr, const std::map<int, std::pair<int, bool>>& r_map);
 
 std::vector<int> offspring_recon(const std::vector<int>& genome_orig,
-                                const std::map<int, std::pair<int, bool>>& change_log_map);
+                                const std::map<int, std::pair<int, bool>>& change_log_map, const std::unordered_map<int, std::vector<int>>& insertions);
 
 
-#ifdef DEBUG
+//#ifdef DEBUG
 TEST_CASE("Empty parent genome") {
     std::vector<int> genome{}; // how is it different from std::vector<int> genome;
     std::map<int, std::pair<int, bool>> r_map{};
@@ -130,7 +129,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -162,7 +161,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -196,7 +195,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -232,7 +231,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -269,7 +268,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -307,7 +306,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -360,7 +359,7 @@ SCENARIO("Change log can be used to reconstruct offspring genome from original g
                 }
 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -402,7 +401,7 @@ SCENARIO("Insert within insert") {
                 }
                 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
         
@@ -445,7 +444,7 @@ SCENARIO("Insert within insert") {
                 }
                 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
         
@@ -488,7 +487,7 @@ SCENARIO("Insert within insert") {
                 }
                 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
         
@@ -532,7 +531,7 @@ SCENARIO("Insert within insert") {
                 }
                 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
         
@@ -576,7 +575,7 @@ SCENARIO("Insert within insert") {
                 }
                 
                 // Check reconstructed offspring genome:
-                CHECK(offspring_recon(genome_orig, change_log) == expected_offspring);
+                CHECK(offspring_recon(genome_orig, change_log, insertions) == expected_offspring);
             }
         }
 
@@ -585,5 +584,5 @@ SCENARIO("Insert within insert") {
 
 
 
-#endif
+//#endif
 

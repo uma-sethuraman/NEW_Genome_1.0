@@ -9,6 +9,7 @@
 #include "utilities.h"
 #include "TetianaGenome.h"
 #include "TD_NKFitnessEvaluator.h"
+#include "TetianaTests.h"
 
 
 void testData(AbstractGenome* genome)
@@ -196,6 +197,9 @@ void runGeneTest(AbstractGenome* genome) {
 }
 
 void find_patterns_tests() {
+    std::cout << "-------------------------------" << std::endl;
+    std::cout << "-- begin find_patterns_tests --" << std::endl;
+    
 	AbstractGenome* test_genome = new TestGenome(30);
 	size_t i(0);
 	GN::genomeWrite<std::byte>({ .genome = test_genome, .index = i++, .value = std::byte(3) });
@@ -259,6 +263,7 @@ void find_patterns_tests() {
 void test_alterations() {
 	std::cout << "----------------------------" << std::endl;
 	std::cout << "-- begin test_alterations --" << std::endl;
+    
 	AbstractGenome* test_genome = new TestGenome(0);
 	test_genome->show();
 	test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
@@ -269,23 +274,41 @@ void test_alterations() {
 	test_genome->show();
 	test_genome->remove(1, 2);
 	test_genome->show();
+    
 	std::cout << "-- done test_alterations --" << std::endl;
 	std::cout << "---------------------------" << std::endl << std::endl;
 }
-int main() {
+
+void test_alterations_tetiana() {
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "-- begin test_alterations_tetiana --" << std::endl;
+    
+    AbstractGenome* test_genome = new TetianaGenome(0);
+    test_genome->show();
+    test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
+    test_genome->show();
+    test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
+    test_genome->show();
+    
+    std::cout << "-- done test_alterations_tetiana --" << std::endl;
+    std::cout << "---------------------------" << std::endl << std::endl;
+}
+
+int main(int argc, char* argv[]) {
     
     //AbstractGenome* genome = new TetianaGenome(8);
     //delete genome;
     
     //evolve_NK();
     
-	AbstractGenome* genome = new TetianaGenome(8);
-	test_alterations();
+	//AbstractGenome* genome = new TetianaGenome(8);
+	
+    test_alterations();
+    test_alterations_tetiana();
+    find_patterns_tests();
 
-	find_patterns_tests();
-
-	//AbstractGenome* genome = new TestGenome(8);
-	// AbstractGenome  & y = *(new TestGenome);
+	AbstractGenome* genome = new TestGenome(8);
+	//AbstractGenome  & y = *(new TestGenome);
 
 	runTests(genome);
 	testData(genome);
@@ -293,11 +316,13 @@ int main() {
 
 	AbstractGenome* secondGenome = new TetianaGenome(200);
 	runGeneTest(secondGenome);
-
 	delete secondGenome;
-	//AbstractGenome* secondGenome = new TestGenome(200);
+
+    //AbstractGenome* secondGenome = new TestGenome(200);
 	//runGeneTest(secondGenome);
 	//delete secondGenome;
 
-	return(0);
+    int result = Catch::Session().run(argc, argv);
+    
+    return result;
 }
