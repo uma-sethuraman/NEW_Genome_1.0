@@ -298,7 +298,7 @@ int main() {
     // pass in 0 to just see pass/fail results of all tests
     // pass in 1 to see pass/fail results AND debug output of all tests
     // pass in <GenomeName> based on which genome class you want to test
-    runUmaChangelogTests<UmaGenome>(0);
+    runUmaChangelogTests<TestGenome>(0);
 
     return(0);
 }

@@ -13,6 +13,7 @@ private:
     std::map<int, std::byte> changelog;
     std::map<int, int> offsetMap;
     bool mutationsOccurred; // false if no mutations have occurred on sites yet
+    size_t currentGenomeSize;
 
 public:
     UmaGenome(size_t _size);
@@ -22,6 +23,7 @@ public:
 
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
+    virtual size_t size() override;
     virtual void resize(size_t new_size) override;
 
     virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {

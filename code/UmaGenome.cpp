@@ -5,8 +5,9 @@
 #include "Uma_NKEvaluator.h"
 #include "random.h"
 
-UmaGenome::UmaGenome(size_t _size): AbstractGenome(_size),sites(_size){
+UmaGenome::UmaGenome(size_t _size){
     sites.resize(_size);
+    currentGenomeSize = _size;
 
     // insert initial default entry into offset map
     offsetMap.insert({0, 0});
@@ -15,9 +16,13 @@ UmaGenome::UmaGenome(size_t _size): AbstractGenome(_size),sites(_size){
     mutationsOccurred = false;
 }
 
+size_t UmaGenome::size() {
+    return currentGenomeSize;
+}
+
 // Still need to figure out how to delete pointer returned
 std::byte* UmaGenome::data(size_t index, size_t byteSize) {
-    if ((index+byteSize) > size_){
+    if ((index+byteSize) > currentGenomeSize){
         std::cout << "error: byteSize exceeds the size of current genome" << std::endl;
         exit(-1);
     }
@@ -32,8 +37,8 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
         int end = 0;
         if (byteSize == 0){
             // get entire genome starting at index
-            vectorSize = size_;
-            end = size_;
+            vectorSize = currentGenomeSize;
+            end = currentGenomeSize;
         }
         else{
             // get genome from index to index+byteSize
@@ -53,8 +58,10 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
    }
 }
 
+// will work when resizing "parent"?
 void UmaGenome::resize(size_t new_size) {
-    size_ = new_size;
+    sites.resize(new_size);
+    currentGenomeSize = new_size;
 };
 
 // gets offset of key's lower bound from offsetMap
@@ -166,7 +173,7 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
         offset_it++;
     }
 
-    size_ += size; // update current genome size
+    currentGenomeSize += size; // update current genome size
 
     mutationsOccurred = true;
 }
@@ -208,14 +215,14 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         offset_it++;
     }
 
-    size_ -= segmentSize; // update current genome size
+    currentGenomeSize -= segmentSize; // update current genome size
 
     mutationsOccurred = true;
 }
 
 // prints entire current genome
 void UmaGenome::show() {
-    for (int index = 0; index < size_; index++) {
+    for (int index = 0; index < currentGenomeSize; index++) {
         std::byte& num = GN::genomeRead<std::byte>(this, index);
         std::cout << (int)num << " ";
     }
