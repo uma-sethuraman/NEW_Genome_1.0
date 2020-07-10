@@ -275,7 +275,8 @@ void test_alterations() {
     std::cout << "---------------------------" << std::endl << std::endl;
 }
 int main() {
-    test_alterations();
+
+	test_alterations();
 
     find_patterns_tests();
 
