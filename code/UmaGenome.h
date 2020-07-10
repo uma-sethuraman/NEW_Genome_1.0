@@ -44,8 +44,8 @@ public:
     virtual void mutate() override; 
 
     void pointMutate(size_t index, std::byte value);
-    virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
-    virtual void insert(size_t index, std::vector<std::byte> segment) override;
+    virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
+    virtual void insert(size_t index, const std::vector<std::byte>& segment) override;
     virtual void remove(size_t index, size_t segmentSize) override;
     virtual void show() override;
 

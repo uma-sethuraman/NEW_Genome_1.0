@@ -10,6 +10,8 @@ UmaGenome::UmaGenome(size_t _size): AbstractGenome(_size),sites(_size){
 
     // insert initial default entry into offset map
     offsetMap.insert({0, 0});
+
+    // no mutations have occurred yet, parent genome intact
     mutationsOccurred = false;
 }
 
@@ -21,7 +23,7 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     }
 
     if(!mutationsOccurred) {
-        // before any mutations, don't need changelog
+        // before any mutations, don't need to check changelog
         return static_cast<std::byte*>(&sites[index]);
     }
     else{
@@ -41,11 +43,14 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
 
         // create vector with requested data
         std::vector<std::byte> result(vectorSize);
-        for (int i = index; i < end; i++)
-            result[i] = getCurrentGenomeAt(i);
+        int res_index = 0;
+        for (int gen_index = index; gen_index < end && res_index < vectorSize; gen_index++){
+            result[res_index] = getCurrentGenomeAt(gen_index);
+            res_index++;  
+        }
 
         return static_cast<std::byte*>(result.data());
-    }
+   }
 }
 
 void UmaGenome::resize(size_t new_size) {
@@ -95,10 +100,11 @@ void UmaGenome::pointMutate(size_t index, std::byte value) {
         // key index not in map, insert it with value
         changelog.insert({index, value});
     }
+
     mutationsOccurred = true;
 }
 
-void UmaGenome::overwrite(size_t index, std::vector<std::byte> segment) {
+void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
     int size = segment.size();
     int seg_index = 0;
 
@@ -107,10 +113,11 @@ void UmaGenome::overwrite(size_t index, std::vector<std::byte> segment) {
         pointMutate(gen_index, segment[seg_index]);
         seg_index++;
     }
+
     mutationsOccurred = true;
 }
 
-void UmaGenome::insert(size_t index, std::vector<std::byte> segment) {
+void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 
     int size = segment.size(); // insertion size
 
@@ -160,6 +167,7 @@ void UmaGenome::insert(size_t index, std::vector<std::byte> segment) {
     }
 
     size_ += size; // update current genome size
+
     mutationsOccurred = true;
 }
 
@@ -201,9 +209,11 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
     }
 
     size_ -= segmentSize; // update current genome size
+
     mutationsOccurred = true;
 }
 
+// prints entire current genome
 void UmaGenome::show() {
     for (int index = 0; index < size_; index++) {
         std::byte& num = GN::genomeRead<std::byte>(this, index);
