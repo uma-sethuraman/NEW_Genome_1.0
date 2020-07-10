@@ -24,30 +24,36 @@ namespace TestGenomeLite
     void TestConstructor()
     {
         // test size 100
-        size_t size = 100;
-        // AbstractGenome* genome = new GenomeLite(size);
+        size_t size = 50;
+        AbstractGenome* genome = new GenomeLite(size);
 
-        // std::vector< Byte > segment(size, (Byte)10);
-        // genome->overwrite(0, segment);
+        for (size_t i(0); i < size; i++)
+        {
+            *(genome->data(i)) = (Byte)(i*2);
+        }
 
-        // delete genome;
+        std::vector< Byte > segment(size, (Byte)10);
+        genome->overwrite(0, segment);
 
-        // std::cout << "Test Constructor " << size << ": " BOLDGREEN << "PASSED" << RESET << std::endl;
+        std::cout << "Test Constructor " << size << ": " BOLDGREEN << "PASSED" << RESET << std::endl;
 
         // test size 5000
-        size = 5000;
-        AbstractGenome* genome2 = new GenomeLite(size);
+        size = 50;
+        AbstractGenome* genome2 = genome->clone();
+
+        std::vector< Byte > segment2(20, (Byte)0);
+        genome2->overwrite(10, segment2);
 
         genome2->show();
+        genome->show();
 
-        std::vector< Byte > segment2(size, (Byte)10);
-        genome2->overwrite(0, segment2);
 
-        genome2->show();
-
-        delete genome2;
 
         std::cout << "Test Constructor: " << size << BOLDGREEN << "PASSED" << RESET << std::endl;
+
+
+        delete genome;
+        delete genome2;
     }
 
 }

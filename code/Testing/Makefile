@@ -170,6 +170,33 @@ home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.s
 .PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.s
 
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.o: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o
+
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.o
+
+# target to build an object file
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o
+
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.i: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i
+
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.i
+
+# target to preprocess a source file
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i
+
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.s: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
+
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.s
+
+# target to generate assembly for a file
+home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
+.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
+
 home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.o: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o
 
 .PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.o
@@ -196,33 +223,6 @@ home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.s: home/victoria/WAVES
 home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s
 .PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s
-
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.o: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o
-
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.o
-
-# target to build an object file
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o
-
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.i: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i
-
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.i
-
-# target to preprocess a source file
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i
-
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.s: home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s
-
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.s
-
-# target to generate assembly for a file
-home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s
-.PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s
 
 main.o: main.cpp.o
 
@@ -263,12 +263,12 @@ help:
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.o"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.i"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.s"
+	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.o"
+	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.i"
+	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.s"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.o"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.i"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.s"
-	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.o"
-	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.i"
-	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

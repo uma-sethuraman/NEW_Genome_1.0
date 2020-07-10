@@ -90,9 +90,22 @@ CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.s
 
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o: CMakeFiles/test.dir/flags.make
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o -c /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp
+
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp > CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.i
+
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
+
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o: CMakeFiles/test.dir/flags.make
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o -c /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp
 
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.i: cmake_force
@@ -102,19 +115,6 @@ CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cp
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.s
-
-CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o: CMakeFiles/test.dir/flags.make
-CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o -c /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp
-
-CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp > CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.i
-
-CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp -o CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.s
 
 CMakeFiles/test.dir/main.cpp.o: CMakeFiles/test.dir/flags.make
 CMakeFiles/test.dir/main.cpp.o: main.cpp
@@ -132,16 +132,16 @@ CMakeFiles/test.dir/main.cpp.s: cmake_force
 # Object files for target test
 test_OBJECTS = \
 "CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.o" \
+"CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o" \
 "CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o" \
-"CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o" \
 "CMakeFiles/test.dir/main.cpp.o"
 
 # External object files for target test
 test_EXTERNAL_OBJECTS =
 
 test: CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.o
+test: CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o
 test: CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.cpp.o
-test: CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentTree.cpp.o
 test: CMakeFiles/test.dir/main.cpp.o
 test: CMakeFiles/test.dir/build.make
 test: CMakeFiles/test.dir/link.txt

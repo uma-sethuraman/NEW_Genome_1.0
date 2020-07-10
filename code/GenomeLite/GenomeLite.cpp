@@ -12,6 +12,11 @@ void GenomeLite::Reallocate()
 
 }
 
+AbstractGenome* GenomeLite::clone()
+{
+    return new GenomeLite(*this);
+}
+
 /** Gets contiguous data from genome
  * \param index to start
  * \param byteSize number of bytes
@@ -19,7 +24,7 @@ void GenomeLite::Reallocate()
  **/
 Byte* GenomeLite::data(size_t index, size_t byteSize)
 {
-    return Tree->GetData(index);
+    return List->GetData(index);
 }
 
 /** Overwrites an index in the gene
@@ -28,7 +33,7 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  **/
 void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
-    Tree->Overwrite(index, segment);
+    List->Overwrite(index, segment);
 }
 
 /** Inserts at index in the gene
@@ -37,7 +42,7 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
-    Tree->Insert(index, segment);
+    List->Insert(index, segment);
 }
 
 /** Removes at index in the gene
@@ -46,13 +51,13 @@ void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::remove(size_t index, size_t segmentSize)
 {
-    Tree->Remove(index, segmentSize);
+    List->Remove(index, segmentSize);
 }
 
 /** Prints the tree **/
 void GenomeLite::show()
 {
-    Tree->Print();
+    List->Print();
 }
 
 /** Finds all instances of pattern in genome

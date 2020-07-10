@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include "../AbstractGenome.h"
-#include "SegmentTree.h"
+#include "SegmentList.h"
 
 
 typedef std::byte Byte;
@@ -21,7 +21,7 @@ typedef std::byte Byte;
 class GenomeLite : public AbstractGenome
 {
 private:
-    SegmentTree* Tree;
+    SegmentList* List;
 
     void Reallocate();
 
@@ -31,15 +31,20 @@ public:
 
     /** size constructor **/
     GenomeLite(size_t size) 
-        : AbstractGenome(size), Tree(new SegmentTree(size)) {}
+        : AbstractGenome(size), List(new SegmentList(size)) {}
+
+    /** size constructor **/
+    GenomeLite(const GenomeLite &genome) 
+        : AbstractGenome(genome.size_), List(new SegmentList(*(genome.List))) {}
 
     /** destructor **/
-    ~GenomeLite() { delete Tree; }
+    ~GenomeLite() { delete List; }
 
     /** Gets size of genome sites
      * \return size of tree **/
-    virtual size_t size() { return Tree->GetSiteCount(); }
+    virtual size_t size() { return List->GetSiteCount(); }
 
+    virtual AbstractGenome* clone() override;
     virtual Byte* data(size_t index = 0, size_t byteSize = 0) override;
     virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
     virtual void insert(size_t index, const std::vector<std::byte>& segment) override;

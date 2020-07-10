@@ -13,8 +13,6 @@
 #include <iostream>
 #include <vector>
 
-#include "GeneSegment.h"
-
 typedef std::byte Byte; // c++17 std::byte doesn't always work
 
 class SegmentPool;
@@ -23,20 +21,17 @@ class SegmentPool;
 class SegmentNode
 {
 private:
-    // friend class SegmentTree;
-    friend class GenomeLite;
-    friend class SegmentTree;
+    // friend class SegmentList
+    friend class SegmentList;
 
     /// Data variables
-    std::shared_ptr< GeneSegment > Data;
-	Byte* Start; ///< Start of memory
+    std::shared_ptr< std::vector<Byte> > Data;
+	size_t Start = 0; ///< Start of memory
     size_t Size; ///< Size of data
 
-    
-
-
-    size_t Weight = 0;
     size_t Pos;
+    long Next = -1;
+    long Prev = -1;
 
 public:
     /** Default Constructor */
@@ -45,40 +40,39 @@ public:
     /** Constructor
      * \param start beginning of data
      * \param size size of data */
-    SegmentNode(std::shared_ptr< GeneSegment> data, size_t pos) 
-        : Data(data), Start(data->GetData()), Size(data->GetSize()), Weight(data->GetSize()), Pos(pos) {}
+    SegmentNode(std::shared_ptr< std::vector<Byte> > data, size_t pos) 
+        : Data(data), Size(data->size()), Pos(pos) {}
 
 
     /** Constructor
      * \param start beginning of data
      * \param size size of data */
-    SegmentNode(std::shared_ptr< GeneSegment> data, size_t pos, Byte* start, size_t size) 
-        : Data(data), Start(start), Size(size), Weight(size), Pos(pos) {}
+    SegmentNode(std::shared_ptr< std::vector<Byte> > data, size_t pos, size_t start, size_t size) 
+        : Data(data), Start(start), Size(size), Pos(pos) {}
 
     /** Deconstructor **/
     ~SegmentNode() { }
 
     const size_t GetPos() { return Pos; }
     const size_t GetSize() { return Size; }
-    const size_t GetWeight() { return Weight; }
-    const size_t GetHeight() { return Height; }
+
 
     Byte* GetData(size_t index);
+    SegmentNode* GetPrev(SegmentPool* pool);
+    SegmentNode* GetNext(SegmentPool* pool);
     SegmentNode* GetNode(size_t index, SegmentPool* pool);
 
     /** Gets use count 
      * \returns use count of the smart pointer **/
     bool Unique() { return Data.use_count() == 1; }
 
-    void SetWeight(size_t weight) { Weight = weight; }
-    void SetHeight(int height) { Height = height; }
+    void SetPrev(SegmentNode* node);
+    void SetNext(SegmentNode* node);
 
-
-    void TruncateLeft(size_t cutSize = 1);
-    void TruncateRight(size_t cutSize = 1);
-    SegmentNode* Cut(SegmentPool* pool, size_t index);
-    size_t Overwrite(size_t index, const std::vector<std::byte>& segment, size_t segmentStart);
-    size_t Insert(size_t index, const std::vector<std::byte>& segment, size_t segmentStart);
+    void TruncateLeft(size_t index = 1);
+    void TruncateRight(size_t index = 1);
+    SegmentNode* Copy(SegmentPool* pool);
+    size_t Overwrite(size_t index, const std::vector<std::byte>& segment, size_t start);
     void Print();
 
 };

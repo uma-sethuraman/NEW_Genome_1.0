@@ -13,7 +13,7 @@
 Byte* SegmentNode::GetData(size_t index)
 {
     if (index < Size)
-        return Start+index;
+        return &(Data->at(Start+index));
     else
     {
         std::cout << "Error: trying to get data from index " << (int)index << std::endl;
@@ -24,107 +24,104 @@ Byte* SegmentNode::GetData(size_t index)
 }
 
 
-// /** Gets right node referencet
-//  * \returns node reference **/
-// SegmentNode* SegmentNode::GetParent(SegmentPool* pool)
-// {
-//     if (Parent == std::numeric_limits<size_t>::max())
-//         return nullptr;
-//     return pool->At(Parent);
-// }
+/** Gets left node reference
+ * \returns node reference **/
+SegmentNode* SegmentNode::GetPrev(SegmentPool* pool)
+{
+    if (Prev > 0)
+        return pool->At(Prev);
+    return nullptr;
+}
 
-// /** Sets Left node
-//  * \param node **/
-// void SegmentNode::SetLeft(SegmentNode* node)
-// {
-//     if (node)
-//         Left = node->GetPos();
-//     else
-//         Left = std::numeric_limits<size_t>::max();
-// }
 
+/** Gets right node referencet
+ * \returns node reference **/
+SegmentNode* SegmentNode::GetNext(SegmentPool* pool)
+{
+    if (Next > 0)
+        return pool->At(Next);
+    return nullptr;
+}
+
+
+/** Sets Prev node
+ * \param node **/
+void SegmentNode::SetPrev(SegmentNode* node)
+{
+    if (node)
+    {
+        Prev = node->GetPos();
+        node->Next = Pos;
+    }
+    else
+        Prev = -1;
+}
+
+/** Sets Next node
+ * \param node **/
+void SegmentNode::SetNext(SegmentNode* node)
+{
+    if (node)
+    {
+        Next = node->GetPos();
+        node->Prev = Pos;
+    }
+    else
+        Next = -1;
+}
 
 
 /** Truncates Data from left 
- * \param cutSize amount to cut off the left of current segment 
+ * \param index amount to cut off the left of current segment 
  **/
-void SegmentNode::TruncateLeft(size_t cutSize)
+void SegmentNode::TruncateLeft(size_t index)
 {
-    Start += cutSize;
-    Size -= cutSize;
-    Weight -= (int)cutSize;
+    Start += index;
+    Size -= index;
 }
 
 /** Truncates Data from right 
- * \param cutSize amount to cut off the right of current segment 
+ * \param index amount to cut off the right of current segment 
  **/
-void SegmentNode::TruncateRight(size_t cutSize)
+void SegmentNode::TruncateRight(size_t index)
 {
-    Size -= cutSize;
-    Weight -= (int)cutSize;
+    Size = index;
 }
 
 
 /** Subdivide segment at index
  * \param pool The pool of memory to make a pointer from
- * \param index Index to cut the segment
  * \return pair of two new SegmentNodes to the cut segments 
  **/
-SegmentNode* SegmentNode::Cut(SegmentPool* pool, size_t index)
+SegmentNode* SegmentNode::Copy(SegmentPool* pool)
 {
-    SegmentNode* cutSegment = pool->Allocate(Data, Start+index, Size-index);
-    TruncateRight(Size-index);
-
-    return cutSegment;
+    return pool->Allocate(Data, Start, Size);
 }
 
-/** Overwrites segmentNode
- * \param index to start overwriting
- * \param segment to overwrite with
- **/
-size_t SegmentNode::Overwrite(size_t index, const std::vector<std::byte>& segment, size_t segmentStart)
+
+size_t SegmentNode::Overwrite(size_t index, const std::vector<std::byte>& segment, size_t start)
 {
-    size_t size = segment.size()-segmentStart;
-    if (size > Size)
-        size = Size;
-    std::memcpy(Start+index, &segment[segmentStart], size);
+    auto size = Size-index;
+    std::memcpy(&(Data->at(index)), &(segment.at(start)), size);
 
-    return segmentStart + size;
-}
-
-/** Overwrites segmentNode
- * \param index to start overwriting
- * \param segment to overwrite with
- **/
-size_t SegmentNode::Insert(size_t index, const std::vector<std::byte>& segment, size_t segmentStart)
-{
-    size_t insertSize = segment.size()-segmentStart;
-    if (Size+insertSize > Data->MaxSize)
-        insertSize = Data->MaxSize - Size;
-
-    
-    std::memcpy(Start+index+insertSize, Start+index, Size-index);
-    std::memcpy(Start+index, &segment[segmentStart], insertSize);
-
-    return segmentStart + insertSize;
+    return start+size;
 }
 
 
 /** prints node info **/
 void SegmentNode::Print()
 {
-    std::cout << "SegmentNode " << this << std::endl;
-    std::cout << "weight " << std::dec << Weight << " size " << Size << " height " << Height << std::endl;
-    std::cout << "left " << Left << std::endl;
+    std::cout << "SegmentNode " << this << "\tsize " << Size << "\tpos " << Pos << std::endl;
+    std::cout << "left " << Prev << std::endl;
     std::cout << "B " << (unsigned long)Start << std::endl;
     std::cout << "E " << (unsigned long)Start+Size << std::endl;
     
     for (size_t i = 0; i < Size; i++)
     {
-        std::cout << std::dec << (int)(*(Start+i)) << ", ";
+        std::cout << std::dec << (int)Data->at(Start+i) << ", ";
     }
     std::cout << std::endl;
 
-    std::cout << "right " << Right << std::endl;
+    std::cout << "right " << Next << std::endl;
     std::cout << std::endl;
 }
