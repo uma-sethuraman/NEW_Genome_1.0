@@ -27,10 +27,9 @@ private:
     friend class GenomeLite;
 
     /// member variables
-    SegmentNode* Root; ///< Root node of tree
     SegmentPool* Pool; ///< allocation pool for nodes
+    size_t Root; ///< Root node of tree
 
-    size_t Size = 1;    ///< Size of tree
     size_t SiteCount = 0;
 
 public:
@@ -40,7 +39,7 @@ public:
     ~SegmentList() { delete Pool; }
     size_t GetSiteCount() { return SiteCount; }
 
-    std::pair< SegmentNode*, size_t > Find(size_t index);
+    std::pair< size_t, size_t > Find(size_t index);
     std::pair< SegmentNode*, size_t > FindEnd(SegmentNode* node, size_t start, size_t size);
     Byte* GetData(size_t index);
     void Overwrite(size_t index, const std::vector<std::byte>& segment);
