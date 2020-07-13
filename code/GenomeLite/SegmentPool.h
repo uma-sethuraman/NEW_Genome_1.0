@@ -177,7 +177,7 @@ public:
     size_t Overwrite(size_t index, size_t localIndex, const Gene& segment, size_t start)
     {
         auto size = Pool[index].Size-localIndex;
-        std::move(segment.begin(), segment.end(), Pool[index].Data->begin()+localIndex);
+        std::copy_n(segment.begin(), segment.size(), Pool[index].Data->begin()+localIndex);
 
         return start+size;
     }

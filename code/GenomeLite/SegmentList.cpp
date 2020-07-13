@@ -22,6 +22,35 @@
 SegmentList::SegmentList(size_t size)
     :Pool(new SegmentPool(size)), SiteCount(size)
 {
+    Root = CreateList(SiteCount);
+}
+
+/** 
+ * Copy Constructor 
+ * \param list to copy from
+ **/
+SegmentList::SegmentList(const SegmentList &list)
+    : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount) 
+{
+
+}
+
+
+/** 
+ * Reallocates the current list to a new list
+ * \returns pointer to newly created list
+ **/
+void SegmentList::Reallocate()
+{
+    SegmentPool* oldPool = Pool;
+    size_t oldRoot = Root;
+
+    Pool = new SegmentPool(SiteCount);
+    // Root = CreateList(SiteCount, 0);
+}
+
+size_t SegmentList::CreateList(size_t size)
+{
     size_t node;
     size_t startSize = 0;
 
@@ -35,9 +64,7 @@ SegmentList::SegmentList(size_t size)
         node = Pool->Allocate(std::make_shared< std::vector<Byte> >(size));
         startSize = size;
     }
-
-    Root = node;
-    IndexTable.push_back( {(size_t)0, (size_t)node} );
+    IndexTable.push_back( {(size_t)0, (size_t)(node)} );
 
 
     size_t startNode = node;
@@ -59,35 +86,10 @@ SegmentList::SegmentList(size_t size)
         Pool->SetNext(node, newNode);
         node = newNode;
 
-        IndexTable.push_back( {(size_t)lastSize, (size_t)node} );
+        IndexTable.push_back( {(size_t)(lastSize), (size_t)(node)} );
     }
-}
 
-/** 
- * Copy Constructor 
- * \param list to copy from
- **/
-SegmentList::SegmentList(const SegmentList &list)
-    : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount) 
-{
-}
-
-
-/** 
- * Reallocates the current list to a new list
- * \returns pointer to newly created list
- **/
-void SegmentList::Reallocate()
-{
-    SegmentPool* oldPool = Pool;
-    size_t oldRoot = Root;
-
-    Pool = new SegmentPool(SiteCount);
-    // Root = CreateList(SiteCount, 0);
-}
-
-size_t SegmentList::CreateList(size_t size, size_t index)
-{
+    return startNode;
 }
 
 void SegmentList::Resize(size_t size)
@@ -100,6 +102,8 @@ void SegmentList::Resize(size_t size)
     {
         Insert(SiteCount, std::vector< Byte >(size-SiteCount));
     }
+
+    SiteCount = size;
 }
 
 /** 
@@ -256,7 +260,7 @@ void SegmentList::Insert(size_t index, const std::vector<std::byte>& segment)
     auto found = Find(index);
     auto left = found.PoolIndex;
     auto leftOffset = index-found.Offset;
-    auto tableEnd = found.TableEnd;
+    auto tableEnd = ++found.TableEnd;
 
     // overwrite current genome
     if (Pool->Unique(left))
@@ -322,8 +326,7 @@ void SegmentList::Insert(size_t index, const std::vector<std::byte>& segment)
 
     SiteCount += segment.size();
     
-    if (++tableEnd < IndexTable.size())
-        IndexTable.erase(IndexTable.begin()+tableEnd, IndexTable.end());
+    IndexTable.resize(tableEnd);
 
 }
 
@@ -416,9 +419,7 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
     Pool->SetNext(left, right);
 
     SiteCount -= segmentSize;
-
-    if (++tableEnd < IndexTable.size())
-        IndexTable.erase(IndexTable.begin()+tableEnd, IndexTable.end());
+    IndexTable.resize(tableEnd);
 
 }
 

@@ -38,14 +38,33 @@ namespace TestGenomeLite
             std::cout << i << "\t" << (int)*(genome->data(i)) << std::endl;
         }
 
+        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        // test clone
+        AbstractGenome* genome2 = genome->clone();
+
+
+        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+
+        delete genome;
+        delete genome2;
+    }
+
+    void TestOverwrite()
+    {
+        // test size 100
+        size_t size = 5000;
+        AbstractGenome* genome = new GenomeLite(size);
+        genome->show();
         
-        genome->overwrite(0, std::vector< Byte >(size, (Byte)10));
+        // genome->overwrite(0, std::vector< Byte >(size, (Byte)10));
 
         std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
 
         // test size 5000
         size = 50;
-        // AbstractGenome* genome2 = genome->clone();
+        AbstractGenome* genome2 = genome->clone();
         // genome2->show();
 
         // genome2->overwrite(0, std::vector< Byte >(10, (Byte)0));
@@ -60,7 +79,7 @@ namespace TestGenomeLite
 
 
         delete genome;
-        // delete genome2;
+        delete genome2;
     }
 
     void TestInsert()
@@ -115,17 +134,12 @@ namespace TestGenomeLite
         genome2->show();
         std::cout << BOLDBLUE << std::endl;
         genome2->overwrite(15, std::vector< Byte >(10, (Byte)6));
+        genome2->remove(0, 20);
         
 
         genome2->show();
 
         std::cout << RESET << genome2->size() << std::endl;
-        // assert(60 == genome2->size());
-
-
-        // std::cout << "\t" BOLDBLUE "\tcopy" << std::endl; 
-        // genome2->show();
-
 
 
         std::cout << "Test Delete " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
@@ -141,22 +155,13 @@ namespace TestGenomeLite
         size_t size = 1000;
         AbstractGenome* genome = new GenomeLite(size);
 
-        genome->show();
-
-        for (size_t i(0); i < size; i++)
-        {
-            *(genome->data(i)) = (Byte)(i*2);
-            // std::cout << i << "\t" << (int)*(genome->data(i)) << std::endl;
-        }
-
-        genome->show();
-
         genome->resize(5000);
+        assert(genome->size() == 5000);
         genome->insert(2000, std::vector< Byte >(10, (Byte)5));
+        assert(genome->size() == 5010);
 
-        std::cout << BOLDBLUE;
-
-        genome->show();
+        genome->resize(100);
+        assert(genome->size() == 100);
 
 
         std::cout << "Test Resize " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;

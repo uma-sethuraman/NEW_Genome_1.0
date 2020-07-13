@@ -6,15 +6,25 @@
 
 #IncludeRegexTransform: 
 
-/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp
-cstdint
+/home/victoria/WAVES/newgenome/code/AbstractGenome.h
+stdint.h
 -
 vector
 -
-utility
+iostream
 -
-algorithm
+unordered_map
 -
+cstddef
+-
+
+/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.h
+cstdint
+-
+iostream
+-
+../AbstractGenome.h
+/home/victoria/WAVES/newgenome/code/AbstractGenome.h
 SegmentList.h
 /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.h
 
@@ -69,4 +79,34 @@ algorithm
 -
 SegmentNode.h
 /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
+
+/home/victoria/WAVES/newgenome/code/TestGenome.h
+vector
+-
+stdint.h
+-
+AbstractGenome.h
+/home/victoria/WAVES/newgenome/code/AbstractGenome.h
+cstddef
+-
+algorithm
+-
+
+/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
+cassert
+-
+../AbstractGenome.h
+/home/victoria/WAVES/newgenome/code/AbstractGenome.h
+../TestGenome.h
+/home/victoria/WAVES/newgenome/code/TestGenome.h
+../GenomeLite/GenomeLite.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.h
+
+/home/victoria/WAVES/newgenome/code/Testing/main.cpp
+iostream
+-
+string
+-
+TestGenomeLite.h
+/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
 
