@@ -27,15 +27,13 @@ public:
 
 	virtual void resize(size_t new_size) override;
 
-	virtual void insert(size_t index, std::vector<std::byte> segment) override;
+	virtual void overwrite(size_t index, std::vector<std::byte>& segment);
 
-	virtual void overwrite(size_t index, std::vector<std::byte> segment) override;
+	virtual void insert(size_t index, std::vector<std::byte>& segment);
 
 	virtual void remove(size_t index, size_t segmentSize) override;
 
-	virtual void printChangelog() override;
-
-	virtual void generateGenome(AbstractGenome* genome) override;
+	virtual void show() override;
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
 		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
@@ -53,5 +51,7 @@ public:
 		std::unordered_map<std::string, std::vector<size_t>> geneMap = { {"det", {0}},{"prob",{ 10,20}} };
 		return(geneMap);
 	}
+
+	//virtual void printChangelog() override;
 
 };

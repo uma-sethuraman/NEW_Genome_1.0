@@ -38,7 +38,7 @@ public:
 
 
 	// starting at index, write values in segement over values currently in genome
-	virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override {
+	virtual void overwrite(size_t index, const std::vector<std::byte>& segment)  {
 		if (index + segment.size() > sites.size()) {
 			std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
 			exit(1);
@@ -50,7 +50,7 @@ public:
 	}
 
 	// starting at index, write values in segement genome between genome[index-1] and genome[index]
-	virtual void insert(size_t index, const std::vector<std::byte>& segment) override {
+	virtual void insert(size_t index, const std::vector<std::byte>& segment)  {
 		sites.insert(sites.begin()+index, segment.begin(), segment.end());
 	}
 

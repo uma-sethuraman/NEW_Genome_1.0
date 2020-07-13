@@ -51,18 +51,6 @@ public:
         exit(1);
     }
 
-    // defined by stephanie
-    virtual void printChangelog() {
-        std::cout << "printChangelog has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
-    //defined by stephanie
-    virtual void generateGenome(AbstractGenome* genome) {
-        std::cout << "generateGenome has not been written for this genome class" << std::endl;
-        exit(1);
-    }
-
     // return an int key to the genes in question
     virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) {
         std::cout << "initGeneView has not been written for this genome class" << std::endl;
@@ -77,13 +65,13 @@ public:
     // new functions
 
     // starting at index, write values in segment over values currently in genome
-    virtual void overwrite(size_t index, std::vector<std::byte> segment) {
+    virtual void overwrite(size_t index, std::vector<std::byte>& segment) {
         std::cout << "overwrite has not been written for this genome class" << std::endl;
         exit(1);
     }
 
     // starting at index, write values in segment genome between genome[index-1] and genome[index]
-    virtual void insert(size_t index, std::vector<std::byte> segment) {
+    virtual void insert(size_t index, std::vector<std::byte>& segment) {
         std::cout << "insert vector has not been written for this genome class" << std::endl;
         exit(1);
     }
