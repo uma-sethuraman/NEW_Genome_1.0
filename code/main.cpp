@@ -97,13 +97,13 @@ void stephanie_runTestOne(AbstractGenome* genome) {
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
 
-	genome->overwrite(2, std::vector < std::byte>{44});
-	genome->printChangelog();
-	genome->remove(4, 2);
-	genome->printChangelog();
-	genome->insert(2, std::vector<std::byte>{ (std::byte)66 });
-	genome->printChangelog();
-	genome->generateGenome(genome);
+	//genome->overwrite(2, std::vector < std::byte>{44});
+	//genome->printChangelog();
+	//genome->remove(4, 2);
+	//genome->printChangelog();
+	//genome->insert(2, std::vector<std::byte>{ (std::byte)66 });
+	//genome->printChangelog();
+	//genome->show();
 }
 
 void stephanie_runTestTwo(AbstractGenome* genome) {
@@ -115,12 +115,12 @@ void stephanie_runTestTwo(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->remove(3, 4);
-	genome->insert(4, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66 });
-	genome->overwrite(5, std::vector < std::byte>{88});
-	genome->overwrite(4, std::vector < std::byte>{99});
-	genome->printChangelog();
-	genome->generateGenome(genome);
+	//genome->remove(3, 4);
+	//genome->insert(4, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66 });
+	//genome->overwrite(5, std::vector < std::byte>{88});
+	//genome->overwrite(4, std::vector < std::byte>{99});
+	//genome->printChangelog();
+	//genome->show();
 }
 
 void stephanie_runTestThree(AbstractGenome* genome) {
@@ -132,12 +132,12 @@ void stephanie_runTestThree(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->remove(7, 4);
-	genome->insert(0, std::vector<std::byte>{ (std::byte)44, (std::byte)55 });
-	genome->remove(2, 1);
-	genome->overwrite(0, std::vector < std::byte>{66});
-	genome->printChangelog();
-	genome->generateGenome(genome);
+	//genome->remove(7, 4);
+	//genome->insert(0, std::vector<std::byte>{ (std::byte)44, (std::byte)55 });
+	//genome->remove(2, 1);
+	//genome->overwrite(0, std::vector < std::byte>{66});
+	//genome->printChangelog();
+	//genome->show();
 }
 
 void stephanie_runTestFour(AbstractGenome* genome) {
@@ -149,13 +149,13 @@ void stephanie_runTestFour(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->remove(3, 2);
-	genome->printChangelog();
-	genome->remove(5, 2);
-	genome->printChangelog();
-	genome->remove(1, 4);
-	genome->printChangelog();
-	genome->generateGenome(genome);
+	//genome->remove(3, 2);
+	//genome->printChangelog();
+	//genome->remove(5, 2);
+	//genome->printChangelog();
+	//genome->remove(1, 4);
+	//genome->printChangelog();
+	//genome->show();
 }
 
 void stephanie_runTestFive(AbstractGenome* genome) {
@@ -167,11 +167,11 @@ void stephanie_runTestFive(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->insert(5, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 });
-	genome->printChangelog();
-	genome->remove(2, 5);
-	genome->printChangelog();
-	genome->generateGenome(genome);
+	//genome->insert(5, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 });
+	//genome->printChangelog();
+	//genome->remove(2, 5);
+	//genome->printChangelog();
+	//genome->show();
 }
 
 void stephanie_runTestSix(AbstractGenome* genome) {
@@ -183,42 +183,54 @@ void stephanie_runTestSix(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->insert(5, std::vector<std::byte>{ (std::byte)11, (std::byte)22, (std::byte)33 });
+	//genome->insert(5, std::vector<std::byte>{ (std::byte)11, (std::byte)22, (std::byte)33 });
 		//genome->printChangelog();
-		//genome->generateGenome(genome);
-	genome->remove(1, 5);
+		//genome->show();
+	//genome->remove(1, 5);
 		//genome->printChangelog();
-		//genome->generateGenome(genome);
-	genome->insert(4, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 });
+		//genome->show();
+	//genome->insert(4, std::vector<std::byte>{ (std::byte)44, (std::byte)55, (std::byte)66, (std::byte)77 });
+		////genome->printChangelog();
+		////genome->show();
+	//genome->insert(6, std::vector<std::byte>{ (std::byte)13, (std::byte)23, (std::byte)33, (std::byte)43 });
+		//////genome->printChangelog();
+		////genome->show();
+	//genome->remove(5, 4);
+		////genome->printChangelog();
+		////genome->show();
+	//genome->insert(1, std::vector<std::byte>{ (std::byte)42, (std::byte)52, (std::byte)62 });
 		//genome->printChangelog();
-		//genome->generateGenome(genome);
-	genome->insert(6, std::vector<std::byte>{ (std::byte)13, (std::byte)23, (std::byte)33, (std::byte)43 });
+		////genome->show();
+	//genome->remove(4, 7); //***
 		//genome->printChangelog();
-		//genome->generateGenome(genome);
-	genome->remove(5, 4);
+		////genome->show();
+	//genome->insert(6, std::vector<std::byte>{ (std::byte)79 });
 		//genome->printChangelog();
-		//genome->generateGenome(genome);
-	genome->insert(1, std::vector<std::byte>{ (std::byte)42, (std::byte)52, (std::byte)62 });
-		genome->printChangelog();
-		genome->generateGenome(genome);
-	genome->remove(4, 7); //***
-		genome->printChangelog();
-		genome->generateGenome(genome);
-	genome->insert(6, std::vector<std::byte>{ (std::byte)79 });
-		genome->printChangelog();
-		genome->generateGenome(genome);
+		//genome->show();
 }
 
 void stephanie_runTestSeven(AbstractGenome* genome) {
 	std::cout << "---- test six ----" << std::endl;
 	genome->resize(10);
+	std::cout << "genome size " << genome->size() << std::endl;
 	auto readHead = genome->data();
 	for (size_t i(0); i < genome->size(); ++i)
 		readHead[i] = (std::byte)(Random::getInt(99));
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl << std::endl;
-	genome->overwrite(1, std::vector<std::byte>{ (std::byte)11, (std::byte)22, (std::byte)33 });
+	std::vector<std::byte> myVector = { (std::byte)1, (std::byte)2, (std::byte)3 };
+	genome->show();
+	genome->insert(0, myVector);
+	genome->show();
+	myVector = { (std::byte)1, (std::byte)2, (std::byte)3 };
+	genome->insert(0, myVector );
+	genome->show();
+	myVector = { (std::byte)4, (std::byte)4, (std::byte)4 };
+	genome->overwrite(2, myVector );
+	genome->show();
+	genome->remove(1, 2);
+	genome->show();
 }
 
 void testData(AbstractGenome* genome){
@@ -468,15 +480,16 @@ void test_alterations() {
 	std::cout << "----------------------------" << std::endl;
 	std::cout << "-- begin test_alterations --" << std::endl;
 	AbstractGenome* test_genome = new TestGenome(0);
-	test_genome->show();
-	test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
-	test_genome->show();
-	test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
-	test_genome->show();
-	test_genome->overwrite(2, std::vector<std::byte>{ (std::byte)4, (std::byte)4, (std::byte)4 });
-	test_genome->show();
-	test_genome->remove(1, 2);
-	test_genome->show();
+	std::vector<std::byte> myVector = { (std::byte)1, (std::byte)2, (std::byte)3 };
+	//test_genome->show();
+	//test_genome->insert(0, myVector);
+	//test_genome->show();
+	//test_genome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
+	//test_genome->show();
+	//test_genome->overwrite(2, std::vector<std::byte>{ (std::byte)4, (std::byte)4, (std::byte)4 });
+	//test_genome->show();
+	//test_genome->remove(1, 2);
+	//test_genome->show();
 	std::cout << "-- done test_alterations --" << std::endl;
 	std::cout << "---------------------------" << std::endl << std::endl;
 }
@@ -485,7 +498,7 @@ void test_alterations() {
 int main() {
 	AbstractGenome* genome = new StephanieGenome(100);
 	stephanie_runTestSeven(genome);
-	delete StephanieGenome;
+	delete genome;
 
 	//test_alterations();
 
