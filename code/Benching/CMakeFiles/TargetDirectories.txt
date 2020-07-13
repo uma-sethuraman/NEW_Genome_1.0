@@ -1,3 +1,0 @@
-/home/victoria/WAVES/newgenome/code/Benching/CMakeFiles/rebuild_cache.dir
-/home/victoria/WAVES/newgenome/code/Benching/CMakeFiles/edit_cache.dir
-/home/victoria/WAVES/newgenome/code/Benching/CMakeFiles/bench.dir

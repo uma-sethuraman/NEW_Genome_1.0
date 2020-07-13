@@ -1,1 +1,0 @@
-/usr/bin/c++   -g -Wall -o3   CMakeFiles/bench.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.o CMakeFiles/bench.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o CMakeFiles/bench.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o CMakeFiles/bench.dir/Bench.cpp.o  -o bench 
