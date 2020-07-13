@@ -10,6 +10,7 @@ private:
 	// custom properties & functions
 	std::vector<std::byte> sites;
 public:
+
 	TestGenome(size_t _size);
 	~TestGenome() override {
 		std::cout << "done" << std::endl;
@@ -17,6 +18,7 @@ public:
 
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
+	virtual size_t size() override;
 	virtual void resize(size_t new_size) override;
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {

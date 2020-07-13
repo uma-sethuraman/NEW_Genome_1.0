@@ -6,8 +6,6 @@
 #include <list>
 
 class AbstractGenome {
-protected:
-    size_t size_; // size should be size of memory when 
 
 public:
     struct GeneDefinition {
@@ -16,15 +14,13 @@ public:
         size_t geneSize; // size in bytes
     };
 
-    AbstractGenome() = delete;
-
-    AbstractGenome(size_t _size) :size_(_size) {}
+    AbstractGenome() {};
 
     virtual ~AbstractGenome() {} 
     
-    virtual size_t size() {return size_;}
+    virtual size_t size() = 0;
     
-    virtual void resize(size_t new_size) {size_ = new_size;};
+    virtual void resize(size_t new_size) = 0;
 
     /** Gives the user a new byte array of memory
     * \param index index into the genome
