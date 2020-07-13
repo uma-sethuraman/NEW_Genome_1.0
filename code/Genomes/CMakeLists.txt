@@ -11,7 +11,7 @@ project( test )
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Tools)
 
 # Optionally you can use file glob (uncomment the next line)
-file( GLOB GENOME_SOURCES *.cpp )
+file( GLOB_RECURSE GENOME_SOURCES *.cpp )
 add_library( genomes ${GENOME_SOURCES})
 
 
