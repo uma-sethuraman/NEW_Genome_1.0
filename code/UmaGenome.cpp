@@ -20,7 +20,7 @@ size_t UmaGenome::size() {
     return currentGenomeSize;
 }
 
-// Still need to figure out how to delete pointer returned
+// Still need to figure out how to free pointer returned
 std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     if ((index+byteSize) > currentGenomeSize){
         std::cout << "error: byteSize exceeds the size of current genome" << std::endl;
@@ -33,32 +33,37 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     }
     else{
         // need to use changelog
-        int vectorSize = 0;
+        int dataSize = 0;
         int end = 0;
         if (byteSize == 0){
             // get entire genome starting at index
-            vectorSize = currentGenomeSize;
+            dataSize = currentGenomeSize;
             end = currentGenomeSize;
         }
         else{
             // get genome from index to index+byteSize
-            vectorSize = byteSize;
+            dataSize = byteSize;
             end = index+byteSize;
         }
 
-        // create vector with requested data
-        std::vector<std::byte> result(vectorSize);
-        int res_index = 0;
-        for (int gen_index = index; gen_index < end && res_index < vectorSize; gen_index++){
-            result[res_index] = getCurrentGenomeAt(gen_index);
-            res_index++;  
+        // allocate required amount of data
+        std::byte* ret = (std::byte*)malloc(dataSize*sizeof(std::byte));
+        if (ret == nullptr) {
+            std::cout << "data allocation failed, exiting" << std::endl;
+            exit(-1);
         }
 
-        return static_cast<std::byte*>(result.data());
+        // set values in range requested by user
+        int ret_index = 0;
+        for (int gen_index = index; gen_index < end && ret_index < dataSize; gen_index++) {
+            ret[ret_index] = getCurrentGenomeAt(gen_index);
+            ret_index++;
+        }
+        return ret;
    }
 }
 
-// will work when resizing "parent"?
+// will resize the sites vector and change current genome size
 void UmaGenome::resize(size_t new_size) {
     sites.resize(new_size);
     currentGenomeSize = new_size;

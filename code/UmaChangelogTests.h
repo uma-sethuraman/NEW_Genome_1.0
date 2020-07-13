@@ -17,8 +17,8 @@ void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::stri
         failed = true;
     else {
         std::byte* genomeData = gen->data(0,0);
-        for(int i = 0; i < answer.size() && !failed; i++) {
-            if(genomeData[i] != answer[i]){
+        for(int i = 0; i < answer.size(); i++) {
+            if((*(genomeData+i)) != answer[i]){
                 failed = true;
             }
         }
@@ -50,6 +50,7 @@ void pointTest1(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
     
     std::vector<std::byte> answer{(std::byte)4,(std::byte)4,(std::byte)2,(std::byte)4,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)2,(std::byte)1,(std::byte)0};
@@ -60,9 +61,55 @@ void pointTest1(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     printResults(answer, genome, "Point Test 1: ");
+    
+    delete genome;
+}
+
+// testing copy/replace mutation
+template <class genomeName>
+void copyTest1(bool debug) {
+    AbstractGenome* genome = new genomeName(50); 
+    for (int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite<std::byte>(genome, i, (std::byte)i);
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    // replace the first 10 values with the last 10 values
+    // first 10 values should become: 40 41 42 43 44 45 46 47 48 49
+    std::vector<std::byte> copyVals(10);
+    int genIndex = genome->size()-copyVals.size();
+    for (int copyPos = 0; copyPos < copyVals.size(); copyPos++){
+        copyVals[copyPos] = GN::genomeRead<std::byte>(genome, genIndex);
+        genIndex++;
+    }
+    genome->overwrite(0, copyVals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    std::vector<std::byte> answer(50);
+    
+    for (int aPos = 0; aPos < answer.size(); aPos++) {
+        if (aPos >= 0 && aPos < copyVals.size()) 
+            answer[aPos] = (std::byte)(aPos+40);
+        else
+            answer[aPos] = (std::byte)aPos;  
+    }
+
+    printResults(answer, genome, "Copy Test 1: ");
     
     delete genome;
 }
@@ -86,6 +133,7 @@ void deleteTest1(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->remove(5,3);
@@ -93,6 +141,7 @@ void deleteTest1(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(3),(std::byte)(2),(std::byte)(0),(std::byte)(1),(std::byte)(1),(std::byte)(0)};
@@ -121,6 +170,7 @@ void deleteTest2(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(1,std::vector<std::byte>({(std::byte)(1)}));
@@ -133,6 +183,7 @@ void deleteTest2(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
@@ -161,6 +212,7 @@ void deleteTest3(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(1,std::vector<std::byte>({(std::byte)(1)}));
@@ -172,6 +224,7 @@ void deleteTest3(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(1),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
@@ -200,6 +253,7 @@ void deleteTest4(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(1,std::vector<std::byte>({(std::byte)(1)}));
@@ -213,6 +267,7 @@ void deleteTest4(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(2),(std::byte)(2),(std::byte)(4),(std::byte)(2),(std::byte)(1),(std::byte)(4)};
@@ -240,6 +295,7 @@ void deleteTest5(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(2,std::vector<std::byte>({(std::byte)(3)}));
@@ -249,6 +305,7 @@ void deleteTest5(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(4),(std::byte)(3),(std::byte)3,(std::byte)0,(std::byte)4,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
@@ -277,6 +334,7 @@ void deleteTest6(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->remove(9,1);
@@ -284,6 +342,7 @@ void deleteTest6(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)2,(std::byte)0,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1};
@@ -312,6 +371,7 @@ void deleteTest7(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->remove(0,1);
@@ -319,6 +379,7 @@ void deleteTest7(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)3,(std::byte)2,(std::byte)0,(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
@@ -347,6 +408,7 @@ void deleteTest8(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->remove(0,4);
@@ -354,6 +416,7 @@ void deleteTest8(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)1,(std::byte)2,(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)0};
@@ -382,6 +445,7 @@ void deleteTest9(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(2,std::vector<std::byte>({(std::byte)3}));
@@ -393,6 +457,7 @@ void deleteTest9(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)3,(std::byte)4,(std::byte)4};
@@ -420,6 +485,7 @@ void deleteTest10(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(4,std::vector<std::byte>({(std::byte)70}));
@@ -429,6 +495,7 @@ void deleteTest10(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)34,(std::byte)49,(std::byte)9,(std::byte)70,(std::byte)2,(std::byte)11,(std::byte)67,(std::byte)48,(std::byte)12};
@@ -451,6 +518,7 @@ void insertTest1(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> vals{(std::byte)(99)};
@@ -459,6 +527,7 @@ void insertTest1(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)99,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
@@ -481,6 +550,7 @@ void insertTest2(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
@@ -489,6 +559,7 @@ void insertTest2(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)99,(std::byte)66,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
@@ -512,6 +583,7 @@ void insertTest3(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
@@ -520,6 +592,7 @@ void insertTest3(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)99,(std::byte)66,(std::byte)11,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55};
@@ -543,6 +616,7 @@ void insertTest4(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> vals{(std::byte)(99), (std::byte)(66)};
@@ -551,6 +625,7 @@ void insertTest4(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)11,(std::byte)22,(std::byte)33,(std::byte)44,(std::byte)55,(std::byte)99,(std::byte)66};
@@ -574,6 +649,7 @@ void insertTest5(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(1,std::vector<std::byte>({(std::byte)1}));
@@ -585,6 +661,7 @@ void insertTest5(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)4,(std::byte)4,(std::byte)2,(std::byte)2,(std::byte)3};
@@ -608,6 +685,7 @@ void allMutationsTest1(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     // 4 3 2 0 1
@@ -629,6 +707,7 @@ void allMutationsTest1(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)4,(std::byte)3,(std::byte)1,(std::byte)4,(std::byte)2,(std::byte)3};
@@ -657,6 +736,7 @@ void allMutationsTest2(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     // parent: 40,34,21,9,0,2,11,67,48,12
@@ -682,6 +762,7 @@ void allMutationsTest2(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)50,(std::byte)49,(std::byte)40,(std::byte)99,(std::byte)70,(std::byte)21,(std::byte)9,(std::byte)0,(std::byte)2,(std::byte)11,(std::byte)67,(std::byte)48,(std::byte)42};
@@ -705,6 +786,7 @@ void allMutationsTest3(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->insert(1, std::vector<std::byte>({(std::byte)(99)}));
@@ -715,6 +797,7 @@ void allMutationsTest3(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(11),(std::byte)(99),(std::byte)(88),(std::byte)(77),(std::byte)(65),(std::byte)(55)};
@@ -724,7 +807,7 @@ void allMutationsTest3(bool debug) {
     delete genome;
 }
 
-// multiple point mutations on a large genome
+// multiple point mutations on a medium genome
 template <class genomeName>
 void stressTest1(bool debug) {
     AbstractGenome* genome = new genomeName(100); 
@@ -736,6 +819,7 @@ void stressTest1(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     genome->overwrite(10, std::vector<std::byte>({(std::byte)(65)}));
@@ -752,6 +836,7 @@ void stressTest1(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer(genome->size());
@@ -788,6 +873,7 @@ void stressTest2(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     // original: 17 20 10 11 32
@@ -805,6 +891,7 @@ void stressTest2(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer{(std::byte)(17),(std::byte)(20),(std::byte)(10),
@@ -818,7 +905,7 @@ void stressTest2(bool debug) {
     delete genome;
 }
 
-// large insertion in large genome
+// large insertion in medium genome
 template <class genomeName>
 void stressTest3(bool debug) {
     AbstractGenome* genome = new genomeName(100);
@@ -830,6 +917,7 @@ void stressTest3(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     // insert 50 values, all of which are 44
@@ -839,6 +927,7 @@ void stressTest3(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer(150, (std::byte)50);
@@ -851,7 +940,7 @@ void stressTest3(bool debug) {
     delete genome;
 }
 
-// large deletion for large genome
+// large deletion for medium genome
 template <class genomeName>
 void stressTest4(bool debug) {
     AbstractGenome* genome = new genomeName(200);
@@ -863,6 +952,7 @@ void stressTest4(bool debug) {
         std::cout << "----------------------------------------" << std::endl;
         std::cout << "ORIGINAL GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     // delete 50 values
@@ -871,6 +961,7 @@ void stressTest4(bool debug) {
     if (debug) {
         std::cout << "CURRENT GENOME: ";
         genome->show();
+        std::cout << std::endl;
     }
 
     std::vector<std::byte> answer(150);
@@ -884,11 +975,167 @@ void stressTest4(bool debug) {
     delete genome;
 }
 
+// multiple point mutations on size 100000 large genome
+// debug doesn't print entire genome since it's very large
+// user can modify test to print what they want when debug is set
 template <class genomeName>
-void runPointTests(bool debug) {
+void stressTest5(bool debug) {
+    AbstractGenome* genome = new genomeName(100000); 
+    for (int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite<std::byte>(genome, i, (std::byte)i);
+    }
+
+    genome->overwrite(100, std::vector<std::byte>({(std::byte)(65)}));
+    genome->overwrite(200, std::vector<std::byte>({(std::byte)(75)}));
+    genome->overwrite(300, std::vector<std::byte>({(std::byte)(85)}));
+    genome->overwrite(4000, std::vector<std::byte>({(std::byte)(95)}));
+    genome->overwrite(5000, std::vector<std::byte>({(std::byte)(105)}));
+    genome->overwrite(6000, std::vector<std::byte>({(std::byte)(205)}));
+    genome->overwrite(70000, std::vector<std::byte>({(std::byte)(15)}));
+    genome->overwrite(80000, std::vector<std::byte>({(std::byte)(20)}));
+    genome->overwrite(90000, std::vector<std::byte>({(std::byte)(45)}));
+    genome->overwrite(99999, std::vector<std::byte>({(std::byte)(70)}));
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    std::vector<std::byte> answer(genome->size());
+    for (int index = 0; index < answer.size(); index++) {
+        answer[index] = (std::byte)index;
+        if (index == 100) answer[index] = (std::byte)65;
+        if (index == 200) answer[index] = (std::byte)75;
+        if (index == 300) answer[index] = (std::byte)85;
+        if (index == 4000) answer[index] = (std::byte)95;
+        if (index == 5000) answer[index] = (std::byte)105;
+        if (index == 6000) answer[index] = (std::byte)205;
+        if (index == 70000) answer[index] = (std::byte)15;
+        if (index == 80000) answer[index] = (std::byte)20;
+        if (index == 90000) answer[index] = (std::byte)45;
+        if (index == 99999) answer[index] = (std::byte)70;
+    }
+
+    printResults(answer, genome, "Stress Test 5: ");
+
+    delete genome;
+}
+
+// insertion of size 300 at beginning of size 100000 genome
+// debug doesn't print entire genome since it's very large
+// user can modify test to print what they want when debug is set
+template <class genomeName>
+void stressTest6(bool debug) {
+    AbstractGenome* genome = new genomeName(100000); 
+    for (int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite<std::byte>(genome, i, (std::byte)17);
+    }
+
+    // insert 300 values, all of which are 77
+    std::vector<std::byte> vals(300, (std::byte)66);
+    genome->insert(0, vals);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    std::vector<std::byte> answer(100300, (std::byte)17);
+    for (int a = 0; a < 300; a++) {
+        answer[a] = (std::byte)66;
+    }
+
+    printResults(answer, genome, "Stress Test 6: ");
+
+    delete genome;
+}
+
+// deletion of size 300 at beginning of size 100000 genome
+// debug doesn't print entire genome since it's very large
+// user can modify test to print what they want when debug is set
+template <class genomeName>
+void stressTest7(bool debug) {
+    AbstractGenome* genome = new genomeName(100000); 
+    for (int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite<std::byte>(genome, i, (std::byte)17);
+    }
+
+    // remove 300 values at position 0
+    genome->remove(0, 300);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    std::vector<std::byte> answer(99700, (std::byte)17);
+
+    printResults(answer, genome, "Stress Test 7: ");
+
+    delete genome;
+}
+
+// point, copy, insert, and delete mutations on size 1 million genome
+// debug doesn't print entire genome since it's very large
+// user can modify test to print what they want when debug is set
+template<class genomeName>
+void stressTest8(bool debug) {
+    AbstractGenome* genome = new genomeName(1000000); 
+
+    // sets all 1 million values in genome to 10 initially
+    for (int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite<std::byte>(genome, i, (std::byte)10);
+    }
+
+    genome->remove(0, 200); // delete first 200 sites, size becomes 999800
+
+    // insert 300 sites of value 15 at position 0, size becomes 1000100
+    std::vector<std::byte> insertionVals(300, (std::byte)15);
+    genome->insert(0, insertionVals);
+
+    // change position 5 to have value 30
+    genome->overwrite(5, std::vector<std::byte>({(std::byte)30}));
+
+    // set positions 301 to 351 to value 15 by copy mutation
+    std::vector<std::byte> copyVals(50);
+    for (int copyPos = 200; copyPos < 250; copyPos++)
+        copyVals[copyPos-200] = GN::genomeRead<std::byte>(genome, copyPos);
+    genome->overwrite(301, copyVals);
+
+    // positions 0 to 4 have value 15
+    // then position 5 has value 30
+    // then positions 6 to 299 have value 15
+    // then position 300 has value 10
+    // then positions 301 to 350 have value 15
+    // then positions 351 to end of genome have values 10
+    // final genome size = 1000100
+    std::vector<std::byte> answer(1000100, (std::byte)10);
+    for (int pos = 0; pos <= 350; pos++) {
+        if(pos == 5)
+            answer[pos] = (std::byte)30;
+        else if (pos == 300)
+            answer[pos] = (std::byte)10;
+        else
+            answer[pos] = (std::byte)15;
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer, genome, "Stress Test 8: ");
+
+    delete genome;
+}
+
+
+template <class genomeName>
+void runOverwriteTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
-    std::cout << "RUNNING POINT TESTS: " << std::endl;
+    std::cout << "RUNNING OVERWRITE TESTS: " << std::endl;
     pointTest1<genomeName>(debug);
+    copyTest1<genomeName>(debug);
 }
 
 template <class genomeName>
@@ -935,11 +1182,16 @@ void runAllStressTests(bool debug) {
     stressTest2<genomeName>(debug);
     stressTest3<genomeName>(debug);
     stressTest4<genomeName>(debug);
+    stressTest5<genomeName>(debug);
+    stressTest6<genomeName>(debug);
+    stressTest7<genomeName>(debug);
+    stressTest8<genomeName>(debug);
 }
 
+// runs all tests in this file
 template <class genomeName>
 void runUmaChangelogTests(bool debug) {
-    runPointTests<genomeName>(debug);
+    runOverwriteTests<genomeName>(debug);
     runDeleteTests<genomeName>(debug);
     runInsertTests<genomeName>(debug);
     runAllMutationsTests<genomeName>(debug);

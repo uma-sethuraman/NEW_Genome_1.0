@@ -13,7 +13,7 @@ private:
     std::map<int, std::byte> changelog;
     std::map<int, int> offsetMap;
     bool mutationsOccurred; // false if no mutations have occurred on sites yet
-    size_t currentGenomeSize;
+    size_t currentGenomeSize; // current genome size
 
 public:
     UmaGenome(size_t _size);
@@ -52,7 +52,6 @@ public:
     virtual void show() override;
 
     int getLowerBoundOffset(int key);
-
     void printChangelog();
     void printOffsetMap();
     std::byte getCurrentGenomeAt(int pos); // random access method
