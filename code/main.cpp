@@ -287,7 +287,7 @@ int main() {
 	delete genome;
 
 	AbstractGenome* secondGenome = new StephanieGenome(200);
-	StephanieGenomeTest_Eight(secondGenome);
+	//StephanieGenomeTest_Nine(secondGenome);
 	delete secondGenome;
 
 

@@ -159,7 +159,33 @@ void StephanieGenomeTest_Nine(AbstractGenome* genome) {
 	for (size_t i(0); i < genome->size(); ++i)
 		std::cout << (int)GN::genomeRead<std::byte>(genome, i) << " ";
 	std::cout << std::endl;
-	std::vector<std::byte> myVector = { (std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33, std::byte)11, (std::byte)22, (std::byte)33 };
+	std::vector<std::byte> myVector = { 
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33,
+		(std::byte)11, (std::byte)22, (std::byte)33
+	};
 	genome->insert(9, myVector);
 	genome->insert(99, myVector);
 	genome->insert(50, myVector);
