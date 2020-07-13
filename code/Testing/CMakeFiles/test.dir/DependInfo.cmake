@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.cpp.o"
   "/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o"
+  "/home/victoria/WAVES/newgenome/code/TestGenome.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o"
   "/home/victoria/WAVES/newgenome/code/Testing/main.cpp" "/home/victoria/WAVES/newgenome/code/Testing/CMakeFiles/test.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

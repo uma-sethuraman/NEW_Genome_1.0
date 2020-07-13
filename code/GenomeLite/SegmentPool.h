@@ -12,16 +12,19 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <deque>
+#include <algorithm>
 
 #include"SegmentNode.h"
 
-typedef std::byte Byte; // c++17 std::byte doesn't always work
+typedef std::byte Byte; // c++17 Byte doesn't always work
+typedef std::vector< std::byte > Gene;
 
 /** Implementation of a genom object **/
 class SegmentPool
 {
 private:
-    std::vector< SegmentNode > Pool;
+    std::vector< SegmentNode > Pool; //< Pool of segmentNodes
 
 public:
     /** (deleted) Default Constructor **/
@@ -53,33 +56,44 @@ public:
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const bool IsFull() { return Pool.size() == Pool.capacity(); }
+    const bool IsFull() { return Pool.size() >= Pool.capacity()-10; }
 
-    /** Gets node at index from array
-     * \return node at index **/
-    SegmentNode* At(size_t index) 
-    { 
-        return &Pool[index]; 
-    }
 
     /** Creates a new node in the pool
      * \param data to make SegmentNOde from
      * \return pointer to newly allocated node **/
-    size_t Allocate(std::shared_ptr< std::vector<Byte> > data)
+    size_t Allocate(std::shared_ptr< Gene > data)
     {
         Pool.push_back(SegmentNode(data, Pool.size())); // assign node the data
         return Pool.size()-1;
     }
 
     /** Creates a new node in the pool
-     * \param data to make SegmentNOde from
-     * \param start Start of data within the segment
-     * \param size of data
-     * \return pointer to newly allocated node **/
+     * \param index of node to copy
+     * \return index of newly copied node **/
     size_t Copy(size_t index) 
     {
         Pool.push_back(SegmentNode(Pool[index], Pool.size())); // assign node the data
         return Pool.size()-1;
+    }
+
+    /** Creates a new node in the pool
+     * \param index of node to copy
+     * \return index of newly copied node **/
+    size_t Split(size_t index) 
+    {
+        size_t cutIndex = Pool.size();
+        auto cutSize = Pool[index].Size/2;
+
+        Pool.push_back(SegmentNode(std::make_shared< Gene >(Pool[index].Data->begin()+cutSize, Pool[index].Data->end()), Pool.size()));
+      
+        Pool[cutIndex].Next = Pool[index].Next;
+        Pool[index].Next = cutIndex;
+
+        Pool[index].Size -= cutSize;
+        Pool[index].Data->resize(Pool[index].Size);
+
+        return cutIndex;
     }
 
     /** Gets use count 
@@ -87,6 +101,13 @@ public:
     bool Unique(size_t index) 
     { 
         return Pool[index].Data.use_count() == 1; 
+    }
+
+    /** Gets use count 
+     * \returns use count of the smart pointer **/
+    bool Allocated(size_t index) 
+    { 
+        return Pool[index].Data != nullptr; 
     }
 
     /** Gets data from Segment
@@ -153,26 +174,35 @@ public:
         Pool[index].Size = localIndex;
     }
 
-    size_t Overwrite(size_t index, size_t localIndex, const std::vector<std::byte>& segment, size_t start)
+    size_t Overwrite(size_t index, size_t localIndex, const Gene& segment, size_t start)
     {
         auto size = Pool[index].Size-localIndex;
-        std::memcpy(&(Pool[index].Data->at(localIndex)), &(segment.at(start)), size);
+        std::move(segment.begin(), segment.end(), Pool[index].Data->begin()+localIndex);
 
         return start+size;
     }
 
-    void Insert(size_t index, size_t localIndex, const std::vector<std::byte>& segment)
+    void Insert(size_t index, size_t localIndex, const Gene& segment)
     {
-        Pool[index].Size += segment.size();
+        auto newSize = Pool[index].Data->size()+segment.size();
+        Pool[index].Size = newSize;
 
-        Pool[index].Data->insert(Pool[index].Data->end(), Pool[index].Data->begin()+localIndex, Pool[index].Data->end());
-        std::copy(segment.begin(), segment.end(), Pool[index].Data->begin()+localIndex);
+        auto newData = std::make_shared< Gene >(newSize);
+
+        std::copy_n(Pool[index].Data->begin(), localIndex, newData->begin());
+        std::copy_n(segment.begin(), segment.size(), newData->begin()+localIndex);
+        std::copy_n(Pool[index].Data->begin()+localIndex, Pool[index].Data->size()-localIndex, newData->begin()+localIndex+segment.size());
+
+        Pool[index].Data.swap(newData);
+
     }
 
     void Remove(size_t index, size_t localIndex, size_t segmentSize)
     {
         Pool[index].Size -= segmentSize;
-        Pool[index].Data->erase(Pool[index].Data->begin()+localIndex, Pool[index].Data->begin()+localIndex+segmentSize);
+        auto data = Pool[index].Data;
+        
+        data->erase(data->begin()+localIndex, data->begin()+localIndex+segmentSize);
     }
 
     void Clear(size_t index)

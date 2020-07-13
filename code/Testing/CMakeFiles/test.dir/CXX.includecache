@@ -6,25 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/victoria/WAVES/newgenome/code/AbstractGenome.h
-stdint.h
+/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp
+cstdint
 -
 vector
 -
-iostream
+utility
 -
-unordered_map
+algorithm
 -
-cstddef
--
-
-/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.h
-cstdint
--
-iostream
--
-../AbstractGenome.h
-/home/victoria/WAVES/newgenome/code/AbstractGenome.h
 SegmentList.h
 /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.h
 
@@ -39,7 +29,9 @@ cstdint
 -
 cstring
 -
-queue
+vector
+-
+iterator
 -
 cmath
 -
@@ -55,8 +47,6 @@ cstddef
 -
 memory
 -
-iostream
--
 vector
 -
 
@@ -73,22 +63,10 @@ cstring
 -
 vector
 -
+deque
+-
+algorithm
+-
 SegmentNode.h
 /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
-
-/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
-cassert
--
-../AbstractGenome.h
-/home/victoria/WAVES/newgenome/code/AbstractGenome.h
-../GenomeLite/GenomeLite.h
-/home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.h
-
-/home/victoria/WAVES/newgenome/code/Testing/main.cpp
-iostream
--
-string
--
-TestGenomeLite.h
-/home/victoria/WAVES/newgenome/code/Testing/TestGenomeLite.h
 

@@ -9,12 +9,26 @@
  **/
 void GenomeLite::Reallocate()
 {
-
+    List->Reallocate();
 }
 
 AbstractGenome* GenomeLite::clone()
 {
     return new GenomeLite(*this);
+}
+
+/** Gets size of genome sites
+ * \return size of tree **/
+size_t GenomeLite::size() 
+{ 
+    return List->GetSiteCount(); 
+}
+
+/** Gets size of genome sites
+ * \param newSize **/
+void GenomeLite::resize(size_t newSize) 
+{ 
+    List->Resize(newSize);
 }
 
 /** Gets contiguous data from genome
@@ -33,6 +47,8 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  **/
 void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
+    if (List->IsFull())
+        Reallocate();
     List->Overwrite(index, segment);
 }
 
@@ -42,6 +58,8 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
+    if (List->IsFull())
+        Reallocate();
     List->Insert(index, segment);
 }
 

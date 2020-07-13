@@ -197,6 +197,33 @@ home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
 .PHONY : home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.s
 
+home/victoria/WAVES/newgenome/code/TestGenome.o: home/victoria/WAVES/newgenome/code/TestGenome.cpp.o
+
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.o
+
+# target to build an object file
+home/victoria/WAVES/newgenome/code/TestGenome.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.cpp.o
+
+home/victoria/WAVES/newgenome/code/TestGenome.i: home/victoria/WAVES/newgenome/code/TestGenome.cpp.i
+
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.i
+
+# target to preprocess a source file
+home/victoria/WAVES/newgenome/code/TestGenome.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.i
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.cpp.i
+
+home/victoria/WAVES/newgenome/code/TestGenome.s: home/victoria/WAVES/newgenome/code/TestGenome.cpp.s
+
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.s
+
+# target to generate assembly for a file
+home/victoria/WAVES/newgenome/code/TestGenome.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.s
+.PHONY : home/victoria/WAVES/newgenome/code/TestGenome.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -239,6 +266,9 @@ help:
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.o"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.i"
 	@echo "... home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.s"
+	@echo "... home/victoria/WAVES/newgenome/code/TestGenome.o"
+	@echo "... home/victoria/WAVES/newgenome/code/TestGenome.i"
+	@echo "... home/victoria/WAVES/newgenome/code/TestGenome.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

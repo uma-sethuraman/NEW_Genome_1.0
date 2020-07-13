@@ -40,9 +40,10 @@ int main() {
 	// GenomeLite Testing
 	Title("GENOMELITE TESTING");
 
-	// TestGenomeLite::TestConstructor();
+	TestGenomeLite::TestConstructor();
 	// TestGenomeLite::TestInsert();
-	TestGenomeLite::TestDelete();
+	// TestGenomeLite::TestDelete();
+	// TestGenomeLite::TestResize();
 
 
 	EndTest();

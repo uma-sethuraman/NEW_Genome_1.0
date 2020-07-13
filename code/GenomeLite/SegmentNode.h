@@ -2,7 +2,7 @@
  * \file SegmentNode.h
  * \author Victoria Cao
  * 
- * \brief Segment node class for segmentation of data
+ * \brief Segment node struct for segmentation of data
  * implementation
  **/
 
@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <cstddef>
 #include <memory>
-#include <iostream>
 #include <vector>
 
 typedef std::byte Byte; // c++17 std::byte doesn't always work

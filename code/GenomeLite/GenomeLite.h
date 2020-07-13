@@ -31,19 +31,18 @@ public:
 
     /** size constructor **/
     GenomeLite(size_t size) 
-        : AbstractGenome(size), List(new SegmentList(size)) {}
+        : List(new SegmentList(size)) {}
 
     /** size constructor **/
     GenomeLite(const GenomeLite &genome) 
-        : AbstractGenome(genome.size_), List(new SegmentList(*(genome.List))) {}
+        : List(new SegmentList(*(genome.List))) {}
 
     /** destructor **/
     ~GenomeLite() { delete List; }
 
-    /** Gets size of genome sites
-     * \return size of tree **/
-    virtual size_t size() { return List->GetSiteCount(); }
 
+    virtual size_t size() override;
+    virtual void resize(size_t newSize) override;
     virtual AbstractGenome* clone() override;
     virtual Byte* data(size_t index = 0, size_t byteSize = 0) override;
     virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;

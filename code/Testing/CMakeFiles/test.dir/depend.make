@@ -13,11 +13,16 @@ CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cp
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
 CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentPool.h
 
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o: /home/victoria/WAVES/newgenome/code/AbstractGenome.h
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o: /home/victoria/WAVES/newgenome/code/TestGenome.cpp
+CMakeFiles/test.dir/home/victoria/WAVES/newgenome/code/TestGenome.cpp.o: /home/victoria/WAVES/newgenome/code/TestGenome.h
+
 CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/AbstractGenome.h
 CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/GenomeLite.h
 CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentList.h
 CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentNode.h
 CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/GenomeLite/SegmentPool.h
+CMakeFiles/test.dir/main.cpp.o: /home/victoria/WAVES/newgenome/code/TestGenome.h
 CMakeFiles/test.dir/main.cpp.o: TestGenomeLite.h
 CMakeFiles/test.dir/main.cpp.o: main.cpp
 
