@@ -31,7 +31,7 @@ void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::stri
         std::cout << "passed" << std::endl;
 }
 
-// simple point mutations
+// 3 point mutations on size 10 genome
 template <class genomeName>
 void pointTest1(bool debug) {
     AbstractGenome* genome = new genomeName(10);
@@ -69,7 +69,7 @@ void pointTest1(bool debug) {
     delete genome;
 }
 
-// testing copy/replace mutation
+// copy mutation on size 50 genome
 template <class genomeName>
 void copyTest1(bool debug) {
     AbstractGenome* genome = new genomeName(50); 
@@ -114,7 +114,7 @@ void copyTest1(bool debug) {
     delete genome;
 }
 
-// just one deletion
+// deletion in the middle of size 10 genome
 template <class genomeName>
 void deleteTest1(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -151,7 +151,7 @@ void deleteTest1(bool debug) {
     delete genome;
 }
 
-// only point and deletion mutations
+// point and deletion mutations on size 10 genome
 template <class genomeName>
 void deleteTest2(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -193,7 +193,7 @@ void deleteTest2(bool debug) {
     delete genome;
 }
 
-// only point and deletion mutations
+// point and deletion mutations on size 10 genome
 template <class genomeName>
 void deleteTest3(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -234,7 +234,8 @@ void deleteTest3(bool debug) {
     delete genome;
 }
 
-// delete a key that's already in map
+// deleting indices that were previously altered by point mutations
+// size 10 genome
 template <class genomeName>
 void deleteTest4(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -277,6 +278,7 @@ void deleteTest4(bool debug) {
     delete genome;
 }
 
+// point and deletion mutations on size 10 genome
 template <class genomeName>
 void deleteTest5(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -315,7 +317,7 @@ void deleteTest5(bool debug) {
     delete genome;
 }
 
-// delete last element in genome
+// delete last element in size 10 genome
 template <class genomeName>
 void deleteTest6(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -352,7 +354,7 @@ void deleteTest6(bool debug) {
     delete genome;
 }
 
-// delete first element in genome
+// delete first element in size 10 genome
 template <class genomeName>
 void deleteTest7(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -390,6 +392,7 @@ void deleteTest7(bool debug) {
 }
 
 // delete series of 4 elements starting at index 0
+// size 10 genome
 template <class genomeName>
 void deleteTest8(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -426,7 +429,7 @@ void deleteTest8(bool debug) {
     delete genome;
 }
 
-// alternating point and delete mutations
+// alternating point and delete mutations on size 10 genome
 template <class genomeName>
 void deleteTest9(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -467,6 +470,7 @@ void deleteTest9(bool debug) {
     delete genome;
 }
 
+// alternating point and delete mutations on size 10 genome
 template <class genomeName>
 void deleteTest10(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -505,6 +509,7 @@ void deleteTest10(bool debug) {
     delete genome;
 }
 
+// inserting one value at position 1 of size 5 genome
 template <class genomeName>
 void insertTest1(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -537,6 +542,7 @@ void insertTest1(bool debug) {
     delete genome;
 }
 
+// insertion of two values at position 1 of size 5 genome
 template <class genomeName>
 void insertTest2(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -569,7 +575,7 @@ void insertTest2(bool debug) {
     delete genome;
 }
 
-// insert at beginning of genome
+// insert at beginning of size 5 genome
 template <class genomeName>
 void insertTest3(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -602,7 +608,7 @@ void insertTest3(bool debug) {
     delete genome;
 }
 
-// insert at end of genome
+// insert at end of size 5 genome
 template <class genomeName>
 void insertTest4(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -635,7 +641,7 @@ void insertTest4(bool debug) {
     delete genome;
 }
 
-// point and insert mutations
+// point and insert mutations on size 5 genome
 template <class genomeName>
 void insertTest5(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -671,7 +677,7 @@ void insertTest5(bool debug) {
     delete genome;
 }
 
-// point,insert,and delete mutations
+// overwrite, insert, and remove mutations on size 5 genome
 template <class genomeName>
 void allMutationsTest1(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -717,7 +723,7 @@ void allMutationsTest1(bool debug) {
     delete genome;
 }
 
-// point,insert,and delete mutations
+// overwrite, insert, and remove mutations on size 10 genome
 template <class genomeName>
 void allMutationsTest2(bool debug) {
     AbstractGenome* genome = new genomeName(10); 
@@ -773,6 +779,7 @@ void allMutationsTest2(bool debug) {
 }
 
 // example from powerpoint demo
+// overwrite, insert, and remove mutations on size 5 genome
 template <class genomeName>
 void allMutationsTest3(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -807,7 +814,7 @@ void allMutationsTest3(bool debug) {
     delete genome;
 }
 
-// multiple point mutations on a medium genome
+// multiple point mutations on size 100 genome
 template <class genomeName>
 void stressTest1(bool debug) {
     AbstractGenome* genome = new genomeName(100); 
@@ -860,6 +867,7 @@ void stressTest1(bool debug) {
 }
 
 // insertion inception (insertion inside insertion inside insertion...)
+// size 5 genome
 template <class genomeName>
 void stressTest2(bool debug) {
     AbstractGenome* genome = new genomeName(5); 
@@ -905,7 +913,7 @@ void stressTest2(bool debug) {
     delete genome;
 }
 
-// large insertion in medium genome
+// insertion of size 50 on size 100 genome
 template <class genomeName>
 void stressTest3(bool debug) {
     AbstractGenome* genome = new genomeName(100);
@@ -940,7 +948,7 @@ void stressTest3(bool debug) {
     delete genome;
 }
 
-// large deletion for medium genome
+// deletion of size 50 for size 200 genome
 template <class genomeName>
 void stressTest4(bool debug) {
     AbstractGenome* genome = new genomeName(200);
@@ -1129,7 +1137,7 @@ void stressTest8(bool debug) {
     delete genome;
 }
 
-
+// runs all point and copy mutation tests
 template <class genomeName>
 void runOverwriteTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
@@ -1138,6 +1146,7 @@ void runOverwriteTests(bool debug) {
     copyTest1<genomeName>(debug);
 }
 
+// runs all delete/remove tests
 template <class genomeName>
 void runDeleteTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
@@ -1154,6 +1163,7 @@ void runDeleteTests(bool debug) {
     deleteTest10<genomeName>(debug);
 }
 
+// runs all insert tests
 template <class genomeName>
 void runInsertTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
@@ -1165,6 +1175,7 @@ void runInsertTests(bool debug) {
     insertTest5<genomeName>(debug);
 }
 
+// runs all tests which test overwrite+insert+delete together
 template <class genomeName>
 void runAllMutationsTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
@@ -1174,6 +1185,7 @@ void runAllMutationsTests(bool debug) {
     allMutationsTest3<genomeName>(debug);
 }
 
+// runs all stress tests
 template <class genomeName>
 void runAllStressTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
