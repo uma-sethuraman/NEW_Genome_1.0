@@ -1,2 +1,0 @@
-/usr/bin/ar qc libgenomes.a  CMakeFiles/genomes.dir/AbstractGenome.cpp.o CMakeFiles/genomes.dir/TestGenome.cpp.o CMakeFiles/genomes.dir/UmaGenome.cpp.o CMakeFiles/genomes.dir/Uma_NKEvaluator.cpp.o
-/usr/bin/ranlib libgenomes.a

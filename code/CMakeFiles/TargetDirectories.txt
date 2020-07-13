@@ -1,6 +1,0 @@
-/home/victoria/WAVES/newgenome/code/CMakeFiles/rebuild_cache.dir
-/home/victoria/WAVES/newgenome/code/CMakeFiles/edit_cache.dir
-/home/victoria/WAVES/newgenome/code/CMakeFiles/test.dir
-/home/victoria/WAVES/newgenome/code/Genomes/CMakeFiles/rebuild_cache.dir
-/home/victoria/WAVES/newgenome/code/Genomes/CMakeFiles/edit_cache.dir
-/home/victoria/WAVES/newgenome/code/Genomes/CMakeFiles/genomes.dir
