@@ -56,13 +56,3 @@ public:
     void printOffsetMap();
     std::byte getCurrentGenomeAt(int pos); // random access method
 };
-
-namespace NK {
-
-    // Represents an organism (genome, score) in a population of organisms
-    // Used in NK evaluator
-    struct Organism {
-        AbstractGenome* genome;
-        double score;
-    };
-}

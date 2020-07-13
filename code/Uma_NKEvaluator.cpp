@@ -22,7 +22,7 @@ double getRandomDouble(double min, double max) {
 } 
 
 // Used to sort list of organisms (containing a genome and its score) by score
-bool compareOrganismByScore (const NK::Organism& a, const NK::Organism& b) {
+bool compareOrganismByScore (const Organism& a, const Organism& b) {
     return a.score > b.score;
 }
 
@@ -66,7 +66,7 @@ void copyGenome(AbstractGenome* a, AbstractGenome* b) {
 // Chooses top 10% of genome population based on highest scores,
 // Clears and refills genome population vector with mutated versions of this top 10%,
 // Performs evolution on genome population
-void evolvePopulation(std::vector<NK::Organism>& population, int N, int K, bool debug) {
+void evolvePopulation(std::vector<Organism>& population, int N, int K, bool debug) {
 
     // choose top 10 percent of population to move to next generation
     // this evolution method relies on population size being a multiple of 10
@@ -74,7 +74,7 @@ void evolvePopulation(std::vector<NK::Organism>& population, int N, int K, bool 
     int top10percent = pop_size/10;
 
     // temporarily stores next generation population of genomes (and scores)
-    std::vector<NK::Organism> new_population(pop_size);
+    std::vector<Organism> new_population(pop_size);
 
     // index into new population vector, iterates from 0 to pop_size
     int newpop_ind = 0; 
@@ -151,7 +151,7 @@ void runNKFitness(int N, int K, int updates, int pop_size, bool debug) {
     int time = 0; // which update we are currently on
 
     // population of genomes (and their scores)
-    std::vector<NK::Organism> population(pop_size);
+    std::vector<Organism> population(pop_size);
     
     // initialize population of pop_size random genomes of size N
     for (int org = 0; org < pop_size; org++) {

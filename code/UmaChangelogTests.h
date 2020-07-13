@@ -509,6 +509,45 @@ void deleteTest10(bool debug) {
     delete genome;
 }
 
+// deleting value that was just inserted
+// size 10 genome
+template <class genomeName>
+void deleteTest11(bool debug) {
+    AbstractGenome* genome = new genomeName(10); 
+    GN::genomeWrite<std::byte>(genome, 0, (std::byte)11);
+    GN::genomeWrite<std::byte>(genome, 1, (std::byte)22);
+    GN::genomeWrite<std::byte>(genome, 2, (std::byte)33);
+    GN::genomeWrite<std::byte>(genome, 3, (std::byte)44);
+    GN::genomeWrite<std::byte>(genome, 4, (std::byte)55);
+    GN::genomeWrite<std::byte>(genome, 5, (std::byte)66);
+    GN::genomeWrite<std::byte>(genome, 6, (std::byte)77);
+    GN::genomeWrite<std::byte>(genome, 7, (std::byte)88);
+    GN::genomeWrite<std::byte>(genome, 8, (std::byte)99);
+    GN::genomeWrite<std::byte>(genome, 9, (std::byte)111);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    genome->insert(7, std::vector<std::byte>({(std::byte)(212)}));
+    genome->remove(5, 3);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    std::vector<std::byte> answer{(std::byte)(11),(std::byte)(22),(std::byte)(33),(std::byte)(44),(std::byte)(55), (std::byte)(88), (std::byte)(99), (std::byte)(111)};
+    
+    printResults(answer, genome, "Delete Test 11: ");
+
+    delete genome;
+}
+
 // inserting one value at position 1 of size 5 genome
 template <class genomeName>
 void insertTest1(bool debug) {
@@ -677,6 +716,59 @@ void insertTest5(bool debug) {
     delete genome;
 }
 
+// alternating overwrite and insert mutations on size 10 genome
+template <class genomeName>
+void insertTest6(bool debug) {
+    AbstractGenome* genome = new genomeName(10); 
+    GN::genomeWrite<std::byte>(genome, 0, (std::byte)11);
+    GN::genomeWrite<std::byte>(genome, 1, (std::byte)22);
+    GN::genomeWrite<std::byte>(genome, 2, (std::byte)33);
+    GN::genomeWrite<std::byte>(genome, 3, (std::byte)44);
+    GN::genomeWrite<std::byte>(genome, 4, (std::byte)55);
+    GN::genomeWrite<std::byte>(genome, 5, (std::byte)66);
+    GN::genomeWrite<std::byte>(genome, 6, (std::byte)77);
+    GN::genomeWrite<std::byte>(genome, 7, (std::byte)88);
+    GN::genomeWrite<std::byte>(genome, 8, (std::byte)99);
+    GN::genomeWrite<std::byte>(genome, 9, (std::byte)111);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    // original genome: 11 22 33 44 55 66 77 88 99 111
+    // after mutation 1: 11 22 33 44 55 66 77 212 88 99 111
+    // after mutation 2: 11 22 33 44 55 200 77 212 88 99 111
+    // after mutation 3: 11 22 15 16 33 44 55 200 77 212 88 99 111
+    // after mutation 4: 11 88 99 111 33 44 55 200 77 212 88 99 111
+    genome->insert(7, std::vector<std::byte>({(std::byte)(212)}));
+    genome->overwrite(5, std::vector<std::byte>({(std::byte)(200)}));
+    genome->insert(2, std::vector<std::byte>({(std::byte)(15), (std::byte)(16)}));
+
+    std::vector<std::byte> copyVals(3);
+    int genIndex = genome->size()-copyVals.size();
+    for (int copyPos = 0; copyPos < copyVals.size(); copyPos++){
+        copyVals[copyPos] = GN::genomeRead<std::byte>(genome, genIndex);
+        genIndex++;
+    }
+    genome->overwrite(1, copyVals);
+
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    std::vector<std::byte> answer{(std::byte)(11),(std::byte)(88),(std::byte)(99),(std::byte)(111),(std::byte)(33),(std::byte)(44), (std::byte)(55), (std::byte)(200), (std::byte)(77), (std::byte)(212), (std::byte)(88), (std::byte)(99), (std::byte)(111)};
+    
+    printResults(answer, genome, "Insert Test 6: ");
+
+    delete genome;
+}
+
 // overwrite, insert, and remove mutations on size 5 genome
 template <class genomeName>
 void allMutationsTest1(bool debug) {
@@ -746,8 +838,8 @@ void allMutationsTest2(bool debug) {
     }
 
     // parent: 40,34,21,9,0,2,11,67,48,12
-    // after mutation 1: 60,50,51,40,34,21,9,0,2,11,67,48,12 - CORRECT
-    // after mutation 2: 60,50,51,40,70,21,9,0,2,11,67,48,12 - GOES WRONG HERE
+    // after mutation 1: 60,50,51,40,34,21,9,0,2,11,67,48,12
+    // after mutation 2: 60,50,51,40,70,21,9,0,2,11,67,48,12
     // after mutation 3: 50,51,40,70,21,9,0,2,11,67,48,12
     // after mutation 4: 50,51,40,70,21,9,0,2,11,67,48,12,62,52,42
     // after mutation 5: 50,51,40,70,21,9,0,2,11,67,48,12,42
@@ -810,6 +902,61 @@ void allMutationsTest3(bool debug) {
     std::vector<std::byte> answer{(std::byte)(11),(std::byte)(99),(std::byte)(88),(std::byte)(77),(std::byte)(65),(std::byte)(55)};
     
     printResults(answer, genome, "All-Mutations Test 3: ");
+
+    delete genome;
+}
+
+// point, copy, delete, and insert mutations on size 10 genome
+template <class genomeName>
+void allMutationsTest4(bool debug) {
+    AbstractGenome* genome = new genomeName(10); 
+    GN::genomeWrite<std::byte>(genome, 0, (std::byte)11);
+    GN::genomeWrite<std::byte>(genome, 1, (std::byte)22);
+    GN::genomeWrite<std::byte>(genome, 2, (std::byte)33);
+    GN::genomeWrite<std::byte>(genome, 3, (std::byte)44);
+    GN::genomeWrite<std::byte>(genome, 4, (std::byte)55);
+    GN::genomeWrite<std::byte>(genome, 5, (std::byte)66);
+    GN::genomeWrite<std::byte>(genome, 6, (std::byte)77);
+    GN::genomeWrite<std::byte>(genome, 7, (std::byte)88);
+    GN::genomeWrite<std::byte>(genome, 8, (std::byte)99);
+    GN::genomeWrite<std::byte>(genome, 9, (std::byte)111);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    // original genome: 11 22 33 44 55 66 77 88 99 111
+    // after mutation 1: 11 22 33 44 55 66 77 212 88 99 111
+    // after mutation 2: 11 22 33 44 55 88 99 111
+    // after mutation 3: 11 22 33 44 55 200 99 111
+    // after mutation 4: 11 22 15 16 33 44 55 200 99 111
+    // after mutation 5: 11 200 99 111 33 44 55 200 99 111
+    genome->insert(7, std::vector<std::byte>({(std::byte)(212)}));
+    genome->remove(5, 3);
+    genome->overwrite(5, std::vector<std::byte>({(std::byte)(200)}));
+    genome->insert(2, std::vector<std::byte>({(std::byte)(15), (std::byte)(16)}));
+
+    // replace position 1,2,3 with last 3 values in genome
+    std::vector<std::byte> copyVals(3);
+    int genIndex = genome->size()-copyVals.size();
+    for (int copyPos = 0; copyPos < copyVals.size(); copyPos++){
+        copyVals[copyPos] = GN::genomeRead<std::byte>(genome, genIndex);
+        genIndex++;
+    }
+    genome->overwrite(1, copyVals);
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    std::vector<std::byte> answer{(std::byte)(11),(std::byte)(200),(std::byte)(99),(std::byte)(111),(std::byte)(33),(std::byte)(44), (std::byte)(55), (std::byte)(200), (std::byte)(99), (std::byte)(111)};
+    
+    printResults(answer, genome, "All-Mutations Test 4: ");
 
     delete genome;
 }
@@ -1161,6 +1308,7 @@ void runDeleteTests(bool debug) {
     deleteTest8<genomeName>(debug);
     deleteTest9<genomeName>(debug);
     deleteTest10<genomeName>(debug);
+    deleteTest11<genomeName>(debug);
 }
 
 // runs all insert tests
@@ -1173,6 +1321,7 @@ void runInsertTests(bool debug) {
     insertTest3<genomeName>(debug);
     insertTest4<genomeName>(debug);
     insertTest5<genomeName>(debug);
+    insertTest6<genomeName>(debug);
 }
 
 // runs all tests which test overwrite+insert+delete together
@@ -1183,6 +1332,7 @@ void runAllMutationsTests(bool debug) {
     allMutationsTest1<genomeName>(debug);
     allMutationsTest2<genomeName>(debug);
     allMutationsTest3<genomeName>(debug);
+    allMutationsTest4<genomeName>(debug);
 }
 
 // runs all stress tests
