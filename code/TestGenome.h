@@ -10,8 +10,8 @@ private:
 	// custom properties & functions
 	std::vector<std::byte> sites;
 public:
-
 	TestGenome(size_t _size);
+
 	~TestGenome() override {
 		std::cout << "done" << std::endl;
 	}
@@ -40,7 +40,7 @@ public:
 
 
 	// starting at index, write values in segement over values currently in genome
-	virtual void overwrite(size_t index, const std::vector<std::byte>& segment)  {
+	virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override {
 		if (index + segment.size() > sites.size()) {
 			std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
 			exit(1);
@@ -52,8 +52,8 @@ public:
 	}
 
 	// starting at index, write values in segement genome between genome[index-1] and genome[index]
-	virtual void insert(size_t index, const std::vector<std::byte>& segment)  {
-		sites.insert(sites.begin()+index, segment.begin(), segment.end());
+	virtual void insert(size_t index, const std::vector<std::byte>& segment) override {
+		sites.insert(sites.begin() + index, segment.begin(), segment.end());
 	}
 
 	// starting at index, delete segmentSize values from genome starting at genome[index]
@@ -62,7 +62,7 @@ public:
 			std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
 			exit(1);
 		}
-		sites.erase(sites.begin()+index, sites.begin() + index + segmentSize);
+		sites.erase(sites.begin() + index, sites.begin() + index + segmentSize);
 	}
 
 	// print the whole genome
@@ -87,7 +87,7 @@ public:
 		}
 
 		std::size_t skip;
-		for (size_t s_index = 0; s_index < (sites.size() - pattern.size())+1; s_index += skip) {
+		for (size_t s_index = 0; s_index < (sites.size() - pattern.size()) + 1; s_index += skip) {
 			skip = 0;
 			for (int p_index(pattern.size() - 1); p_index >= 0; p_index--) {
 				if (sites[s_index + p_index] != pattern[p_index]) {

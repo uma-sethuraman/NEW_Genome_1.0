@@ -19,17 +19,20 @@ private:
 
 public:
 	StephanieGenome(size_t _size);
+
 	~StephanieGenome() override {
 		std::cout << "\ndone" << std::endl;
 	}
 
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
+	virtual size_t size() override;
+
 	virtual void resize(size_t new_size) override;
 
-	virtual void overwrite(size_t index, std::vector<std::byte>& segment);
+	virtual void overwrite(size_t index, const std::vector<std::byte>& segment);
 
-	virtual void insert(size_t index, std::vector<std::byte>& segment);
+	virtual void insert(size_t index, const std::vector<std::byte>& segment);
 
 	virtual void remove(size_t index, size_t segmentSize) override;
 
