@@ -19,10 +19,10 @@
 
 // misc
 #include "utilities.h"
-// #include "Uma_NKEvaluator.h"
+#include "Uma_NKEvaluator.h"
 
 
-
+/** main function for running tests **/
 int main() 
 {
     /**     Uma's Testing Suite         **/
@@ -30,5 +30,6 @@ int main()
     // pass in 1 to see pass/fail results AND debug output of all tests
     // pass in <GenomeName> based on which genome class you want to test
     runUmaChangelogTests<TestGenome>(0);
+    
     return(0);
 }
