@@ -3,6 +3,6 @@ space to work on new genome class for MABE
 
 
 ### To compile:
-cd code
-bash build.sh
+cd code  <br />
+bash build.sh  <br />
 ./test
