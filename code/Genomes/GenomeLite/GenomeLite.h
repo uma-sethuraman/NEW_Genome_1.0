@@ -30,8 +30,7 @@ public:
     GenomeLite() = delete;
 
     /** size constructor **/
-    GenomeLite(size_t size) 
-        : List(new SegmentList(size)) {}
+    GenomeLite(size_t size);
 
     /** size constructor **/
     GenomeLite(const GenomeLite &genome) 

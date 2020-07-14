@@ -20,8 +20,10 @@
  * \param size of new list
  **/
 SegmentList::SegmentList(size_t size)
-    :Pool(new SegmentPool(size)), SiteCount(size)
+    : SiteCount(size)
 {
+    size_t poolSize = std::max((size_t)10, (size/pageSize)*2);
+    Pool = new SegmentPool(poolSize);
     Root = CreateList(SiteCount);
 }
 
@@ -43,12 +45,30 @@ SegmentList::SegmentList(const SegmentList &list)
 void SegmentList::Reallocate()
 {
     SegmentPool* oldPool = Pool;
-    size_t oldRoot = Root;
+    size_t oldNode = Root;
 
     Pool = new SegmentPool(SiteCount);
-    // Root = CreateList(SiteCount, 0);
+    Root = CreateList(SiteCount);
+
+    size_t node = Root;
+    size_t start = 0;
+    // while(start < SiteCount)
+    // {
+        
+
+    //     auto ele = &(*segment.begin()); 
+    //     Pool->Overwrite(left, leftOffset, segment, startIndex, size);
+    //     startIndex += size;
+    //     left = Pool->GetNext(left);      
+    // }
 }
 
+
+/**
+ * Creates linked list of size and adds it to the back of the index table
+ * \param size
+ * \returns head of the list
+ **/
 size_t SegmentList::CreateList(size_t size)
 {
     size_t node;
@@ -92,6 +112,11 @@ size_t SegmentList::CreateList(size_t size)
     return startNode;
 }
 
+
+/**
+ * Resizes the genome
+ * \param size to resize to
+ **/
 void SegmentList::Resize(size_t size)
 {
     if (size < SiteCount)
@@ -114,26 +139,29 @@ void SegmentList::Resize(size_t size)
 TableEntry SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
-    auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0));
-    if ((entry != IndexTable.begin() && (*entry).first > index) || entry == IndexTable.end())
-        --entry;
+    auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0))-IndexTable.begin();
     
-    size_t node = (*entry).second;
-    size_t left = (*entry).first;
-    auto tableIt = entry-IndexTable.begin();
+    if (entry == IndexTable.size() || (IndexTable[entry].first != index && entry > 0))
+    {
+        --entry;
+    }
+
+    auto found = IndexTable[entry];
+    size_t node = found.second;
+    size_t left = found.first;
 
     // iterate through segment list if not in node
-    while (left + Pool->GetSize(node) < index)
+    while (left + Pool->GetSize(node)-1 < index && left + Pool->GetSize(node) < SiteCount)
     {
         left += Pool->GetSize(node);
         node = Pool->GetNext(node);
 
         // update index table
         IndexTable.push_back(std::make_pair<size_t, size_t>((size_t)(left), (size_t(node))));
-        tableIt = IndexTable.size()-1;
+        entry = IndexTable.size()-1;
     }
 
-    return TableEntry(tableIt, node, left);
+    return TableEntry(entry, node, left);
 }
 
 /** 
@@ -153,12 +181,12 @@ Byte* SegmentList::GetData(size_t index)
  * \param index 
  * \param segment to overwrite with
  **/
-void SegmentList::Overwrite(size_t index, const std::vector<std::byte>& segment)
+void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 {
     auto found = Find(index);
     auto left = found.PoolIndex;
     auto leftOffset = index-found.Offset;
-    auto tableEnd = ++found.TableEnd;
+    auto entry = ++found.Entry;
 
     size_t startIndex = 0;
 
@@ -167,7 +195,11 @@ void SegmentList::Overwrite(size_t index, const std::vector<std::byte>& segment)
         // overwrite the node if current genome is only one with data
         if (Pool->Unique(left))
         {
-            startIndex = Pool->Overwrite(left, leftOffset, segment, startIndex);
+            size_t size = std::min((Pool->GetSize(left)-leftOffset), (segment.size()-startIndex));
+   
+            auto ele = &(*segment.begin()); 
+            Pool->Overwrite(left, leftOffset, segment, startIndex, size);
+            startIndex += size;
             leftOffset = 0;
             left = Pool->GetNext(left);      
         }
@@ -243,10 +275,10 @@ void SegmentList::Overwrite(size_t index, const std::vector<std::byte>& segment)
             left = right;
             leftOffset = rightOffset;
 
+            IndexTable.resize(entry);
         }
     }
 
-    IndexTable.resize(tableEnd);
 
 }
 
@@ -255,12 +287,12 @@ void SegmentList::Overwrite(size_t index, const std::vector<std::byte>& segment)
  * \param index 
  * \param segment to insert
  **/
-void SegmentList::Insert(size_t index, const std::vector<std::byte>& segment)
+void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 {
     auto found = Find(index);
     auto left = found.PoolIndex;
     auto leftOffset = index-found.Offset;
-    auto tableEnd = ++found.TableEnd;
+    auto entry = ++found.Entry;
 
     // overwrite current genome
     if (Pool->Unique(left))
@@ -325,9 +357,7 @@ void SegmentList::Insert(size_t index, const std::vector<std::byte>& segment)
     }
 
     SiteCount += segment.size();
-    
-    IndexTable.resize(tableEnd);
-
+    IndexTable.resize(entry);
 }
 
 
@@ -341,10 +371,12 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
     auto found = Find(index);
     auto left = found.PoolIndex;
     auto leftOffset = index-found.Offset;
-    auto tableEnd = found.TableEnd;
+    auto entry = ++found.Entry;
 
     auto right = left;
     auto rightOffset = leftOffset;
+
+    SiteCount -= segmentSize;
 
     while(segmentSize)
     {
@@ -417,10 +449,7 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
     }
         
     Pool->SetNext(left, right);
-
-    SiteCount -= segmentSize;
-    IndexTable.resize(tableEnd);
-
+    IndexTable.resize(entry);
 }
 
 /** 

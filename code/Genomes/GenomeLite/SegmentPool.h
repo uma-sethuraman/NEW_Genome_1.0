@@ -56,7 +56,7 @@ public:
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const bool IsFull() { return Pool.size() >= Pool.capacity()-10; }
+    const bool IsFull() { return Pool.size()+2 >= Pool.capacity(); }
 
 
     /** Creates a new node in the pool
@@ -174,12 +174,9 @@ public:
         Pool[index].Size = localIndex;
     }
 
-    size_t Overwrite(size_t index, size_t localIndex, const Gene& segment, size_t start)
+    void Overwrite(size_t index, size_t localIndex, const Gene& segment, size_t start, size_t size)
     {
-        auto size = Pool[index].Size-localIndex;
-        std::copy_n(segment.begin(), segment.size(), Pool[index].Data->begin()+localIndex);
-
-        return start+size;
+        std::copy_n(segment.begin()+start, size, Pool[index].Data->begin()+localIndex);
     }
 
     void Insert(size_t index, size_t localIndex, const Gene& segment)

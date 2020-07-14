@@ -24,12 +24,12 @@ typedef std::byte Byte; // easy reading
 /** struct for finding **/
 struct TableEntry
 {
-    size_t TableEnd; 
+    size_t Entry;
     size_t PoolIndex;
     size_t Offset;
 
-    TableEntry(size_t te, size_t pInd, size_t offset)
-        : TableEnd(te), PoolIndex(pInd), Offset(offset) {}
+    TableEntry(size_t entry, size_t pInd, size_t offset)
+        : Entry(entry), PoolIndex(pInd), Offset(offset) {}
 };
 
 
@@ -47,7 +47,7 @@ private:
     size_t SiteCount = 0;
 
 public:
-    SegmentList() = default;
+    SegmentList() = delete;
     SegmentList(size_t size);
     SegmentList(const SegmentList &List);
     void Reallocate();

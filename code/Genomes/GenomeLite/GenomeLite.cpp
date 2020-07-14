@@ -5,6 +5,12 @@
 
 #include "GenomeLite.h"
 
+GenomeLite::GenomeLite(size_t size)
+{
+    List = new SegmentList(size);
+}
+
+
 /** Reallocates the tree
  **/
 void GenomeLite::Reallocate()

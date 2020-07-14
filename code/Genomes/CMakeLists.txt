@@ -7,6 +7,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # set the project name
 project( test )
 
+# set debugging
+set(CMAKE_BUILD_TYPE Debug)
+
 # include source
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Tools)
 
