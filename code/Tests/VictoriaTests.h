@@ -34,14 +34,18 @@ typedef std::byte Byte; // c++17 Byte doesn't always work
 namespace VictoriaTests
 {
 
+    /*******************************************************
+     * 
+     *          CONSTRUCTOR TESTS
+     * 
+     ******************************************************/
+
     /**
-     * Tests cloning functions for making population
+     * Tests constructor 50
      **/
     template <class genomeName>
-    void TestConstructor(bool debug)
+    void TestConstructor50(bool debug)
     {
-        std::cout << BOLDWHITE "Running " BOLDMAGENTA "CONSTRUCTOR TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
-
         // test size 50
         size_t size = 50;
         AbstractGenome* genome = new genomeName(size);
@@ -52,26 +56,18 @@ namespace VictoriaTests
         assert(genome->size() == size);
         std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
 
-        // test size 500
-        size = 500;
-
-        AbstractGenome* temp = new genomeName(size);
         delete genome;
-        genome = temp;
+    }
 
-        if (debug)
-            genome->show();
-
-        assert(genome->size() == size);
-        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
-
-
+    /**
+     * Tests constructor 5000
+     **/
+    template <class genomeName>
+    void TestConstructor5000(bool debug)
+    {
         // test size 5000
-        size = 5000;
-
-        temp = new genomeName(size);
-        delete genome;
-        genome = temp;
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
 
         if (debug)
             genome->show();
@@ -79,26 +75,18 @@ namespace VictoriaTests
         assert(genome->size() == size);
         std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
 
-        // test size 50000
-        size = 50000;
-
-        temp = new genomeName(size);
         delete genome;
-        genome = temp;
+    }
 
-        if (debug)
-            genome->show();
-
-        assert(genome->size() == size);
-        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
-
-
+    /**
+     * Tests constructor 500000
+     **/
+    template <class genomeName>
+    void TestConstructor500000(bool debug)
+    {
         // test size 500000
-        size = 500000;
-
-        temp = new genomeName(size);
-        delete genome;
-        genome = temp;
+        size_t size = 500000;
+        AbstractGenome* genome = new genomeName(size);
 
         if (debug)
             genome->show();
@@ -106,9 +94,225 @@ namespace VictoriaTests
         assert(genome->size() == size);
         std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
 
+        delete genome;
+    }
+
+    /**
+     * Tests cloning functions for making population
+     **/
+    template <class genomeName>
+    void TestConstructor(bool debug)
+    {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "CONSTRUCTOR TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
+
+        TestConstructor50<genomeName>(debug);
+        TestConstructor5000<genomeName>(debug);
+        TestConstructor500000<genomeName>(debug);
+    }
 
 
-        // end of tests delete genome
+    /*******************************************************
+     * 
+     *          OVERWRITE TESTS
+     * 
+     ******************************************************/
+
+
+    /*******************************************************
+     *          OVERWRITE ALL TESTS
+     ******************************************************/
+
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwriteAll50(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            assert(*(genome->data(i)) == (Byte)10);
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite All " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+    /**
+     * Tests overwriting the whole genome size 5000
+     **/
+    template <class genomeName>
+    void TestOverwriteAll5000(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            assert(*(genome->data(i)) == (Byte)10);
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite All " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+    /**
+     * Tests overwriting the whole genome size 500000
+     **/
+    template <class genomeName>
+    void TestOverwriteAll500000(bool debug)
+    {
+        // test size 500000
+        size_t size = 500000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            assert(*(genome->data(i)) == (Byte)10);
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite All " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+    /**
+     * Tests overwriting the whole genome
+     **/
+    template <class genomeName>
+    void TestOverwriteAll(bool debug)
+    {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "OVERWRITE ALL TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
+
+        TestOverwriteAll50<genomeName>(debug);
+        TestOverwriteAll5000<genomeName>(debug);
+        TestOverwriteAll500000<genomeName>(debug);
+    }
+
+
+    /*******************************************************
+     *          OVERWRITE PART TESTS
+     ******************************************************/
+
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwriteFront(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(10, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i < 10)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite Front: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwriteMiddle(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(2950, std::vector<Byte>(100, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i >= 2950 && i < 3050)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwriteBack(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(40, std::vector<Byte>(10, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i >= 40)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite Back: " BOLDGREEN " PASSED" << RESET << std::endl;
+
         delete genome;
     }
 
@@ -117,79 +321,119 @@ namespace VictoriaTests
      * Tests overwriting the whole genome
      **/
     template <class genomeName>
-    void TestOverwriteAll(bool debug)
+    void TestOverwritePart(bool debug)
     {
-        std::cout << BOLDWHITE "Running " BOLDMAGENTA "OVERWRITE ALL TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "OVERWRITE PART TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
 
-        // test size 50
-        size_t size = 50;
+        TestOverwriteFront<genomeName>(debug);
+        TestOverwriteMiddle<genomeName>(debug);
+        TestOverwriteBack<genomeName>(debug);
+    }
+
+
+    /*******************************************************
+     *          OVERWRITE POINT TESTS
+     ******************************************************/
+ 
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwritePointSmall(bool debug)
+    {
+        // test size 10
+        size_t size = 10;
         AbstractGenome* genome = new genomeName(size);
 
-        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
+        genome->overwrite(0, std::vector<Byte>({(Byte)4,(Byte)3,(Byte)2,(Byte)0,(Byte)1,(Byte)2,(Byte)4,(Byte)3,(Byte)1,(Byte)0}));
+        genome->overwrite(1, std::vector<Byte>({(Byte)(4)}));
+        genome->overwrite(7, std::vector<Byte>({(Byte)(2)}));
+        genome->overwrite(3, std::vector<Byte>({(Byte)(4)}));
 
         if (debug)
             genome->show();
 
-        // assertions
+        std::vector<Byte> compare({(Byte)4,(Byte)4,(Byte)2,(Byte)4,(Byte)1,(Byte)2,(Byte)4,(Byte)2,(Byte)1,(Byte)0});
         for (size_t i(0); i < size; i++)
         {
-            assert(GN::genomeRead<Byte>(genome, i) == (Byte)10);
+            assert(*(genome->data(i)) == compare[i]);
         }
         assert(genome->size() == size);
 
-        std::cout << "Test Overwrite " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+        std::cout << "Test Overwrite Point Small Genome: " BOLDGREEN " PASSED" << RESET << std::endl;
 
-
-        // test size 500
-        size = 500;
-
-        AbstractGenome* temp = new genomeName(size);
         delete genome;
-        genome = temp;
-
-        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
-
-        if (debug)
-            genome->show();
-
-        // assertions
-        for (size_t i(0); i < size; i++)
-        {
-            assert(GN::genomeRead<Byte>(genome, i) == (Byte)10);
-        }
-        assert(genome->size() == size);
-
-
-        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
-
-
-        // test size 5000
-        size = 5000;
-
-        temp = new genomeName(size);
-        delete genome;
-        genome = temp;
-
-        genome->overwrite(0, std::vector<Byte>(size, (Byte)10));
-
-        if (debug)
-            genome->show();
-
-        // assertions
-        for (size_t i(0); i < size; i++)
-        {
-            assert(GN::genomeRead<Byte>(genome, i) == (Byte)10);
-        }
-        assert(genome->size() == size);
-
-
-        std::cout << "Test Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
-
-
-        // delete genome once done with tests
-        delete genome;
-
     }
+
+
+    /**
+     * Tests overwriting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestOverwritePointLarge(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(size, (Byte)0));
+        genome->overwrite(0, std::vector<Byte>(1, (Byte)1));
+        genome->overwrite(10, std::vector<Byte>(1, (Byte)2));
+        genome->overwrite(2999, std::vector<Byte>(1, (Byte)3));
+        genome->overwrite(4999, std::vector<Byte>(1, (Byte)4));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(2999); i < size; i++)
+        {
+            if (i == 0)
+                assert(*(genome->data(i)) == (Byte)1);
+            else if (i == 10)
+                assert(*(genome->data(i)) == (Byte)2);
+            else if (i == 2999)
+                assert(*(genome->data(i)) == (Byte)3);
+            else if (i == 4999)
+                assert(*(genome->data(i)) == (Byte)4);
+            else
+                assert(*(genome->data(i)) == (Byte)0);       
+        }
+        assert(genome->size() == size);
+
+        genome->overwrite(0, std::vector<Byte>(1, (Byte)5));
+        genome->overwrite(10, std::vector<Byte>(1, (Byte)6));
+        genome->overwrite(2999, std::vector<Byte>(1, (Byte)7));
+        genome->overwrite(4999, std::vector<Byte>(1, (Byte)8));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i == 0)
+                assert(*(genome->data(i)) == (Byte)5);
+            else if (i == 10)
+                assert(*(genome->data(i)) == (Byte)6);
+            else if (i == 2999)
+                assert(*(genome->data(i)) == (Byte)7);
+            else if (i == 4999)
+                assert(*(genome->data(i)) == (Byte)8);
+            else
+                assert(*(genome->data(i)) == (Byte)0);       
+        }
+        assert(genome->size() == size);
+
+        std::cout << "Test Overwrite Point Large Genome: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /*******************************************************
+     *          RUN OVERWRITE TESTS
+     ******************************************************/
 
     /**
      * Tests all of the overwrite functions
@@ -198,9 +442,120 @@ namespace VictoriaTests
     void TestOverwrite(bool debug)
     {
         TestOverwriteAll<genomeName>(debug);
+        TestOverwritePart<genomeName>(debug);
+        TestOverwritePointSmall<genomeName>(debug);
+        TestOverwritePointLarge<genomeName>(debug);
+    }
+
+ 
+    /*******************************************************
+     * 
+     *          INSERT TESTS
+     * 
+     ******************************************************/
+
+    /*******************************************************
+     *          INSERT TESTS
+     ******************************************************/
+
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestInsertFront(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->insert(0, std::vector<Byte>(10, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(32); i < genome->size(); i++)
+        {
+            if (i < 10)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);      
+        }
+        assert(genome->size() == size+10);
+
+        std::cout << "Test Insert Front: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
     }
 
 
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestInsertMiddle(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->insert(2999, std::vector<Byte>(100, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            if (i >= 2999 && i < 3099)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size+100);
+
+        std::cout << "Test Insert Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestInsertBack(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->insert(50, std::vector<Byte>(10, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i >= 50)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size+10);
+
+        std::cout << "Test Insert Back: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /*******************************************************
+     *          RUN INSERT TESTS
+     ******************************************************/
 
     /**
      * Tests cloning functions for making population
@@ -208,8 +563,120 @@ namespace VictoriaTests
     template <class genomeName>
     void TestInsert(bool debug)
     {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "INSERT TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
 
+        TestInsertFront<genomeName>(debug);
+        TestInsertMiddle<genomeName>(debug);
+        TestInsertBack<genomeName>(debug);
     }
+
+
+    /*******************************************************
+     * 
+     *          DELETE TESTS
+     * 
+     ******************************************************/
+  
+    /*******************************************************
+     *          INSERT TESTS
+     ******************************************************/
+
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestDeleteFront(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        genome->remove(0, 10);
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*(genome->data(i)) == (Byte)(i+10));
+        }
+        assert(genome->size() == size-10);
+
+        std::cout << "Test Delete Front: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestDeleteMiddle(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->insert(2999, std::vector<Byte>(100, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            if (i >= 2999 && i < 3099)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size+100);
+
+        std::cout << "Test Delete Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
+
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestDeleteBack(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->insert(50, std::vector<Byte>(10, (Byte)10));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < size; i++)
+        {
+            if (i >= 50)
+                assert(*(genome->data(i)) == (Byte)10);
+            else
+                assert(*(genome->data(i)) != (Byte)10);
+            
+        }
+        assert(genome->size() == size+10);
+
+        std::cout << "Test Delete Back: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
 
 
     /**
@@ -218,9 +685,17 @@ namespace VictoriaTests
     template <class genomeName>
     void TestDelete(bool debug)
     {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "DELETE TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
 
+        TestDeleteFront<genomeName>(debug);
     }
 
+
+    /*******************************************************
+     * 
+     *          CLONE TESTS
+     * 
+     ******************************************************/
 
     /**
      * Tests cloning functions for making population
@@ -232,6 +707,12 @@ namespace VictoriaTests
     }
 
 
+
+    /*******************************************************
+     * 
+     *          RUN ALL TESTS
+     * 
+     ******************************************************/
 
     /** 
      * Tests all of the previous tests
