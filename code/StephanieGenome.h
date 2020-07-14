@@ -55,6 +55,6 @@ public:
 		return(geneMap);
 	}
 
-	//virtual void printChangelog() override;
+	void printChangelog();
 
 };
