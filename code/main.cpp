@@ -5,7 +5,6 @@
 #include <bitset>
 #include "AbstractGenome.h"
 #include "UmaGenome.h"
-#include "Uma_NKEvaluator.h"
 #include "TestGenome.h"
 #include <cstddef>
 #include "utilities.h"
@@ -276,7 +275,7 @@ void test_alterations() {
 }
 int main() {
 
-	//test_alterations();
+	// test_alterations();
 
     //find_patterns_tests();
 
@@ -291,13 +290,10 @@ int main() {
     //runGeneTest(secondGenome);
     //delete secondGenome;
 
-    // Order of parameters: N, K, updates, population size, debug mode
-    // Need to fix mutate method to uncomment this!
-    //runNKFitness(5, 2, 10, 20, 0);
-
     // pass in 0 to just see pass/fail results of all tests
     // pass in 1 to see pass/fail results AND debug output of all tests
     // pass in <GenomeName> based on which genome class you want to test
     runUmaChangelogTests<UmaGenome>(0);
+    
     return(0);
 }

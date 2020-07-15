@@ -1929,7 +1929,7 @@ void runOverwriteTests(bool debug) {
 template <class genomeName>
 void runRemoveTests(bool debug) {
     std::cout << "----------------------------------------" << std::endl;
-    std::cout << "RUNNING DELETE TESTS: " << std::endl;
+    std::cout << "RUNNING REMOVE TESTS: " << std::endl;
     removeTest1<genomeName>(debug);
     removeTest2<genomeName>(debug);
     removeTest3<genomeName>(debug);
