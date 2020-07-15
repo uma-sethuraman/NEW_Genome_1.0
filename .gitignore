@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 # IDE files
 code/.vscode
+=======
+code/Genomes/libgenomes.a
+code/test
+>>>>>>> 8f86962c51e995f2cbbe6bfe8b623b5cc37ae07b
