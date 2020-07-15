@@ -18,7 +18,6 @@ size_t UmaGenome::size() {
     return currentGenomeSize;
 }
 
-// Still need to figure out how to free pointer returned
 std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     if ((index+byteSize) > currentGenomeSize){
         std::cout << "error: byteSize exceeds the size of current genome" << std::endl;
@@ -44,14 +43,14 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
             end = index+byteSize;
         }
 
-        // allocate required amount of data
+        // allocate required amount of data based on dataSize
         std::byte* ret = (std::byte*)malloc(dataSize*sizeof(std::byte));
         if (ret == nullptr) {
             std::cout << "data allocation failed, exiting" << std::endl;
             exit(-1);
         }
 
-        // set values in range requested by user
+        // get values in range requested by user
         int ret_index = 0;
         for (int gen_index = index; gen_index < end && ret_index < dataSize; gen_index++) {
             ret[ret_index] = getCurrentGenomeAt(gen_index);
@@ -61,7 +60,6 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
    }
 }
 
-// will resize the sites vector and change current genome size
 void UmaGenome::resize(size_t new_size) {
     sites.resize(new_size);
     currentGenomeSize = new_size;
@@ -80,22 +78,7 @@ int UmaGenome::getLowerBoundOffset(int key) {
 
 // Not fully implemented or used yet
 void UmaGenome::mutate() {
-    // Something like the code below
-    /*int numPoint = Random::getBinomial((int)sites.size(), MR_Point);
-    int numIns = Random::getBinomial((int)sites.size(), MR_Insertion);
-    int numDel = Random::getBinomial((int)sites.size(), MR_Deletion);*/
-
-    /*for (int p = 0; p < numPoint; p++) {
-        pointMutate();
-    }
-
-    for (int i = 0; i < numIns; i++) {
-        insertMutate();
-    }
-
-    for (int d = 0; d < numDel; d++) {
-        deleteMutate();
-    }*/
+    
 }
 
 // point mutation at position index with given value
@@ -212,6 +195,10 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
     // Decrement all keys starting at index in offset map
     std::map<int,int>::iterator ofs_it = offsetMap.upper_bound(index);
     while(ofs_it != offsetMap.end()) {
+
+        // decrement current key by (segmentSize-1) because
+        // the index that is offsetted is always 
+        // one after the index of deletion
         int key = ofs_it->first;
         auto keyToChange = offsetMap.extract(key);
         keyToChange.key() -= (segmentSize-1);
@@ -271,8 +258,7 @@ void UmaGenome::printOffsetMap() {
     }
 }
 
-// returns value in current genome at position pos
-// random access function
+// random access function : returns value in current genome at position pos
 std::byte UmaGenome::getCurrentGenomeAt(int pos) {
     std::map<int,std::byte>::iterator changelog_it;
     changelog_it = changelog.find(pos);
