@@ -9,8 +9,9 @@
 #include "utilities.h"
 #include "TetianaGenome.h"
 #include "TD_NKFitnessEvaluator.h"
-#include "TetianaTests.h"
 
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
 
 void testData(AbstractGenome* genome)
 {
@@ -294,7 +295,7 @@ void test_alterations_tetiana() {
     std::cout << "---------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char* argv[]) {
+int main() {
     
     //AbstractGenome* genome = new TetianaGenome(8);
     //delete genome;
@@ -303,26 +304,111 @@ int main(int argc, char* argv[]) {
     
 	//AbstractGenome* genome = new TetianaGenome(8);
 	
-    test_alterations();
-    test_alterations_tetiana();
-    find_patterns_tests();
-
-	AbstractGenome* genome = new TestGenome(8);
-	//AbstractGenome  & y = *(new TestGenome);
-
-	runTests(genome);
-	testData(genome);
-	delete genome;
-
-	AbstractGenome* secondGenome = new TetianaGenome(200);
-	runGeneTest(secondGenome);
-	delete secondGenome;
-
-    //AbstractGenome* secondGenome = new TestGenome(200);
-	//runGeneTest(secondGenome);
-	//delete secondGenome;
-
-    int result = Catch::Session().run(argc, argv);
+//    test_alterations();
+//    test_alterations_tetiana();
+//    find_patterns_tests();
+//
+//	AbstractGenome* genome = new TestGenome(8);
+//	//AbstractGenome  & y = *(new TestGenome);
+//
+//	runTests(genome);
+//	testData(genome);
+//	delete genome;
+//
+//	AbstractGenome* secondGenome = new TetianaGenome(200);
+//	runGeneTest(secondGenome);
+//	delete secondGenome;
+//
+//    //AbstractGenome* secondGenome = new TestGenome(200);
+//	//runGeneTest(secondGenome);
+//	//delete secondGenome;
     
+    
+////    AbstractGenome* myGenome = new TetianaGenome(11);
+//    AbstractGenome* myGenome = new TetianaGenome(5);
+//
+//    GN::genomeWrite<std::byte>(myGenome, 0, (std::byte)21);
+//    GN::genomeWrite<std::byte>(myGenome, 1, (std::byte)35);
+//    GN::genomeWrite<std::byte>(myGenome, 2, (std::byte)43);
+//    GN::genomeWrite<std::byte>(myGenome, 3, (std::byte)84);
+//    GN::genomeWrite<std::byte>(myGenome, 4, (std::byte)12);
+////    GN::genomeWrite<std::byte>(myGenome, 5, (std::byte)15);
+////    GN::genomeWrite<std::byte>(myGenome, 6, (std::byte)19);
+////    GN::genomeWrite<std::byte>(myGenome, 7, (std::byte)28);
+////    GN::genomeWrite<std::byte>(myGenome, 8, (std::byte)39);
+////    GN::genomeWrite<std::byte>(myGenome, 9, (std::byte)45);
+////    GN::genomeWrite<std::byte>(myGenome, 10, (std::byte)51);
+//
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+//
+//    //myGenome->remove(3, 1);
+//    //std::byte* my_offspring_data = myGenome->data(0, 0);
+//    //std::cout << "Show: " << std::endl;
+//    //myGenome->show();
+//
+//    myGenome->insert(2, std::vector<std::byte>{
+//        (std::byte)1,
+//        (std::byte)2,
+//        (std::byte)3,
+//        (std::byte)4
+//    });
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+//
+//    myGenome->insert(3, std::vector<std::byte>{
+//        (std::byte)5,
+//        (std::byte)6
+//    });
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+//
+//    myGenome->remove(1, 3);
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+////
+//    myGenome->remove(1, 3);
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+
+//    myGenome->remove(3, 4);
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+//
+//    myGenome->remove(0, 10);
+//    std::cout << "Show: " << std::endl;
+//    myGenome->show();
+
+
+    
+    
+    
+    AbstractGenome* myGenome = new TetianaGenome(11);
+
+    GN::genomeWrite<std::byte>(myGenome, 0, (std::byte)21);
+    GN::genomeWrite<std::byte>(myGenome, 1, (std::byte)35);
+    GN::genomeWrite<std::byte>(myGenome, 2, (std::byte)43);
+    GN::genomeWrite<std::byte>(myGenome, 3, (std::byte)84);
+    GN::genomeWrite<std::byte>(myGenome, 4, (std::byte)12);
+    GN::genomeWrite<std::byte>(myGenome, 5, (std::byte)15);
+    GN::genomeWrite<std::byte>(myGenome, 6, (std::byte)19);
+    GN::genomeWrite<std::byte>(myGenome, 7, (std::byte)28);
+    GN::genomeWrite<std::byte>(myGenome, 8, (std::byte)39);
+    GN::genomeWrite<std::byte>(myGenome, 9, (std::byte)45);
+    GN::genomeWrite<std::byte>(myGenome, 10, (std::byte)51);
+
+    myGenome->show();
+    
+    myGenome->remove(3, 1);
+    myGenome->show();
+    
+    std::vector<std::byte> segment1{
+        (std::byte)1
+    };
+    myGenome->insert(2, segment1);
+    myGenome->show();
+    
+    int result = Catch::Session().run();
+    //
     return result;
 }

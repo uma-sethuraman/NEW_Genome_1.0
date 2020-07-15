@@ -15,12 +15,15 @@ private:
     
     std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}}; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
+    bool empty = false;
     
 public:
     TetianaGenome(size_t _size);
     ~TetianaGenome() override {
         std::cout << "done" << std::endl;
     }
+    
+    virtual size_t size() override;
     
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
     
@@ -59,17 +62,10 @@ public:
     
     
     // starting at index, write values in segement genome between genome[index-1] and genome[index]
-    virtual void insert(size_t index, std::vector<std::byte> segment) override;
-    
+    virtual void insert(size_t index, const std::vector<std::byte>& segment) override;
     
     // starting at index, delete segmentSize values from genome starting at genome[index]
-    virtual void remove(size_t index, size_t segmentSize) {
-        if (index + segmentSize > sites.size()) {
-            std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
-            exit(1);
-        }
-        sites.erase(sites.begin()+index, sites.begin() + index + segmentSize);
-    }
+    virtual void remove(size_t index, size_t segmentSize) override;
     
     
     std::vector<std::byte> offspring_recon();
