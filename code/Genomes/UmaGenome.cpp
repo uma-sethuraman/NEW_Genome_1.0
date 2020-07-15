@@ -2,8 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <random>
-#include "Uma_NKEvaluator.h"
-#include "random.h"
 
 UmaGenome::UmaGenome(size_t _size){
     sites.resize(_size);
@@ -20,7 +18,6 @@ size_t UmaGenome::size() {
     return currentGenomeSize;
 }
 
-// Still need to figure out how to free pointer returned
 std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     if ((index+byteSize) > currentGenomeSize){
         std::cout << "error: byteSize exceeds the size of current genome" << std::endl;
@@ -46,14 +43,14 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
             end = index+byteSize;
         }
 
-        // allocate required amount of data
+        // allocate required amount of data based on dataSize
         std::byte* ret = (std::byte*)malloc(dataSize*sizeof(std::byte));
         if (ret == nullptr) {
             std::cout << "data allocation failed, exiting" << std::endl;
             exit(-1);
         }
 
-        // set values in range requested by user
+        // get values in range requested by user
         int ret_index = 0;
         for (int gen_index = index; gen_index < end && ret_index < dataSize; gen_index++) {
             ret[ret_index] = getCurrentGenomeAt(gen_index);
@@ -63,7 +60,6 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
    }
 }
 
-// will resize the sites vector and change current genome size
 void UmaGenome::resize(size_t new_size) {
     sites.resize(new_size);
     currentGenomeSize = new_size;
@@ -82,22 +78,7 @@ int UmaGenome::getLowerBoundOffset(int key) {
 
 // Not fully implemented or used yet
 void UmaGenome::mutate() {
-    // Something like the code below
-    /*int numPoint = Random::getBinomial((int)sites.size(), MR_Point);
-    int numIns = Random::getBinomial((int)sites.size(), MR_Insertion);
-    int numDel = Random::getBinomial((int)sites.size(), MR_Deletion);*/
-
-    /*for (int p = 0; p < numPoint; p++) {
-        pointMutate();
-    }
-
-    for (int i = 0; i < numIns; i++) {
-        insertMutate();
-    }
-
-    for (int d = 0; d < numDel; d++) {
-        deleteMutate();
-    }*/
+    
 }
 
 // point mutation at position index with given value
@@ -133,19 +114,11 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 
     int size = segment.size(); // insertion size
 
-    /* Increment all keys starting at start in changelog by size by 
-       looping through changelog in reverse order until we hit loop_end_key 
-       - where loop_end_key is start if start is in changelog or 
-       start's upper bound otherwise. */
-    std::map<int,std::byte>::iterator loop_end = changelog.find(index);
-    if(loop_end == changelog.end())
-        loop_end = changelog.upper_bound(index);
-    int loop_end_key = loop_end->first; // index to stop the loop
-
-    /* Looping in reverse order and incrementing the keys prevents us from
-       changing a key into a key that already exists */
+    /* Loop from last key in changelog until you hit index (or its upper bound) 
+       and increment the keys by insertion size. Incrementing the keys in reverse
+       order prevents us from changing a key into a key that already exists */
     std::map<int,std::byte>::reverse_iterator changelog_it = changelog.rbegin();
-    while(changelog_it != changelog.rend() && (changelog_it->first >= loop_end_key)) {
+    while(changelog_it != changelog.rend() && (changelog_it->first >= index)) {
 
         // increment current key in changelog by size
         int key = changelog_it->first;
@@ -162,7 +135,22 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
         seg_index++;
     }
 
-    // If insertion start isn't a key in offsetMap, add it to offsetMap
+    /* Loop from last key in offset map until you hit index (or its upper bound) 
+       and increment the keys by insertion size. Incrementing the keys in reverse
+       order prevents us from changing a key into a key that already exists */
+    std::map<int,int>::reverse_iterator ofs_it = offsetMap.rbegin();
+    while(ofs_it != offsetMap.rend() && (ofs_it->first >= index)) {
+
+        // increment current key in offset map by size
+        int key = ofs_it->first;
+        auto keyToChange = offsetMap.extract(key);
+        keyToChange.key() += size;
+        offsetMap.insert(move(keyToChange));
+        ofs_it++;
+    }
+
+
+    // If insertion start position isn't a key in offsetMap, add it to offsetMap
     std::map<int,int>::iterator offset_it = offsetMap.find(index);
     if (offset_it == offsetMap.end()){
         // start not in offsetMap, so add it
@@ -202,6 +190,20 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         keyToChange.key() -= segmentSize;
         changelog.insert(move(keyToChange));
         changelog_it++;
+    }
+
+    // Decrement all keys starting at index in offset map
+    std::map<int,int>::iterator ofs_it = offsetMap.upper_bound(index);
+    while(ofs_it != offsetMap.end()) {
+
+        // decrement current key by (segmentSize-1) because
+        // the index that is offsetted is always 
+        // one after the index of deletion
+        int key = ofs_it->first;
+        auto keyToChange = offsetMap.extract(key);
+        keyToChange.key() -= (segmentSize-1);
+        offsetMap.insert(move(keyToChange));
+        ofs_it++;
     }
 
     // If start not a key in offsetMap, add it to offsetMap
@@ -256,8 +258,7 @@ void UmaGenome::printOffsetMap() {
     }
 }
 
-// returns value in current genome at position pos
-// random access function
+// random access function : returns value in current genome at position pos
 std::byte UmaGenome::getCurrentGenomeAt(int pos) {
     std::map<int,std::byte>::iterator changelog_it;
     changelog_it = changelog.find(pos);
@@ -287,9 +288,3 @@ std::byte UmaGenome::getCurrentGenomeAt(int pos) {
         return sites[pos-pos_offset];
     }
 }
-
-//GeneView UmaGenome::geneView() {
-//  //GeneView gv;
-//  //...
-//  //return gv;
-//}

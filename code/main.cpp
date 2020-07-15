@@ -19,7 +19,6 @@
 
 // misc
 #include "utilities.h"
-#include "Uma_NKEvaluator.h"
 
 
 /** main function for running tests **/
