@@ -11,13 +11,6 @@ GenomeLite::GenomeLite(size_t size)
 }
 
 
-/** Reallocates the tree
- **/
-void GenomeLite::Reallocate()
-{
-    List->Reallocate();
-}
-
 AbstractGenome* GenomeLite::clone()
 {
     return new GenomeLite(*this);
@@ -53,8 +46,8 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  **/
 void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
-    if (List->IsFull())
-        Reallocate();
+    // if (List->IsFull())
+    //     List->Reallocate();
     List->Overwrite(index, segment);
 }
 
@@ -64,8 +57,8 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
-    if (List->IsFull())
-        Reallocate();
+    // if (List->IsFull())
+    //     List->Reallocate();
     List->Insert(index, segment);
 }
 

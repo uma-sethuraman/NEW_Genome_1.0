@@ -4,11 +4,14 @@
  **/
 
 #define pageSize 3000
+#define mutationRate 33 // total all mutations 1 in every 100 sites
+
 
 #include <cstdint>
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <cmath>
 
 #include "SegmentList.h"
 
@@ -22,7 +25,7 @@
 SegmentList::SegmentList(size_t size)
     : SiteCount(size)
 {
-    size_t poolSize = std::max((size_t)10, (size/pageSize)*2);
+    size_t poolSize = std::max((size_t)20, (size_t)(std::ceil(size/pageSize)+std::ceil(size/mutationRate)));
     Pool = new SegmentPool(poolSize);
     Root = CreateList(SiteCount);
 }
@@ -34,7 +37,6 @@ SegmentList::SegmentList(size_t size)
 SegmentList::SegmentList(const SegmentList &list)
     : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount) 
 {
-
 }
 
 
@@ -44,14 +46,14 @@ SegmentList::SegmentList(const SegmentList &list)
  **/
 void SegmentList::Reallocate()
 {
-    SegmentPool* oldPool = Pool;
-    size_t oldNode = Root;
+    // SegmentPool* oldPool = Pool;
+    // size_t oldNode = Root;
 
-    Pool = new SegmentPool(SiteCount);
-    Root = CreateList(SiteCount);
+    // Pool = new SegmentPool(SiteCount);
+    // Root = CreateList(SiteCount);
 
-    size_t node = Root;
-    size_t start = 0;
+    // size_t node = Root;
+    // size_t start = 0;
     // while(start < SiteCount)
     // {
         
@@ -236,6 +238,7 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
                 // remove rest of node
                 else 
                 {
+                    // if not whole node
                     if (rightOffset)
                     {
                         startIndex += Pool->GetSize(right)-rightOffset;
@@ -251,6 +254,7 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 
                     right = Pool->GetNext(right); 
                     rightOffset = 0; 
+                    leftOffset = 0;
                 }
             }
             // insert segment
@@ -320,30 +324,31 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
         // in middle
         if (leftOffset && leftOffset != Pool->GetSize(left))
         {
-            right = left;
-            if (leftOffset == Pool->GetSize(left))
-            {
-                right = Pool->GetNext(right);
-            }
-            else
-            {
-                right = Pool->Copy(left);
-                Pool->TruncateRight(left, leftOffset);
-                Pool->TruncateLeft(right, leftOffset); 
-            }
+            right = Pool->Copy(left);
+
+            Pool->TruncateRight(left, leftOffset);
+            Pool->TruncateLeft(right, leftOffset); 
+
             Pool->SetNext(left, mutation);
+
         }
 
         // front case
         else if (!leftOffset)
         {
             if (left != Root)
+            {
+                left = Pool->GetPrev(left);
                 Pool->SetNext(left, mutation);
+                IndexTable[--entry].second = mutation;
+            }
             else
             {
                 Root = mutation;
                 IndexTable[0].second = (size_t)(Root);
             }
+
+
         }
 
         // back case
@@ -394,11 +399,16 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
 
             else      
             {
-                rightOffset = segmentSize;
+                rightOffset = leftOffset+segmentSize;
                 if (left == right)
                 {
-                    right = Pool->Copy(left);
-                    Pool->TruncateRight(left, leftOffset);
+                    if (leftOffset)
+                    {
+                        right = Pool->Copy(left);
+                        Pool->TruncateRight(left, leftOffset);
+                    }
+                    else
+                        left = Pool->GetPrev(left);
                 }
                 Pool->TruncateLeft(right, rightOffset);  
             }          
@@ -431,7 +441,8 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
             }
 
             right = Pool->GetNext(right); 
-            rightOffset = 0;           
+            rightOffset = 0;  
+            leftOffset = 0;         
         } 
     }
 

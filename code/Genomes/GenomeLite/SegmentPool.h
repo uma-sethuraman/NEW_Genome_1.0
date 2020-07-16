@@ -74,6 +74,8 @@ public:
     size_t Copy(size_t index) 
     {
         Pool.push_back(SegmentNode(Pool[index], Pool.size())); // assign node the data
+        Pool[Pool.back().Next].Prev = Pool.size()-1;
+        
         return Pool.size()-1;
     }
 
@@ -114,7 +116,7 @@ public:
      * \returns size of data **/
     Byte* GetData(size_t index, size_t localIndex)
     {
-        return &(Pool[index].Data->at(localIndex));
+        return &(Pool[index].Data->at(Pool[index].Start+localIndex));
     }
 
     const size_t GetPos(size_t index) 
