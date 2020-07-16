@@ -553,9 +553,42 @@ namespace VictoriaTests
     }
 
 
-    /*******************************************************
-     *          RUN INSERT TESTS
-     ******************************************************/
+    /**
+     * Tests inserting the whole genome size 50
+     **/
+    template <class genomeName>
+    void TestInsertNested(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        genome->overwrite(0, std::vector<Byte>(size, (Byte)0));
+
+        for (size_t i(0); i < 10; i++)
+            genome->insert(i, std::vector<Byte>(2, (Byte)i));
+
+        if (debug)
+            genome->show();
+
+        // assertions
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            if (i < 10)
+                assert(*(genome->data(i)) == (Byte)i);
+            else if (i < 20)
+                assert(*(genome->data(i)) == (Byte)(9-(i%10)));
+            else
+                assert(*(genome->data(i)) == (Byte)0);
+            
+        }
+        assert(genome->size() == size+20);
+
+        std::cout << "Test Insert Nested: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+    }
+
 
     /**
      * Tests cloning functions for making population
@@ -568,6 +601,7 @@ namespace VictoriaTests
         TestInsertFront<genomeName>(debug);
         TestInsertMiddle<genomeName>(debug);
         TestInsertBack<genomeName>(debug);
+        TestInsertNested<genomeName>(debug);
     }
 
 
@@ -576,10 +610,7 @@ namespace VictoriaTests
      *          DELETE TESTS
      * 
      ******************************************************/
-  
-    /*******************************************************
-     *          INSERT TESTS
-     ******************************************************/
+
 
     /**
      * Tests inserting the whole genome size 50
@@ -624,7 +655,12 @@ namespace VictoriaTests
         size_t size = 5000;
         AbstractGenome* genome = new genomeName(size);
 
-        genome->insert(2999, std::vector<Byte>(100, (Byte)10));
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        genome->remove(2999, 100);
 
         if (debug)
             genome->show();
@@ -632,13 +668,13 @@ namespace VictoriaTests
         // assertions
         for (size_t i(0); i < genome->size(); i++)
         {
-            if (i >= 2999 && i < 3099)
-                assert(*(genome->data(i)) == (Byte)10);
+            if (i < 2999)
+                assert(*(genome->data(i)) == (Byte)i);
             else
-                assert(*(genome->data(i)) != (Byte)10);
+                assert(*(genome->data(i)) == (Byte)(i+100));
             
         }
-        assert(genome->size() == size+100);
+        assert(genome->size() == size-100);
 
         std::cout << "Test Delete Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
 
@@ -652,31 +688,32 @@ namespace VictoriaTests
     template <class genomeName>
     void TestDeleteBack(bool debug)
     {
-        // test size 50
-        size_t size = 50;
+         // test size 5000
+        size_t size = 5000;
         AbstractGenome* genome = new genomeName(size);
 
-        genome->insert(50, std::vector<Byte>(10, (Byte)10));
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+        
+        genome->remove(4900, 100);
 
         if (debug)
             genome->show();
 
         // assertions
-        for (size_t i(0); i < size; i++)
+        for (size_t i(0); i < genome->size(); i++)
         {
-            if (i >= 50)
-                assert(*(genome->data(i)) == (Byte)10);
-            else
-                assert(*(genome->data(i)) != (Byte)10);
-            
+            assert(*(genome->data(i)) == (Byte)i);    
         }
-        assert(genome->size() == size+10);
 
-        std::cout << "Test Delete Back: " BOLDGREEN " PASSED" << RESET << std::endl;
+        assert(genome->size() == size-100);
+
+        std::cout << "Test Delete Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
 
         delete genome;
     }
-
 
 
     /**
@@ -688,6 +725,8 @@ namespace VictoriaTests
         std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "DELETE TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
 
         TestDeleteFront<genomeName>(debug);
+        TestDeleteMiddle<genomeName>(debug);
+        TestDeleteBack<genomeName>(debug);
     }
 
 
@@ -697,13 +736,321 @@ namespace VictoriaTests
      * 
      ******************************************************/
 
+    /*******************************************************
+     *          CLONE CONSTRUCTORS TESTS
+     ******************************************************/
+
+    /**
+     * Tests constructor 50
+     **/
+    template <class genomeName>
+    void TestCloneConstructor50(bool debug)
+    {
+        // test size 50
+        size_t size = 50;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*genome->data(i) == *clone->data(i));
+        }
+
+        assert(genome->size() == clone->size());
+        std::cout << "Test Clone Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+    /**
+     * Tests constructor 5000
+     **/
+    template <class genomeName>
+    void TestCloneConstructor5000(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*genome->data(i) == *clone->data(i));
+        }
+
+        assert(genome->size() == clone->size());
+        std::cout << "Test Clone Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+    /**
+     * Tests constructor 500000
+     **/
+    template <class genomeName>
+    void TestCloneConstructor500000(bool debug)
+    {
+        // test size 500000
+        size_t size = 500000;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*genome->data(i) == *clone->data(i));
+        }
+
+        assert(genome->size() == clone->size());
+        std::cout << "Test Clone Constructor " << size << ": " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+    /**
+     * Tests cloning functions for making population
+     **/
+    template <class genomeName>
+    void TestCloneConstructor(bool debug)
+    {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "CLONE CONSTRUCTOR TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
+
+        TestCloneConstructor50<genomeName>(debug);
+        TestCloneConstructor5000<genomeName>(debug);
+        TestCloneConstructor500000<genomeName>(debug);
+    }
+
+    /*******************************************************
+     *          CLONE MUTATION TESTS
+     ******************************************************/
+
+    /**
+     * Tests constructor 5000
+     **/
+    template <class genomeName>
+    void TestCloneOverwrite(bool debug)
+    {
+        // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        clone->overwrite(40, std::vector<Byte>(100, (Byte)10));
+        clone->overwrite(2950, std::vector<Byte>(100, (Byte)10));
+        clone->overwrite(4000, std::vector<Byte>(100, (Byte)10));
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            // std::cout << i << "\t" << (int)*clone->data(i) << "\t" << (int)*genome->data(i) << std::endl;
+            if ((i >= 40 && i < 140)|| (i >= 2950 && i < 3050) || (i >= 4000 && i < 4100))
+            {
+                assert(*clone->data(i) == (Byte)10);
+                assert(*genome->data(i) == (Byte)i);
+            }
+            else
+                assert(*genome->data(i) == *clone->data(i));
+        }
+
+        assert(genome->size() == clone->size());
+        std::cout << "Test Clone Overwrite: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+    /**
+     * Tests constructor 50
+     **/
+    template <class genomeName>
+    void TestCloneInsert(bool debug)
+    {
+       // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        clone->insert(0, std::vector<Byte>(100, (Byte)10));
+        clone->insert(400, std::vector<Byte>(100, (Byte)10));
+        clone->insert(3200, std::vector<Byte>(100, (Byte)10));
+        clone->insert(5300, std::vector<Byte>(100, (Byte)10));
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*(genome->data(i)) == (Byte)i);
+        }
+
+        for (size_t i(0); i < clone->size(); i++)
+        {
+            // std::cout << i << "\t" << (int)*clone->data(i) << "\t" << (int)*genome->data(i) << std::endl;
+            if ((i < 100)|| (i >= 400 && i < 500) || (i >= 3200 && i < 3300) || i >= 5300 )
+            {
+                assert(*clone->data(i) == (Byte)10);
+            }
+            else if (i >= 100 && i < 400)
+                assert(*clone->data(i) == (Byte)(i-100));
+            else if (i >= 500 && i < 3200)
+                assert(*clone->data(i) == (Byte)(i-200));
+            else if (i >= 3300 && i < 5300)
+                assert(*clone->data(i) == (Byte)(i-300));
+        }
+
+        assert(genome->size() != clone->size());
+        std::cout << "Test Clone Insert: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+    /**
+     * Tests constructor 5000
+     **/
+    template <class genomeName>
+    void TestCloneDelete(bool debug)
+    {
+         // test size 5000
+        size_t size = 5000;
+        AbstractGenome* genome = new genomeName(size);
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            *(genome->data(i)) = (Byte)i;
+        }
+
+        AbstractGenome* clone = genome->clone();
+
+        clone->remove(0, 100);
+        clone->remove(400, 100);
+        clone->remove(2700, 100);
+        clone->remove(2600, 200);
+        clone->remove(4400, 100);
+
+        if (debug)
+        {
+            genome->show();
+            clone->show();
+        }
+
+        for (size_t i(0); i < genome->size(); i++)
+        {
+            assert(*(genome->data(i)) == (Byte)i);
+        }
+
+        for (size_t i(0); i < clone->size(); i++)
+        {
+            if (i < 400)
+                assert(*clone->data(i) == (Byte)(i+100));
+            else if (i >= 400 && i < 2600)
+                assert(*clone->data(i) == (Byte)(i+200));
+            else if (i >= 2600)
+                assert(*clone->data(i) == (Byte)(i+500));
+
+        }
+
+        assert(genome->size() != clone->size());
+        std::cout << "Test Clone Delete: " BOLDGREEN " PASSED" << RESET << std::endl;
+
+        delete genome;
+        delete clone;
+    }
+
+
+
+    /**
+     * Tests cloning functions for making population
+     **/
+    template <class genomeName>
+    void TestCloneMutation(bool debug)
+    {
+        std::cout << "\n" BOLDWHITE "Running " BOLDMAGENTA "CLONE MUTATION TESTS " BOLDWHITE " for " BOLDMAGENTA << typeid(genomeName).name() << RESET << std::endl;   
+
+        TestCloneOverwrite<genomeName>(debug);
+        TestCloneInsert<genomeName>(debug);
+        TestCloneDelete<genomeName>(debug);
+    }
+
+
+    /*******************************************************
+     *          ALl CLONE TESTS
+     ******************************************************/
+
     /**
      * Tests cloning functions for making population
      **/
     template <class genomeName>
     void TestClone(bool debug)
     {
-
+        TestCloneConstructor<genomeName>(debug);
+        TestCloneMutation<genomeName>(debug);
     }
 
 
