@@ -1727,6 +1727,7 @@ void allMutationsTest4(bool debug) {
 }
 
 /* multiple point mutations on size 100000 large genome, 
+   initially rewrites all values in genome,
    debug doesn't print entire genome since it's very large,
    user can modify test to print what they want when debug is set */
 template <class genomeName>
@@ -1797,6 +1798,7 @@ void stressTest1(bool debug) {
 }
 
 /* insertion of size 300 at beginning of size 100000 genome,
+   initially rewrites all values in genome,
    debug doesn't print entire genome since it's very large,
    user can modify test to print what they want when debug is set */
 template <class genomeName>
@@ -1831,6 +1833,7 @@ void stressTest2(bool debug) {
 }
 
 /* deletion of size 300 at beginning of size 100000 genome,
+   initially rewrites all values in genome,
    debug doesn't print entire genome since it's very large,
    user can modify test to print what they want when debug is set */
 template <class genomeName>
@@ -1858,7 +1861,8 @@ void stressTest3(bool debug) {
     delete genome;
 }
 
-/* point, copy, insert, and delete mutations on size 1 million genome, 
+/* point, copy, insert, and delete mutations on size 1 million genome,
+   initially rewrites all values in genome, 
    debug doesn't print entire genome since it's very large, 
    user can modify test to print what they want when debug is set */
 template<class genomeName>
@@ -1911,6 +1915,103 @@ void stressTest4(bool debug) {
     }
 
     printResults(answer, genome, "Stress Test 4: ");
+
+    delete genome;
+}
+
+/* 5000 overwrite mutations on size 500000 genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest5(bool debug) {
+
+    // all 500000 values are initially 0
+    AbstractGenome* genome = new genomeName(500000);
+
+    /* correct answer: genome of size 500000 with every value 
+       equal to 0 except every 100th value which is 25 */
+    std::vector<std::byte> answer(genome->size(), (std::byte)0);
+
+    /* 5000 overwrite mutations: point mutation on every 100th value
+       to set that value to 25 */
+    for (int i = 0; i < genome->size(); i+=100) {
+         genome->overwrite(i, std::vector<std::byte>({(std::byte)25}));
+         answer[i] = (std::byte)25; // update answer vector too
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer, genome, "Stress Test 5: ");
+
+    delete genome;
+}
+
+/* 1000 insert mutations of size 200 at position 0 in size 1 million genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest6(bool debug) {
+
+    size_t genomeSize = 1000000;
+
+    // all 1 million values are initially 0
+    AbstractGenome* genome = new genomeName(genomeSize);
+
+    /* 1000 insertions of size 200 
+       with all values in the insertions equal to 55,
+       inserting at the start of the genome */
+    for (int i = 0; i < 1000; i++) {
+        std::vector<std::byte> vals(200, (std::byte)55);
+        genome->insert(0, vals);
+    }
+
+    /* correct answer: genome of size 1200000 with the first 200000
+       indices having a value of 55 and the remaining 1 million indices
+       having value 0 */
+    std::vector<std::byte> answer_part_one(200000, (std::byte)55);
+    std::vector<std::byte> answer_part_two(genomeSize, (std::byte)0);
+    answer_part_two.insert(answer_part_two.begin(), answer_part_one.begin(), answer_part_one.end());
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer_part_two, genome, "Stress Test 6: ");
+
+    delete genome;
+}
+
+/* 1000 remove mutations of size 200 at position 0 in size 1 million genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest7(bool debug) {
+
+    // all 1 million values are initially 0
+    AbstractGenome* genome = new genomeName(1000000);
+
+    /* 1000 deletions of size 200 at position 0, 
+       removing the first 200000 indices of the genome */
+    for (int i = 0; i < 1000; i++) {
+         genome->remove(0, 200);
+    }
+
+    /* correct answer: genome of size 800000 with all values equal to 0 */
+    std::vector<std::byte> answer(800000, (std::byte)0);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer, genome, "Stress Test 7: ");
 
     delete genome;
 }
@@ -1982,6 +2083,9 @@ void runAllStressTests(bool debug) {
     stressTest2<genomeName>(debug);
     stressTest3<genomeName>(debug);
     stressTest4<genomeName>(debug);
+    stressTest5<genomeName>(debug);
+    stressTest6<genomeName>(debug);
+    stressTest7<genomeName>(debug);
 }
 
 // runs all tests in this file
