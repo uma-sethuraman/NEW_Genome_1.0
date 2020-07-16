@@ -2,7 +2,7 @@
 #pragma once
 #include <vector>
 #include <stdint.h>
-#include "AbstractGenome.h"
+#include "Genomes/AbstractGenome.h"
 #include <cstddef>
 #include <algorithm>
 #include <map>
@@ -16,6 +16,8 @@ private:
     std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}}; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
     bool empty = false;
+    
+    //size_t genomeSize;
     
 public:
     TetianaGenome(size_t _size);
@@ -46,21 +48,12 @@ public:
         return(geneMap);
     }
     
+    int get_ind(int ind_curr);
+
     
     // starting at index, write values in segement over values currently in genome
-    virtual void overwrite(size_t index, std::vector<std::byte> segment) {
-        if (index + segment.size() > sites.size()) {
-            std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
-            exit(1);
-        }
-        for (size_t i(0); i < segment.size(); i++) {
-            sites[index + i] = segment[i];
-        }
-        //std::copy_n(segment, segment.size(), sites.begin() + index);
-    }
-    
-    
-    
+    virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
+        
     // starting at index, write values in segement genome between genome[index-1] and genome[index]
     virtual void insert(size_t index, const std::vector<std::byte>& segment) override;
     

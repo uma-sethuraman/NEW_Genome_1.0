@@ -1,12 +1,12 @@
-#include "catch.hpp"
+#include "Tools/catch.hpp"
 
 #include <iostream>
 #include <map>
 #include <unordered_map>
 #include <vector>
 
-#include "TestGenome.h"
-#include "TetianaGenome.h"
+#include "Genomes/TestGenome.h"
+#include "Genomes/TetianaGenome.h"
 
 
 SCENARIO("Test genome mutations") {
@@ -147,13 +147,41 @@ SCENARIO("Test genome mutations") {
             std::vector<std::byte> segment1{
                 (std::byte)1
             };
-            myGenome->insert(2, segment1);
-            testGenome->insert(2, segment1);
+            myGenome->insert(4, segment1);
+            testGenome->insert(4, segment1);
             
+            myGenome->remove(6, 2);
+            testGenome->remove(6, 2);
             
-            //etc
+            std::vector<std::byte> segment2{
+                (std::byte)2,
+                (std::byte)3,
+                (std::byte)4
+            };
+            myGenome->insert(5, segment2);
+            testGenome->insert(5, segment2);
+            
+            myGenome->remove(6, 3);
+            testGenome->remove(6, 3);
+            
+            myGenome->remove(6, 2);
+            testGenome->remove(6, 2);
+            
+            std::vector<std::byte> segment3{
+                (std::byte)5,
+                (std::byte)6,
+                (std::byte)7
+            };
+            myGenome->insert(0, segment3);
+            testGenome->insert(0, segment3);
+            
+            //myGenome->remove(0, 15);
+            //testGenome->remove(0, 15);
+            
             
             THEN("Possible to reconstruct offspring genome") {
+                
+                CHECK(myGenome->size() == testGenome->size());
                 
                 std::byte* my_offspring_data = myGenome->data(0, 0);
                 std::byte* test_offspring_data = testGenome->data(0, 0);
