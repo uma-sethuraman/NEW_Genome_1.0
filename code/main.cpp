@@ -16,15 +16,15 @@ void testData(AbstractGenome* genome)
 {
     for (size_t i(0); i < genome->size(); i++)
     {
-        *genome->data(i) = (std::byte)(i*2);
+        *genome->data(i) = (std::byte)(i * 2);
         // std::cout << (int)*genome->data(i) << std::endl;
     }
 
     auto data = genome->data(2, 2);
     std::cout << (int)*data << std::endl;
     assert(*data == (std::byte)4);
-    assert(*(data+1) == (std::byte)6);
-    
+    assert(*(data + 1) == (std::byte)6);
+
 }
 
 void runTests(AbstractGenome* genome) {
@@ -137,13 +137,13 @@ void runGeneTest(AbstractGenome* genome) {
     //GeneDefinition name, start codon, size of gene
 
     std::cout << "gene contains:\n  ints  'num_in', 'num_out'\n  array<uint8_t, 7> 'addresses'\n  bitset<17> 'logic'\n  double 'answer'";
-    
+
     // write a MyGenomePayload into the genome at index 0
     MyGenePayload gene_instance;
     clean(gene_instance); // zero out memory
-    gene_instance.num_in = 255+10;
+    gene_instance.num_in = 255 + 10;
     gene_instance.num_out = 20;
-    gene_instance.addresses = {30,31,32,33,34,35,36};
+    gene_instance.addresses = { 30,31,32,33,34,35,36 };
     gene_instance.logic = 0b111100101100101101;
     gene_instance.answer = 42.42;
     GN::genomeWrite(genome, 0, gene_instance);
@@ -234,12 +234,12 @@ void find_patterns_tests() {
     std::vector<std::byte> pattern3({ (std::byte)3,(std::byte)3,(std::byte)3 });
 
 
-    assert(test_genome->find_all(pattern1) == std::vector<size_t>({6, 10, 15}));
+    assert(test_genome->find_all(pattern1) == std::vector<size_t>({ 6, 10, 15 }));
     assert(test_genome->find_all(pattern2) == std::vector<size_t>({ 0,11,16 }));
     assert(test_genome->find_all(pattern3) == std::vector<size_t>({ 21,22,26,27 }));
 
     std::cout << "all find pattern tests passed" << std::endl;
-    /*	
+    /*
     for (auto& pat : std::vector< std::vector<std::byte>>({ pattern1,pattern2,pattern3 })) {
         std::cout << "looking for pattern: ";
         for (auto& v : pat) {
@@ -276,36 +276,5 @@ void test_alterations() {
 
 int main() {
 
-	//test_alterations();
-
-    //find_patterns_tests();
-
-    //AbstractGenome* genome = new TestGenome(8);
-    // AbstractGenome  & y = *(new TestGenome);
-
-    //runTests(genome);
-    //testData(genome);
-    //delete genome;
-
-	//AbstractGenome* secondGenome = new StephanieGenome(200);
-	//StephanieGenomeTest_Nine(secondGenome);
-	//delete secondGenome;
-
-    //AbstractGenome* secondGenome = new TestGenome(200);
-    //runGeneTest(secondGenome);
-    //delete secondGenome;
-
-
-    // Order of parameters: N, K, updates, population size, debug mode
-    // Need to fix mutate method to uncomment this!
-    //runNKFitness(5, 2, 10, 20, 0);
-
-
-    // pass in 0 to just see pass/fail results of all tests
-    // pass in 1 to see pass/fail results AND debug output of all tests
-    // pass in <GenomeName> based on which genome class you want to test
-
-    runUmaChangelogTests<StephanieGenome>(1);
-    
     return(0);
 }
