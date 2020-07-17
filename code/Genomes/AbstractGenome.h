@@ -1,8 +1,11 @@
 #pragma once
 #include <stdint.h>
+
+#include <vector>
 #include <iostream>
-#include<unordered_map>
+#include <unordered_map>
 #include <cstddef>
+#include <cstring>
 
 class AbstractGenome {
 
