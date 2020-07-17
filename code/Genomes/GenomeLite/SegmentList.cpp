@@ -25,9 +25,32 @@
 SegmentList::SegmentList(size_t size)
     : SiteCount(size)
 {
-    size_t poolSize = std::max((size_t)20, (size_t)(std::ceil(size/pageSize)+std::ceil(size/mutationRate)));
+    size_t poolSize = std::max((size_t)10, (size_t)(std::ceil(size/pageSize)+std::ceil(size/mutationRate)));
     Pool = new SegmentPool(poolSize);
-    Root = CreateList(SiteCount);
+
+    // Creates list
+    size_t node = 0;
+    size_t start = 0;
+
+    while(start < size)
+    {
+        // creates new node
+        size_t nodeSize = std::min((size_t)pageSize, size - start);
+        size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
+
+        // updates root if at start 
+        if (start == 0)
+            Root = newNode;
+
+        // adds node to indexing table
+        IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
+
+        // links node
+        Pool->SetNext(node, newNode);
+        node = newNode;
+        start += nodeSize;
+    }
+
 }
 
 /** 
@@ -46,72 +69,50 @@ SegmentList::SegmentList(const SegmentList &list)
  **/
 void SegmentList::Reallocate()
 {
-    // SegmentPool* oldPool = Pool;
-    // size_t oldNode = Root;
+    SegmentPool* oldPool = Pool;
+    size_t oldNode = Root;
+    size_t oldOffset = 0;
 
-    // Pool = new SegmentPool(SiteCount);
-    // Root = CreateList(SiteCount);
+    Pool = new SegmentPool(SiteCount);
+    IndexTable.clear();
+    IndexTable.resize(0);
 
-    // size_t node = Root;
-    // size_t start = 0;
-    // while(start < SiteCount)
-    // {
-        
+    size_t node = 0;
+    size_t start = 0;
 
-    //     auto ele = &(*segment.begin()); 
-    //     Pool->Overwrite(left, leftOffset, segment, startIndex, size);
-    //     startIndex += size;
-    //     left = Pool->GetNext(left);      
-    // }
-}
-
-
-/**
- * Creates linked list of size and adds it to the back of the index table
- * \param size
- * \returns head of the list
- **/
-size_t SegmentList::CreateList(size_t size)
-{
-    size_t node;
-    size_t startSize = 0;
-
-    if (size >= pageSize)
+    while(start < SiteCount)
     {
-        node = Pool->Allocate(std::make_shared< std::vector<Byte> >(pageSize));
-        startSize += pageSize;
-    }
-    else
-    {
-        node = Pool->Allocate(std::make_shared< std::vector<Byte> >(size));
-        startSize = size;
-    }
-    IndexTable.push_back( {(size_t)0, (size_t)(node)} );
+        size_t nodeSize = std::min((size_t)pageSize, SiteCount - start);
+        size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
+        if (start == 0)
+            Root = newNode;
 
+        // copy data from old list to new list
+        size_t newlyAllocated = 0;
+        IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
 
-    size_t startNode = node;
-    size_t newNode;
-
-    while (startSize < size)
-    {
-        size_t lastSize = startSize;
-        if (size-startSize >= pageSize)
+        while(newlyAllocated < nodeSize)
         {
-            newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(pageSize));
-            startSize += pageSize;
+            size_t moveSize = std::min({oldPool->GetSize(oldNode)-oldOffset, pageSize-newlyAllocated, SiteCount-start});
+
+            Pool->Overwrite(newNode, newlyAllocated, oldPool->GetData(oldNode, oldOffset), moveSize);
+
+            newlyAllocated += moveSize;
+            oldOffset += moveSize;
+            start += moveSize;
+
+            if (oldOffset >= oldPool->GetSize(oldNode))
+            {
+                oldOffset = 0;
+                oldNode = oldPool->GetNext(oldNode);
+            }
         }
-        else
-        {
-            newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(size-startSize));
-            startSize = size;
-        }
+
         Pool->SetNext(node, newNode);
         node = newNode;
-
-        IndexTable.push_back( {(size_t)(lastSize), (size_t)(node)} );
     }
 
-    return startNode;
+    delete oldPool;
 }
 
 
@@ -142,8 +143,8 @@ TableEntry SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
     auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0))-IndexTable.begin();
-    
-    if (entry == IndexTable.size() || (IndexTable[entry].first != index && entry > 0))
+
+    if (entry >= IndexTable.size() || (IndexTable[entry].first != index && entry > 0))
     {
         --entry;
     }

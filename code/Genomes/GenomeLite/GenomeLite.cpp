@@ -46,8 +46,8 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  **/
 void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
-    // if (List->IsFull())
-    //     List->Reallocate();
+    if (List->IsFull())
+        List->Reallocate();
     List->Overwrite(index, segment);
 }
 
@@ -57,8 +57,8 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
-    // if (List->IsFull())
-    //     List->Reallocate();
+    if (List->IsFull())
+        List->Reallocate();
     List->Insert(index, segment);
 }
 

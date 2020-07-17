@@ -60,7 +60,6 @@ public:
     TableEntry Find(size_t index);
     Byte* GetData(size_t index);
     void Resize(size_t size);
-    size_t CreateList(size_t size);
 
     void Overwrite(size_t index, const std::vector<std::byte>& segment);
     void Insert(size_t index, const std::vector<std::byte>& segment);
