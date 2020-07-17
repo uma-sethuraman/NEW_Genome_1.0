@@ -41,7 +41,11 @@ public:
     /** Copy constructor
      * \param pool **/
     SegmentPool(const SegmentPool &pool)
-        : Pool(pool.Pool) {}
+    {
+        Pool.reserve(pool.Pool.capacity());
+        Pool.resize(pool.Pool.size());
+        std::copy_n(pool.Pool.begin(), pool.Pool.size(), Pool.begin());
+    }
 
     /** Deconstructor **/
     ~SegmentPool() { Pool.clear(); }
@@ -56,7 +60,7 @@ public:
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const bool IsFull() { return Pool.size()+2 >= Pool.capacity(); }
+    const bool IsFull() { return Pool.size()+2 > Pool.capacity(); }
 
 
     /** Creates a new node in the pool
@@ -119,26 +123,37 @@ public:
         return &(Pool[index].Data->at(Pool[index].Start+localIndex));
     }
 
+    /** Gets position
+     * \param index to get position **/
     const size_t GetPos(size_t index) 
     {   
         return Pool[index].Pos; 
     }
 
+    /** Gets size
+     * \param index to get size **/
     const size_t GetSize(size_t index) 
     {   
         return Pool[index].Size; 
     }
 
+    /** Gets previous
+     * \param index to get previous **/
     long GetPrev(size_t index)
     {
         return Pool[index].Prev;
     }
     
+    /** Gets next
+     * \param index to get next **/
     long GetNext(size_t index)
     {
         return Pool[index].Next;
     }
     
+    /** Sets previous
+     * \param index to get previous 
+     * \param prev to set it to **/
     void SetPrev(size_t index, size_t prev)
     {
         if (prev)
@@ -152,6 +167,9 @@ public:
         }
     }
 
+    /** Sets next
+     * \param index to get next 
+     * \param next to set it to **/
     void SetNext(size_t index, size_t next)
     {
         if (next)
@@ -165,22 +183,48 @@ public:
         }
     }
 
+    /** Truncates the node data from left to local index
+     * \param index to get node
+     * \param localIndex to truncate to **/
     void TruncateLeft(size_t index, size_t localIndex)
     {
         Pool[index].Start += localIndex;
         Pool[index].Size -= localIndex;
     }
 
+    /** Truncates the node data from right to local index
+     * \param index to get node
+     * \param localIndex to truncate to **/
     void TruncateRight(size_t index, size_t localIndex)
     {
         Pool[index].Size = localIndex;
     }
 
+    /** Overwrites the data on node
+     * \param index to get node
+     * \param localIndex to start overwriting
+     * \param segment to use for overwriting
+     * \param start index into segment to start copying
+     * \param size to overwrite **/
     void Overwrite(size_t index, size_t localIndex, const Gene& segment, size_t start, size_t size)
     {
         std::copy_n(segment.begin()+start, size, Pool[index].Data->begin()+localIndex);
     }
 
+    /** Overwrites the data on node
+     * \param index to get node
+     * \param localIndex to start overwriting
+     * \param data to overwrite with
+     * \param size to overwrite **/
+    void Overwrite(size_t index, size_t localIndex, Byte* data, size_t size)
+    {
+        std::copy_n(data, size, Pool[index].Data->begin()+localIndex);
+    }
+
+    /** Inserts the data into node
+     * \param index to get node
+     * \param localIndex to start inserting
+     * \param segment to insert **/
     void Insert(size_t index, size_t localIndex, const Gene& segment)
     {
         auto newSize = Pool[index].Data->size()+segment.size();
@@ -196,6 +240,10 @@ public:
 
     }
 
+    /** Removes the data into node
+     * \param index to get node
+     * \param localIndex to start removing
+     * \param segmentSize to remove **/
     void Remove(size_t index, size_t localIndex, size_t segmentSize)
     {
         Pool[index].Size -= segmentSize;
@@ -204,12 +252,23 @@ public:
         data->erase(data->begin()+localIndex, data->begin()+localIndex+segmentSize);
     }
 
+    /** Resizes the nodedata
+     * \param index to get node
+     * \param newSize of data **/
+    void Resize(size_t index, size_t newSize)
+    {
+        Pool[index].Data->resize(newSize);
+    }
+
+    /** Clears the smart pointer at index
+     * \param index to get node **/
     void Clear(size_t index)
     {
         Pool[index].Data.reset();
     }
 
-    /** prints node info **/
+    /** prints node info 
+     * \param index to get node **/
     void Print(size_t index)
     {
         SegmentNode node = Pool[index];
@@ -228,6 +287,7 @@ public:
     }
 
 
+    /** Prints the Pool **/
     void Print()
     {
         for (size_t i(0); i < Pool.size(); ++i)
