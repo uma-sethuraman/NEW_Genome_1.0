@@ -1,0 +1,51 @@
+NAME: Mass Insertion
+120-6-17	9:13:20
+
+P14AbstractGenome: 
+Size	500000
+Mutations	100000
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bench is a Catch v2.12.4 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Mass Insertion Benchmarks
+-------------------------------------------------------------------------------
+/home/victoria/WAVES/newgenome/code/Bench/VictoriaBenchs.cpp:30
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+Normal Insertion                               100             1     2.12131 m 
+                                         1.26247 s     1.25144 s     1.27108 s 
+                                        49.5663 ms    39.2574 ms    62.2565 ms 
+                                                                               
+Nested Insertion                               100             1     2.13278 m 
+                                         1.25462 s     1.23711 s     1.26685 s 
+                                        74.0851 ms    55.7729 ms    93.0754 ms 
+                                                                               
+
+===============================================================================
+test cases: 1 | 1 passed
+assertions: - none -
+
+BENCHING: Deletion
+120-6-17	9:27:18
+
+GenomeLite: 
+Size	500000
+Mutations	100000
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bench is a Catch v2.12.4 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Deletion Benchmarks
+-------------------------------------------------------------------------------
+/home/victoria/WAVES/newgenome/code/Bench/VictoriaBenchs.cpp:71
+...............................................................................
+
