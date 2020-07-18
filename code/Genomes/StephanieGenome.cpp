@@ -8,30 +8,30 @@
 
 StephanieGenome::StephanieGenome(size_t _size) {
 	sites.resize(_size);
+	genomeSize = _size;
 }
 
 std::byte* StephanieGenome::data(size_t index, size_t byteSize) {
-	return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
+	if (!mutationFlag) {
+		return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
+	}
+	else {
+		std::vector<std::byte> newSites = generateNewGenome();
+		return static_cast<std::byte*>(&newSites[index]);
+	}
 }
 
 size_t StephanieGenome::size() {
-	return sites.size();
+	return genomeSize;
 }
 
 void StephanieGenome::resize(size_t new_size) {
 	sites.resize(new_size);
+	genomeSize = new_size;
 };
 
 void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
-	size_t insertOffset = 0;
-	size_t removeOffset = 0;
-	for (auto site : changelog) {
-		removeOffset += site.second.removeOffset;
-		insertOffset += site.second.insertOffset;
-	}
-	auto size_ = ((size() - removeOffset) + insertOffset) - 1;
-
-	if (index <= size_) {
+	if (index <= genomeSize - 1) {
 		auto site = index;
 		for (auto seg : segment) {
 			if (changelog.count(site)) {
@@ -47,18 +47,12 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 			site++;
 		}
 	}
+	mutationFlag = true;
 }
 
 void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment) {
-	size_t insertOffset = 0;
-	size_t removeOffset = 0;
-	for (auto site : changelog) {
-		removeOffset += site.second.removeOffset;
-		insertOffset += site.second.insertOffset;
-	}
-	auto size_ = ((size() - removeOffset) + insertOffset) - 1;
 	//if the mutation is within the genome size
-	if (index <= size_ + 1) {
+	if (index <= genomeSize) {
 		size_t indexCounter = index;
 		//loop through the sites that will be inserted
 		for (int i = 0; i < segment.size(); i++) {
@@ -106,106 +100,16 @@ void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment
 			indexCounter++;
 		}
 	};
+	mutationFlag = true;
+	genomeSize += segment.size();
 }
-
-/*void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment) {
-	printChangelog();
-	size_t insertOffset = 0;
-	size_t removeOffset = 0;
-	for (auto site : changelog) {
-		removeOffset += site.second.removeOffset;
-		insertOffset += site.second.insertOffset;
-	}
-	auto size_ = ((size() - removeOffset) + insertOffset) - 1;
-	if (index <= size_ + 1) {
-		size_t indexCounter = index;
-		for (int i = 0; i < segment.size(); i++) {
-			std::cout << "\tloop " << i << std::endl;
-			//loop through the sites that will be inserted
-			//check if the site exists in the changelog
-			if (changelog.count(indexCounter)) {
-				std::cout << "\t\t" << indexCounter << " exists in changelog" << std::endl;
-				if (changelog.count(indexCounter)) {
-					keys.clear();
-					std::map<size_t, ChangelogStruct>::iterator site = changelog.find(indexCounter);
-					for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
-						keys.push_back(it->first);
-					}
-					for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
-						auto keyIndex = *rit;
-						auto nh = changelog.extract(keyIndex);
-						keyIndex = keyIndex + (size_t)1;
-						nh.key() = keyIndex;
-						changelog.insert(move(nh));
-					}
-					ChangelogStruct c = ChangelogStruct();
-					c.value = segment[i];
-					c.insertOffset = 1;
-					c.removeOffset = 0;
-					changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
-				}
-				else {
-					keys.clear();
-					if (changelog.count(indexCounter)) {
-						std::cout << "\t\t\tblablablabla test " << std::endl;
-						//std::cout << " is present " << std::endl;
-						std::map<size_t, ChangelogStruct>::iterator site = changelog.begin();
-						for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
-							//std::cout << "\t" << it->first << ", " << (int)it->second.value << " " << it->second.insertOffset << std::endl;
-							keys.push_back(it->first);
-						}
-						for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
-							auto keyIndex = *rit;
-							auto nh = changelog.extract(keyIndex);
-							keyIndex = keyIndex + (size_t)1;
-							nh.key() = keyIndex;
-							changelog.insert(move(nh));
-						}
-						ChangelogStruct c = ChangelogStruct();
-						c.value = segment[i];
-						c.insertOffset = 1;
-						c.removeOffset = 0;
-						changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
-					}
-					else {
-						ChangelogStruct c = ChangelogStruct();
-						c.value = segment[i];
-						c.insertOffset = 1;
-						c.removeOffset = 0;
-						changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
-					}
-
-				}
-
-			}
-			else {
-				std::cout << "\t\t" << indexCounter << " does not exist in changelog" << std::endl;
-				ChangelogStruct c = ChangelogStruct();
-				c.value = segment[i];
-				c.insertOffset = 1;
-				c.removeOffset = 0;
-				changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
-			}
-			indexCounter++;
-		}
-	};
-}*/
 
 void StephanieGenome::remove(size_t index, size_t segmentSize) {
 	size_t indexRemoved = index;
 	std::vector<size_t> removeSites;
-	//get the genome size
-	//todo could this 'get size_ method'  be improved?
-	size_t insertOffset = 0;
-	size_t removeOffset = 0;
-	for (const auto& site : changelog) {
-		removeOffset += site.second.removeOffset;
-		insertOffset += site.second.insertOffset;
-	}
-	auto size_ = ((size() - removeOffset) + insertOffset) - 1;
 	size_t removeIndex = index + segmentSize - 1;
 	//if the mutation is within the genome size
-	if (removeIndex <= size_) {
+	if (removeIndex <= genomeSize - 1) {
 		//check if the site exists in the changelog
 		if (changelog.count(index)) {
 			//site contains an overwrite mutation
@@ -259,9 +163,11 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			}
 		}
 	}
+	mutationFlag = true;
+	genomeSize -= segmentSize;
 }
 
-void StephanieGenome::show() {
+std::vector<std::byte> StephanieGenome::generateNewGenome() {
 	size_t insertOffset = 0;
 	size_t removeOffset = 0;
 	size_t index = 0;
@@ -311,92 +217,17 @@ void StephanieGenome::show() {
 			index++;
 		}
 	}
-	for (int i = 0; i < newSites.size(); i++) {
-		std::cout << (int)newSites[i] << " ";
-	}
-	sites.clear();
-	sites = newSites;
+
+	return newSites;
 }
 
-/*void StephanieGenome::show() {
-	printChangelog();
-	size_t insertOffset = 0;
-	size_t removeOffset = 0;
-	for (auto site : changelog) {
-		removeOffset += site.second.removeOffset;
-		insertOffset += site.second.insertOffset;
+void StephanieGenome::show() {
+	for (int index = 0; index < genomeSize; index++) {
+		std::byte& num = GN::genomeRead<std::byte>(this, index);
+		std::cout << (int)num << " ";
 	}
-	size_t size_ = (size() - removeOffset) + insertOffset;
-	std::vector<std::byte> newSites;
-	newSites.resize(size_);
-	size_t original = 0;
-	size_t current = 0;
-	size_t index = 0;
 	std::cout << std::endl;
-	for (int i = 0; i < newSites.size(); i++) {
-		//if site does not exist in the changelog
-		if (!changelog.count(i)) {
-			newSites[i] = sites[original];
-			std::cout << "\tnot in changelog" << std::endl;
-			std::cout << "\ti:\t\t\t" << i << std::endl;
-			std::cout << "\toriginal:\t\t" << original << std::endl;
-			std::cout << "\tsites[original]:\t" << (int)sites[original] << std::endl;
-			std::cout << "\tcurrent:\t\t" << current << std::endl;
-			std::cout << "\tindex:\t\t\t" << index << std::endl;
-			original++;
-			current++;
-		}
-		//if the site contains an overwrite mutation
-		else if (changelog.count(i) && (changelog[i].removeOffset == 0 && changelog[i].insertOffset == 0)) {
-			newSites[i] = changelog[current].value;
-			std::cout << "\toverwrite" << std::endl;
-			std::cout << "\ti:\t\t\t" << i << std::endl;
-			std::cout << "\toriginal:\t\t" << original << std::endl;
-			std::cout << "\tcurrent:\t\t" << current << std::endl;
-			std::cout << "\tchangelog[current].value:\t" << (int)changelog[current].value << std::endl;
-			std::cout << "\tindex:\t\t\t" << index << std::endl;
-			original++;
-			current++;
-		}
-		//if the site contains an insert mutation
-		else if (changelog.count(i) && changelog[i].insertOffset > 0) {
-			newSites[i] = changelog[current].value;
-			std::cout << "\tinsert" << std::endl;
-			std::cout << "\ti:\t\t\t" << i << std::endl;
-			std::cout << "\toriginal:\t\t" << original << std::endl;
-			std::cout << "\tcurrent:\t\t" << current << std::endl;
-			std::cout << "\tchangelog[current].value:\t" << (int)changelog[current].value << std::endl;
-			std::cout << "\tindex:\t\t\t" << index << std::endl;
-			current++;
-		}
-		//if the site contains an remove mutation
-		else if (changelog.count(i) && changelog[i].removeOffset > 0) {
-			original += changelog[i].removeOffset;
-			std::cout << "\tremove" << std::endl;
-			std::cout << "\ti:\t\t\t" << i << std::endl;
-			if (changelog.count(original)) {
-				newSites[i] = changelog[original].value;
-				std::cout << "\toriginal w/ offset:\t" << original << std::endl;
-				std::cout << "\tchangelog[original].value:\t" << (int)changelog[original].value << std::endl;
-			}
-			else {
-				newSites[i] = sites[original];
-				std::cout << "\toriginal w/ offset:\t" << original << std::endl;
-				std::cout << "\tsites[original]:\t" << (int)sites[original] << std::endl;
-			}
-			std::cout << "\tcurrent:\t\t" << current << std::endl;
-			std::cout << "\tindex:\t\t\t" << index << std::endl;
-			original++;
-			current++;
-		}
-		std::cout << std::endl;
-	}
-	for (int i = 0; i < newSites.size(); i++) {
-		std::cout << (int)newSites[i] << " ";
-	}
-	sites.clear();
-	sites = newSites;
-}*/
+}
 
 void StephanieGenome::printChangelog() {
 	std::cout << "\n--- start of map ---" << std::endl;

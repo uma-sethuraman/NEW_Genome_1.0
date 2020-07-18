@@ -13,6 +13,8 @@ private:
 		size_t insertOffset;
 		size_t removeOffset;
 	};
+	bool mutationFlag = false;
+	size_t genomeSize;
 	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
 	std::vector<size_t> keys; //TODO: check if this is needed?
@@ -54,6 +56,8 @@ public:
 		std::unordered_map<std::string, std::vector<size_t>> geneMap = { {"det", {0}},{"prob",{ 10,20}} };
 		return(geneMap);
 	}
+
+	std::vector<std::byte> generateNewGenome();
 
 	void printChangelog();
 
