@@ -42,7 +42,7 @@ public:
 
     virtual size_t size() override;
     virtual void resize(size_t newSize) override;
-    virtual AbstractGenome* clone() override;
+    virtual AbstractGenome* clone(bool forceCopy = false) override;
     virtual Byte* data(size_t index = 0, size_t byteSize = 0) override;
     virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
     virtual void insert(size_t index, const std::vector<std::byte>& segment) override;

@@ -19,6 +19,7 @@ public:
 
 	virtual size_t size() override;
 	virtual void resize(size_t new_size) override;
+	virtual AbstractGenome* clone(bool forceCopy = false) override;
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
 		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and

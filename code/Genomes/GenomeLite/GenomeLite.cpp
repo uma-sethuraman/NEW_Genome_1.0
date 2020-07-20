@@ -11,7 +11,7 @@ GenomeLite::GenomeLite(size_t size)
 }
 
 
-AbstractGenome* GenomeLite::clone()
+AbstractGenome* GenomeLite::clone(bool forceCopy)
 {
     return new GenomeLite(*this);
 }
