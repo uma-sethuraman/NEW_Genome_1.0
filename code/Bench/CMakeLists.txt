@@ -19,8 +19,9 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall" )
 
 # Can manually add the sources using the set command as follows:
 file( GLOB_RECURSE GENOME_SOURCES ../Genomes/*.cpp )
-set( MAIN_EXEC VictoriaBenchs.cpp )
-
+set( SIMPLE SimpleBench.cpp )
+# set( CLONE CloneBench.cpp )
 
 # add main executable
-add_executable( bench ${MAIN_EXEC} ${GENOME_SOURCES} )
+add_executable( simpleBench ${SIMPLE} ${GENOME_SOURCES} )
+# add_executable( cloneBench ${CLONE} ${GENOME_SOURCES} )

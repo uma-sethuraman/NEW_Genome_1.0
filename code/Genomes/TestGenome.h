@@ -13,7 +13,6 @@ public:
 
 	TestGenome(size_t _size);
 	~TestGenome() override {
-		std::cout << "done" << std::endl;
 	}
 
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
