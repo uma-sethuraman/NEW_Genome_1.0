@@ -52,11 +52,11 @@ public:
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const size_t GetSize() { return Pool.capacity(); }
+    const size_t Capacity() { return Pool.capacity(); }
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const size_t GetTail() { return Pool.size(); }
+    const size_t Size() { return Pool.size(); }
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/

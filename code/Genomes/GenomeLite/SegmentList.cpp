@@ -27,6 +27,7 @@ SegmentList::SegmentList(size_t size)
 {
     size_t poolSize = std::max((size_t)10, (size_t)(std::ceil(size/pageSize)+std::ceil(size/mutationRate)));
     Pool = new SegmentPool(poolSize);
+    IndexTable.reserve(poolSize);
 
     // Creates list
     size_t node = 0;
@@ -67,52 +68,54 @@ SegmentList::SegmentList(const SegmentList &list)
  * Reallocates the current list to a new list
  * \returns pointer to newly created list
  **/
-void SegmentList::Reallocate()
+SegmentList* SegmentList::Reallocate()
 {
-    SegmentPool* oldPool = Pool;
     size_t oldNode = Root;
     size_t oldOffset = 0;
 
-    Pool = new SegmentPool(SiteCount);
-    IndexTable.clear();
-    IndexTable.resize(0);
+    SegmentList* newList = new SegmentList();
+    newList->Pool = new SegmentPool(Pool->Capacity()*2);
+    newList->IndexTable.reserve(Pool->Capacity()*2);
+    newList->SiteCount = SiteCount;
 
     size_t node = 0;
     size_t start = 0;
 
+    // copy until end of sites
     while(start < SiteCount)
     {
         size_t nodeSize = std::min((size_t)pageSize, SiteCount - start);
-        size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
+        size_t newNode = newList->Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
         if (start == 0)
-            Root = newNode;
+            newList->Root = newNode;
 
         // copy data from old list to new list
         size_t newlyAllocated = 0;
-        IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
+        newList->IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
 
+        // copying into node (limited to page size)
         while(newlyAllocated < nodeSize)
         {
-            size_t moveSize = std::min({oldPool->GetSize(oldNode)-oldOffset, pageSize-newlyAllocated, SiteCount-start});
+            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, pageSize-newlyAllocated, SiteCount-start});
 
-            Pool->Overwrite(newNode, newlyAllocated, oldPool->GetData(oldNode, oldOffset), moveSize);
+            newList->Pool->Overwrite(newNode, newlyAllocated, Pool->GetData(oldNode, oldOffset), moveSize);
 
             newlyAllocated += moveSize;
             oldOffset += moveSize;
             start += moveSize;
 
-            if (oldOffset >= oldPool->GetSize(oldNode))
+            if (oldOffset >= Pool->GetSize(oldNode))
             {
                 oldOffset = 0;
-                oldNode = oldPool->GetNext(oldNode);
+                oldNode = Pool->GetNext(oldNode);
             }
         }
 
-        Pool->SetNext(node, newNode);
+        newList->Pool->SetNext(node, newNode);
         node = newNode;
     }
 
-    delete oldPool;
+    return newList;
 }
 
 

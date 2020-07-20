@@ -27,7 +27,7 @@ private:
 
 public:
     /** (deleted) default constructor **/
-    GenomeLite() = delete;
+    GenomeLite() = default;
 
     /** size constructor **/
     GenomeLite(size_t size);

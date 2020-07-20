@@ -208,3 +208,45 @@ Deletion Benchmarks
 /home/victoria/WAVES/newgenome/code/Bench/SimpleBench.cpp:77
 ...............................................................................
 
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+Front Deletion                                 100             1     5.26898 s 
+                                        35.6574 ms    34.0833 ms    37.4946 ms 
+                                        8.61669 ms    7.48301 ms    9.76929 ms 
+                                                                               
+Back Deletion                                  100             1     101.517 m 
+                                          1.0388 m     1.02772 m     1.05465 m 
+                                         4.02182 s     2.93702 s     5.83736 s 
+                                                                               
+
+BENCHING: Overwrites
+120-6-20	14:35:43
+
+UmaGenome: 
+Size	500000
+Mutations	10000
+-------------------------------------------------------------------------------
+Overwrite Benchmarks
+-------------------------------------------------------------------------------
+/home/victoria/WAVES/newgenome/code/Bench/SimpleBench.cpp:120
+...............................................................................
+
+benchmark name                       samples       iterations    estimated
+                                     mean          low mean      high mean
+                                     std dev       low std dev   high std dev
+-------------------------------------------------------------------------------
+Normal Overwrites                              100             1     1.63077 s 
+                                        17.5053 ms    17.3275 ms    17.6929 ms 
+                                        929.972 us    818.256 us    1.09197 ms 
+                                                                               
+Whole Genome Overwrite                         100             1     1.92681 m 
+                                        852.548 ms    839.841 ms    872.512 ms 
+                                        79.9333 ms    56.4996 ms     118.55 ms 
+                                                                               
+
+===============================================================================
+test cases: 3 | 3 passed
+assertions: - none -
+

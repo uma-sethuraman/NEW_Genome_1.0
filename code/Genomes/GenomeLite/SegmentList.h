@@ -47,10 +47,10 @@ private:
     size_t SiteCount = 0;
 
 public:
-    SegmentList() = delete;
+    SegmentList() = default;
     SegmentList(size_t size);
     SegmentList(const SegmentList &List);
-    void Reallocate();
+    SegmentList* Reallocate();
 
     ~SegmentList() { delete Pool; }
 
