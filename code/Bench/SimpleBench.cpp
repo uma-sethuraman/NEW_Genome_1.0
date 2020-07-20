@@ -32,8 +32,9 @@ void printTime() {
 
 TEST_CASE("Insertion Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
-    freopen("logs/"+name+".log","a",stdout);
+    std::string name = "GenomeLite";
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
     size_t size = 500000;
@@ -48,7 +49,7 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
     BENCHMARK("Normal Insertion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < numMutations; ++i)
         {
@@ -60,7 +61,7 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
     BENCHMARK("Nested Insertion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < numMutations; ++i)
         {
@@ -76,8 +77,9 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
 TEST_CASE("Deletion Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
-    freopen("logs/"+name+".log","a",stdout);
+    std::string name = "GenomeLite";
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
     size_t size = 500000;
@@ -91,7 +93,7 @@ TEST_CASE("Deletion Benchmarks", "[benchmark]")
 
     BENCHMARK("Front Deletion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < numMutations; ++i)
         {
@@ -103,7 +105,7 @@ TEST_CASE("Deletion Benchmarks", "[benchmark]")
 
     BENCHMARK("Back Deletion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < numMutations; ++i)
         {
@@ -119,8 +121,9 @@ TEST_CASE("Deletion Benchmarks", "[benchmark]")
 
 TEST_CASE("Overwrite Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
-    freopen("logs/"+name+".log","a",stdout);
+    std::string name = "GenomeLite";
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
     size_t size = 500000;
@@ -134,7 +137,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Normal Overwrites") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < numMutations; ++i)
         {
@@ -146,7 +149,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Whole Genome Overwrite") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         genome->overwrite(0, std::vector<Byte>(size, (Byte)0));
 
