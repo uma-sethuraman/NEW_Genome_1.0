@@ -23,7 +23,7 @@ public:
 	StephanieGenome(size_t _size);
 
 	~StephanieGenome() override {
-		std::cout << "\ndone" << std::endl;
+		//std::cout << "\ndone" << std::endl;
 	}
 
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
@@ -58,6 +58,8 @@ public:
 	}
 
 	std::vector<std::byte> generateNewGenome();
+
+	void shiftChangelogLeft();
 
 	void printChangelog();
 
