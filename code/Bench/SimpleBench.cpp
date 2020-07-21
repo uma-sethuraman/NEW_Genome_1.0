@@ -33,11 +33,15 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 {
     std::string name = "UmaGenome";
     std::string file = "logs/"+name+".log";
-    freopen(file.c_str(), "a", stdout);
+    // freopen(file.c_str(), "a", stdout);
 
     // initializing mutation list 
     std::vector<size_t> mutations = randomList(size);
 
+    for (const auto& site : mutations)
+    {
+        std::cout << site << std::endl;
+    }
 
     // Nested Insertion
     std::cout << "BENCHING: Overwrites" << std::endl;

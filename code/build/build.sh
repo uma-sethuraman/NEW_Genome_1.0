@@ -9,8 +9,8 @@ cmake ../$BUILD && make
 # move out of file
 rm "cmake_install.cmake"
 rm "CMakeCache.txt"
-rm "Makefile"
 rm -r "CMakeFiles"
+rm -r "Makefile"
 rm -r "Genomes"
 # find . -type d -name "CMakeFiles" -exec rm -rf {} \;
 
