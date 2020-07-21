@@ -12,7 +12,7 @@ void GenomeLite::Reallocate()
     List->Reallocate();
 }
 
-AbstractGenome* GenomeLite::clone()
+AbstractGenome* GenomeLite::clone(bool forceCopy)
 {
     return new GenomeLite(*this);
 }

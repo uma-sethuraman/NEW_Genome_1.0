@@ -34,8 +34,8 @@ public:
         exit(1);
     }
 
-    virtual AbstractGenome* clone() {
-        std::cout << "mutate has not been written for this genome class" << std::endl;
+    virtual AbstractGenome* clone(bool forceCopy = false) {
+        std::cout << "clone has not been written for this genome class" << std::endl;
         exit(1);
     }
 
