@@ -31,17 +31,13 @@ size_t size = 500000;
 
 TEST_CASE("Overwrite Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
+    std::string name = "GenomeLite";
     std::string file = "logs/"+name+".log";
-    // freopen(file.c_str(), "a", stdout);
+    freopen(file.c_str(), "a", stdout);
 
     // initializing mutation list 
     std::vector<size_t> mutations = randomList(size);
 
-    for (const auto& site : mutations)
-    {
-        std::cout << site << std::endl;
-    }
 
     // Nested Insertion
     std::cout << "BENCHING: Overwrites" << std::endl;
@@ -50,7 +46,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Overwrites") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (const auto& site : mutations)
         {
@@ -62,7 +58,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Whole Genome Overwrite") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         genome->overwrite(0, std::vector<Byte>(size, (Byte)0));
 
@@ -73,7 +69,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
 TEST_CASE("Insertion Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
+    std::string name = "GenomeLite";
     std::string file = "logs/"+name+".log";
     freopen(file.c_str(), "a", stdout);
 
@@ -88,7 +84,7 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Insertion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (const auto& site : mutations)
         {
@@ -103,7 +99,7 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
 TEST_CASE("Deletion Benchmarks", "[benchmark]") 
 {
-    std::string name = "UmaGenome";
+    std::string name = "GenomeLite";
     std::string file = "logs/"+name+".log";
     freopen(file.c_str(), "a", stdout);
 
@@ -118,7 +114,7 @@ TEST_CASE("Deletion Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Deletion") 
     {
-        AbstractGenome* genome = new UmaGenome(size);
+        AbstractGenome* genome = new GenomeLite(size);
 
         for (size_t i(0); i < mutations.size(); i++)
         {

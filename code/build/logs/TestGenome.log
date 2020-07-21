@@ -1,5 +1,5 @@
 BENCHING: Overwrites
-120-6-21	12:17:5
+120-6-21	13:35:12
 
 TestGenome: 
 Size	500000
@@ -19,17 +19,17 @@ benchmark name                       samples       iterations    estimated
                                      mean          low mean      high mean
                                      std dev       low std dev   high std dev
 -------------------------------------------------------------------------------
-Random Overwrites                              100             1    271.554 ms 
-                                        2.79761 ms    2.77861 ms    2.82117 ms 
-                                        107.917 us    89.3717 us    133.304 us 
+Random Overwrites                              100             1     157.08 ms 
+                                        1.59154 ms    1.57277 ms    1.61144 ms 
+                                        98.5636 us    86.0521 us    116.696 us 
                                                                                
-Whole Genome Overwrite                         100             1    790.831 ms 
-                                        7.93909 ms    7.91652 ms    7.99299 ms 
-                                        167.057 us    66.5236 us    308.774 us 
+Whole Genome Overwrite                         100             1    431.517 ms 
+                                        4.36367 ms     4.3446 ms    4.39189 ms 
+                                        117.053 us    88.1011 us    164.353 us 
                                                                                
 
 BENCHING: Insertion
-120-6-21	12:17:16
+120-6-21	13:35:19
 
 TestGenome: 
 Size	500000
@@ -44,13 +44,13 @@ benchmark name                       samples       iterations    estimated
                                      mean          low mean      high mean
                                      std dev       low std dev   high std dev
 -------------------------------------------------------------------------------
-Random Insertion                               100             1     4.21694 s 
-                                        42.0272 ms    41.9812 ms    42.1143 ms 
-                                        312.966 us    179.082 us    506.406 us 
+Random Insertion                               100             1     2.27682 s 
+                                        24.1852 ms    23.9434 ms    24.4321 ms 
+                                        1.24936 ms    1.12829 ms    1.40124 ms 
                                                                                
 
 BENCHING: Deletion
-120-6-21	12:17:24
+120-6-21	13:35:24
 
 TestGenome: 
 Size	500000
@@ -65,9 +65,9 @@ benchmark name                       samples       iterations    estimated
                                      mean          low mean      high mean
                                      std dev       low std dev   high std dev
 -------------------------------------------------------------------------------
-Random Deletion                                100             1     4.27291 s 
-                                        42.7591 ms    42.5043 ms    43.2132 ms 
-                                        1.69131 ms     1.1062 ms    2.53615 ms 
+Random Deletion                                100             1     3.25866 s 
+                                        28.7906 ms    28.5602 ms    29.0898 ms 
+                                        1.32872 ms     1.0689 ms     1.8187 ms 
                                                                                
 
 ===============================================================================
