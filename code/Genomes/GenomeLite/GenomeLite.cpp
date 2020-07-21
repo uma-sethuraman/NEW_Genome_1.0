@@ -93,6 +93,13 @@ void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::remove(size_t index, size_t segmentSize)
 {
+    if (List->IsFull())
+    {
+        SegmentList* oldList = List;
+        List = oldList->Reallocate();
+        delete oldList;
+    }
+
     List->Remove(index, segmentSize);
 }
 

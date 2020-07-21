@@ -9,11 +9,15 @@
 
 #include <ctime>
 #include <string>
+#include <fstream>
+#include <vector>
 
 #include "AbstractGenome.h"
 #include "GenomeLite.h"
 #include "TestGenome.h"
 #include "UmaGenome.h"
+
+#include "benchUtilities.h"
 
 #define CATCH_CONFIG_MAIN 
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
@@ -22,50 +26,35 @@
 
 typedef std::byte Byte;
 
-void printTime() {
-    time_t t = time(0); 
-    struct tm * timeStruct = localtime(&t);
-    std::cout << (timeStruct->tm_year) << '-' << (timeStruct->tm_mon) << '-'<<  (timeStruct->tm_mday);
-    std::cout << "\t" << (timeStruct->tm_hour) << ":" << (timeStruct->tm_min) << ":" << (timeStruct->tm_sec) <<  std::endl;
-}
+size_t size = 500000;
 
 
 TEST_CASE("Insertion Benchmarks", "[benchmark]") 
 {
-    std::string name = "GenomeLite";
+    std::string name = "TestGenome";
     std::string file = "logs/"+name+".log";
-    freopen(file.c_str(), "a", stdout);
+    // freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
-    size_t size = 500000;
-    size_t numMutations = 10000; // 10,000
+    std::vector<size_t> mutations = randomList(size);
 
-
+    for (const auto& site : mutations)
+    {
+        std::cout << site << std::endl;
+    }
 
     // Nested Insertion
     std::cout << "BENCHING: Insertion" << std::endl;
     printTime();
-    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << numMutations << std::endl;  
+    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << mutations.size()  << std::endl;  
 
-    BENCHMARK("Normal Insertion") 
+    BENCHMARK("Random Insertion") 
     {
-        AbstractGenome* genome = new GenomeLite(size);
+        AbstractGenome* genome = new TestGenome(size);
 
-        for (size_t i(0); i < numMutations; ++i)
+        for (const auto& site : mutations)
         {
-            genome->insert(i+2, std::vector< Byte >(1, (Byte)i));
-        }
-
-        delete genome;
-    };
-
-    BENCHMARK("Nested Insertion") 
-    {
-        AbstractGenome* genome = new GenomeLite(size);
-
-        for (size_t i(0); i < numMutations; ++i)
-        {
-            genome->insert(i, std::vector< Byte >(2, (Byte)i));
+            genome->insert(site, std::vector< Byte >(1, (Byte)1));
         }
 
         delete genome;
@@ -77,71 +66,56 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
 TEST_CASE("Deletion Benchmarks", "[benchmark]") 
 {
-    std::string name = "GenomeLite";
+    std::string name = "TestGenome";
     std::string file = "logs/"+name+".log";
     freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
-    size_t size = 500000;
-    size_t numMutations = 10000; // 10,000
+    std::vector<size_t> mutations = randomList(size);
 
 
     // Nested Insertion
     std::cout << "BENCHING: Deletion" << std::endl;
     printTime();
-    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << numMutations << std::endl;  
+    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << mutations.size() << std::endl;  
 
-    BENCHMARK("Front Deletion") 
+    BENCHMARK("Random Deletion") 
     {
-        AbstractGenome* genome = new GenomeLite(size);
+        AbstractGenome* genome = new TestGenome(size);
 
-        for (size_t i(0); i < numMutations; ++i)
+        for (const auto& site : mutations)
         {
-            genome->remove(i, 1);
+            genome->remove(site, 1);
         }
 
         delete genome;
     };
-
-    BENCHMARK("Back Deletion") 
-    {
-        AbstractGenome* genome = new GenomeLite(size);
-
-        for (size_t i(0); i < numMutations; ++i)
-        {
-            genome->remove(size-i-1, 1);
-        }
-
-        delete genome;
-    };
-
 
 }
 
 
 TEST_CASE("Overwrite Benchmarks", "[benchmark]") 
 {
-    std::string name = "GenomeLite";
+    std::string name = "TestGenome";
     std::string file = "logs/"+name+".log";
     freopen(file.c_str(), "a", stdout);
 
     // initializing genomes 
-    size_t size = 500000;
-    size_t numMutations = 10000; // 10,000
+    std::vector<size_t> mutations = randomList(size);
 
 
     // Nested Insertion
     std::cout << "BENCHING: Overwrites" << std::endl;
     printTime();
-    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << numMutations << std::endl;  
+    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << mutations.size() << std::endl;  
 
-    BENCHMARK("Normal Overwrites") 
+    BENCHMARK("Random Overwrites") 
     {
-        AbstractGenome* genome = new GenomeLite(size);
+        AbstractGenome* genome = new TestGenome(size);
 
-        for (size_t i(0); i < numMutations; ++i)
+        for (const auto& site : mutations)
         {
-            genome->overwrite(i, std::vector<Byte>(1, (Byte)i));
+            genome->overwrite(site, std::vector< Byte >(1, (Byte)1));
         }
 
         delete genome;
@@ -149,7 +123,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Whole Genome Overwrite") 
     {
-        AbstractGenome* genome = new GenomeLite(size);
+        AbstractGenome* genome = new TestGenome(size);
 
         genome->overwrite(0, std::vector<Byte>(size, (Byte)0));
 
