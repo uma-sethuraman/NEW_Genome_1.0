@@ -76,6 +76,34 @@ int UmaGenome::getLowerBoundOffset(int key) {
     return lb_offset;
 }
 
+/* Returns a clone of the current genome.
+   If forceCopy is true, then it resets the "parent" genome of the clone
+   to the actual current genome. If forceCopy is false, it directly clones
+   the current genome, leaving the "parent", changelog, and offset map the same
+   in the clone. */
+AbstractGenome* UmaGenome::clone(bool forceCopy) {
+    if (forceCopy) {
+
+        // reconstruct current genome using changelog and offset map
+        std::vector<std::byte> new_sites(currentGenomeSize);
+        for (int new_sites_ind = 0; new_sites_ind < currentGenomeSize; new_sites_ind++) {
+            new_sites[new_sites_ind] = getCurrentGenomeAt(new_sites_ind);
+        }
+
+        // create a clone with an empty changelog and offset map
+        AbstractGenome* cloneGenome = new UmaGenome(currentGenomeSize);
+
+        /* reset the "parent" in the clone by changing the sites vector
+           to be equal to the reconstructed current genome */
+        (static_cast<UmaGenome*>(cloneGenome))->sites = new_sites;
+        return cloneGenome;
+    }
+    else {
+        // clone directly (copy over logs and parent)
+        return new UmaGenome(*this);
+    }
+}
+
 // Not fully implemented or used yet
 void UmaGenome::mutate() {
     

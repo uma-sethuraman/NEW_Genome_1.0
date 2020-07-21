@@ -9,7 +9,6 @@ class UmaGenome : public AbstractGenome {
 private:
     // custom properties & functions
     std::vector<std::byte> sites;
-
     std::map<int, std::byte> changelog;
     std::map<int, int> offsetMap;
     bool mutationsOccurred; // false if no mutations have occurred on sites yet
@@ -21,10 +20,21 @@ public:
         //std::cout << "done" << std::endl;
     }
 
+    // copy constructor
+	UmaGenome(const UmaGenome &genome) {
+		sites = genome.sites;
+        changelog = genome.changelog;
+        offsetMap = genome.offsetMap;
+        mutationsOccurred = genome.mutationsOccurred;
+        currentGenomeSize = genome.currentGenomeSize;
+	}
+
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
     virtual size_t size() override;
     virtual void resize(size_t new_size) override;
+
+    virtual AbstractGenome* clone(bool forceCopy = false) override;
 
     virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
         // geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
