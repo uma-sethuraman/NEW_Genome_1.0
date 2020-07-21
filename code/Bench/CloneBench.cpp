@@ -30,47 +30,29 @@ void printTime() {
 
 TEST_CASE("Insertion Benchmarks", "[benchmark]") 
 {
-    freopen("bench.log","a",stdout);
+    std::string name = "UmaGenome";
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
-    // initializing genomes 
-    size_t size = 500000;
-    std::vector< AbstractGenome* > Parents;
-    std::string name = "GenomeLite";
-
-    for(size_t i (0); i < 5; ++i)
-    {
-        AbstractGenome* genome = new GenomeLite(size);
-        Parents.push_back();
-    }
-
-    size_t numMutations = 100000; // 10,000
-
-    // clone variables
-    std::vector< AbstractGenome* > Children;
+    // initializing mutation list 
+    std::vector<size_t> mutations = randomList(size);
 
 
     // Nested Insertion
-    std::cout << "BENCHING: Clone Mutation" << std::endl;
+    std::cout << "BENCHING: Insertion" << std::endl;
     printTime();
-    std::cout << "\n" name ": \nSize\t" << size << "\nMutations\t" << numMutations << std::endl;  
+    std::cout << "\n" << name << ": \nSize\t" << size << "\nMutations\t" << mutations.size()  << std::endl;  
 
-    BENCHMARK("Clone Creation") 
+    BENCHMARK("Random Insertion") 
     {
-        for(size_t i (0); i < 95; ++i)
+        AbstractGenome* genome = new UmaGenome(size);
+
+        for (const auto& site : mutations)
         {
-            Children.push_back(Parents[i%Parents.size()]->clone());
+            genome->insert(site, std::vector< Byte >(1, (Byte)1));
         }
+
+        delete genome;
     };
 
-
-    // delete pointers
-    for(auto &genome : Parents)
-    {
-        delete genome;
-    }
-
-    for(auto &genome : Children)
-    {
-        delete genome;
-    }
 }

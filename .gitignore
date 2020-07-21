@@ -1,5 +1,5 @@
 # IDE files
 code/.vscode
 
-code/Genomes/libgenomes.a
-code/test
+code/build/test
+code/build/simpleBench
