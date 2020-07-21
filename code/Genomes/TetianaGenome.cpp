@@ -3,10 +3,11 @@
 
 TetianaGenome::TetianaGenome(size_t _size) /*: genomeSize(_size)*/ {
     sites.resize(_size);
+    genome_empty = (_size == 0) ? true : false;
 }
 
 size_t TetianaGenome::size() {
-    if (empty == true) return 0;
+    if (genome_empty == true) return 0;
     int g_size = sites.size() + change_log.rbegin()->second.first;
     return g_size;
 }
@@ -23,7 +24,6 @@ std::byte* TetianaGenome::data(size_t index, size_t byteSize) {
     
     if (mutations == false) {
         return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
-
     } else {
         std::vector<std::byte> offspring_sites = offspring_recon();
         return static_cast<std::byte*>(&offspring_sites[index]); // cast is for demonstration
@@ -35,6 +35,14 @@ std::byte* TetianaGenome::data(size_t index, size_t byteSize) {
 
 void TetianaGenome::resize(size_t new_size) {
     sites.resize(new_size);
+    
+    // I assume that when I call resize(), I am no longer interested in the genome's data up to now
+    change_log.clear();
+    change_log[0] = {0, false};
+    segments_log.clear();
+    
+    genome_empty = (new_size == 0) ? true : false;
+
     //genomeSize = new_size;
 };
 
@@ -58,12 +66,12 @@ int TetianaGenome::get_ind(int ind_curr) {
 // starting at index, write values in segement over values currently in genome
 void TetianaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
     
-    std::cout << "===== overwrite: =====" << std::endl;
-    std::cout << "at index: " << index << " with: ";
-    for (auto el : segment) {
-        std::cout << (int)el << " ";
-    }
-    std::cout << std::endl;
+//    std::cout << "===== overwrite: =====" << std::endl;
+//    std::cout << "at index: " << index << " with: ";
+//    for (auto el : segment) {
+//        std::cout << (int)el << " ";
+//    }
+//    std::cout << std::endl;
 
     
     for (int ind = 0; ind < segment.size(); ++ind) {
@@ -126,7 +134,10 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
 //    std::cout << "segments_log.empty() " << segments_log.empty() << std::endl;
 
     
-    if (empty == true) return;
+    if (genome_empty == true) {
+        std::cout << "genome empty - nothing to remove" << std::endl;
+        return;
+    }
     
     if (change_log.lower_bound(index) == change_log.end()) {
         // no key is >= ind -> just add the key and shift
@@ -261,7 +272,7 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
         if (change_log_temp.size() == 1 && change_log_temp.begin()->first == 0 && (change_log_temp.begin()->second.first + change_log.rbegin()->second.first) <= -sites.size()) {
             //std::cout << "delete everything" << std::endl;
             // this means that everything was deleted
-            empty = true;
+            genome_empty = true;
             change_log = change_log_temp;
             change_log[0] = {0, false};
             return;
@@ -318,12 +329,12 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
 
 void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
     
-    if (empty == true) empty = false; // !
+    if (genome_empty == true) genome_empty = false; // !
     
     //std::cout << "change_log.size(): " << change_log.size() << std::endl;
     
-    std::cout << "===== insert =====" << std::endl;
-    std::cout << "at index: " << index << std::endl;
+//    std::cout << "===== insert =====" << std::endl;
+//    std::cout << "at index: " << index << std::endl;
     
     int segmentSize = segment.size();
     //std::cout << "segmentSize" << segmentSize << std::endl;
@@ -332,9 +343,9 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     auto lb_key = change_log.lower_bound(index); // can be end()
     auto prev_key = std::prev(change_log.upper_bound(index)); // always valid, as change_log.size() >= 1
     
-    std::cout << "next_key: " << next_key->first << ": " << next_key->second.first << ", " << next_key->second.second << std::endl;
-    std::cout << "lb_key: " << lb_key->first << ": " << lb_key->second.first << ", " << lb_key->second.second << std::endl;
-    std::cout << "prev_key: " << prev_key->first << ": " << prev_key->second.first << ", " << prev_key->second.second << std::endl;
+//    std::cout << "next_key: " << next_key->first << ": " << next_key->second.first << ", " << next_key->second.second << std::endl;
+//    std::cout << "lb_key: " << lb_key->first << ": " << lb_key->second.first << ", " << lb_key->second.second << std::endl;
+//    std::cout << "prev_key: " << prev_key->first << ": " << prev_key->second.first << ", " << prev_key->second.second << std::endl;
     
     if (lb_key == change_log.end()) {
         // the last key will always be false, so if there nothing <= than index: just add index to both maps
@@ -364,7 +375,7 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     //std::cout << (next_key != change_log.end() && next_key->second.second == true) << std::endl;
     
     if (prev_key->second.second == true) {
-        std::cout << "if (prev_key->second.second == true)" << std::endl;
+//        std::cout << "if (prev_key->second.second == true)" << std::endl;
         // update change_log
         for (auto it = change_log.begin(); it != std::next(prev_key); ++it) {
             change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
@@ -386,15 +397,15 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
             std::cout << "SEGMENTS MAP IS WRONG!" << std::endl;
         }
     } else if (next_key != change_log.end() && next_key->second.second == true) {
-        std::cout << "else if (next_key != change_log.end() && next_key->second.second == true)" << std::endl;
+//        std::cout << "else if (next_key != change_log.end() && next_key->second.second == true)" << std::endl;
         if (lb_key->first != index) {
-            std::cout << "if (lb_key->first != index)" << std::endl;
+//            std::cout << "if (lb_key->first != index)" << std::endl;
 
             // update change_log
             
             // Jul 16, Uma's insertTest6
             for (auto it = change_log.begin(); it != lb_key; ++it) { // why prev_key and not lb_key?
-                std::cout << "1 insert: " << (it->first) << " : " << it->second.first << ", " << it->second.second << std::endl;
+//                std::cout << "1 insert: " << (it->first) << " : " << it->second.first << ", " << it->second.second << std::endl;
                 change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
             }
 //            for (auto it = change_log.begin(); it != prev_key; ++it) { // why prev_key and not lb_key?
@@ -410,7 +421,7 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
                 int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
                 change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
                 
-                std::cout << "3 insert: " << it->first + segmentSize << " : " << updated_val << ", " << it->second.second << std::endl;
+//                std::cout << "3 insert: " << it->first + segmentSize << " : " << updated_val << ", " << it->second.second << std::endl;
 
                 
                 // update segments_log
@@ -421,13 +432,13 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
                 }
             }
             
-            std::cout << "4 insert: " << index << " : " << 0 << ", " << true << std::endl;
+//            std::cout << "4 insert: " << index << " : " << 0 << ", " << true << std::endl;
 
             change_log_temp[index] = {0, true}; // want to replace if exists
             
             //change_log_temp.insert({{index + segmentSize, {next_key->first - index, false}}});
             change_log_temp.insert({{index + segmentSize, {prev_key->second.first + segmentSize, false}}});
-            std::cout << "5 insert: " << index + segmentSize << " : " << prev_key->second.first + segmentSize << ", " << false << std::endl;
+//            std::cout << "5 insert: " << index + segmentSize << " : " << prev_key->second.first + segmentSize << ", " << false << std::endl;
 
             // update segments_log
             segments_log.insert({{index, segment}});
@@ -456,7 +467,7 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
             
         }
     } else {
-        std::cout << "else" << std::endl;
+//        std::cout << "else" << std::endl;
 
         // no insertions before nor after ind
         // also takes care of "next_key == change_log.end()"
@@ -494,7 +505,7 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     for (auto it = change_log.begin(); it != change_log.end(); ++it) {
         if (it->second.second == true) {
             if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
-                std::cout << "merging two inserts" << std::endl;
+//                std::cout << "merging two inserts" << std::endl;
                 auto next_it = std::next(it);
                 std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
                 std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
@@ -508,19 +519,19 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
         }
     }
     
-    std::cout << "+++++ change_log: +++++" << std::endl;
-    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-        std::cout << it->first << " : " <<
-        it->second.first << " : " << it->second.second << std::endl;
-    }
-    std::cout << "+++++ segments_log: +++++:" << std::endl;
-    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
-        std::cout << it->first << " : ";
-        for (auto v : it->second) {
-            std::cout << (int)v << " ";
-        }
-        std::cout << std::endl;
-    }
+//    std::cout << "+++++ change_log: +++++" << std::endl;
+//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//        std::cout << it->first << " : " <<
+//        it->second.first << " : " << it->second.second << std::endl;
+//    }
+//    std::cout << "+++++ segments_log: +++++:" << std::endl;
+//    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
+//        std::cout << it->first << " : ";
+//        for (auto v : it->second) {
+//            std::cout << (int)v << " ";
+//        }
+//        std::cout << std::endl;
+//    }
     
 }
 
@@ -528,7 +539,7 @@ std::vector<std::byte> TetianaGenome::offspring_recon() {
     
 //    std::cout << "===== offspring_recon =====" << std::endl;
     
-    if (empty == true) {
+    if (genome_empty == true) {
         return std::vector<std::byte>{};
     }
     

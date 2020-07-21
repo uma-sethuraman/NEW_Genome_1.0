@@ -15,14 +15,14 @@ private:
     
     std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}}; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
-    bool empty = false;
+    bool genome_empty = false; // keeps track if current genome offspring is empty
     
     //size_t genomeSize;
     
 public:
     TetianaGenome(size_t _size);
     ~TetianaGenome() override {
-        std::cout << "done" << std::endl;
+        //std::cout << "done" << std::endl;
     }
     
     virtual size_t size() override;

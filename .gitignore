@@ -10,6 +10,7 @@ code/map_test.cpp
 build/
 TetianaGenome_Project/
 Genome_ChangeLog/
+build_raw/
 
 code/Genomes/libgenomes.a
 code/test
