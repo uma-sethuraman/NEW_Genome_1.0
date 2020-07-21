@@ -1199,12 +1199,16 @@ namespace VictoriaTests
         clone->overwrite(2950, std::vector<Byte>(100, (Byte)10));
         clone->overwrite(4000, std::vector<Byte>(100, (Byte)10));
 
+        AbstractGenome* forceClone = clone->clone(1);
+
         if (debug)
         {
             genome->show();
             clone->show();
+            forceClone->show();
         }
 
+        // test overwrite
         for (size_t i(0); i < genome->size(); i++)
         {
             // std::cout << i << "\t" << (int)*clone->data(i) << "\t" << (int)*genome->data(i) << std::endl;
@@ -1215,13 +1219,17 @@ namespace VictoriaTests
             }
             else
                 assert(*genome->data(i) == *clone->data(i));
+
+            assert(*clone->data(i) == *forceClone->data(i));
         }
 
         assert(genome->size() == clone->size());
+        assert(clone->size() == forceClone->size());
         std::cout << "Test Clone Overwrite: " BOLDGREEN " PASSED" << RESET << std::endl;
 
         delete genome;
         delete clone;
+        delete forceClone;
     }
 
 
@@ -1247,11 +1255,15 @@ namespace VictoriaTests
         clone->insert(3200, std::vector<Byte>(100, (Byte)10));
         clone->insert(5300, std::vector<Byte>(100, (Byte)10));
 
+        AbstractGenome* forceClone = clone->clone(1);
+
         if (debug)
         {
             genome->show();
             clone->show();
+            forceClone->show();
         }
+
 
         for (size_t i(0); i < genome->size(); i++)
         {
@@ -1271,13 +1283,18 @@ namespace VictoriaTests
                 assert(*clone->data(i) == (Byte)(i-200));
             else if (i >= 3300 && i < 5300)
                 assert(*clone->data(i) == (Byte)(i-300));
+
+            assert(*clone->data(i) == *forceClone->data(i));
         }
 
         assert(genome->size() != clone->size());
+        assert(clone->size() == forceClone->size());
+
         std::cout << "Test Clone Insert: " BOLDGREEN " PASSED" << RESET << std::endl;
 
         delete genome;
         delete clone;
+        delete forceClone;
     }
 
 
@@ -1304,10 +1321,13 @@ namespace VictoriaTests
         clone->remove(2600, 200);
         clone->remove(4400, 100);
 
+        AbstractGenome* forceClone = clone->clone(1);
+
         if (debug)
         {
             genome->show();
             clone->show();
+            forceClone->show();
         }
 
         for (size_t i(0); i < genome->size(); i++)
@@ -1324,13 +1344,17 @@ namespace VictoriaTests
             else if (i >= 2600)
                 assert(*clone->data(i) == (Byte)(i+500));
 
+            assert(*clone->data(i) == *forceClone->data(i));
         }
 
         assert(genome->size() != clone->size());
+        assert(clone->size() == forceClone->size());
+
         std::cout << "Test Clone Delete: " BOLDGREEN " PASSED" << RESET << std::endl;
 
         delete genome;
         delete clone;
+        delete forceClone;
     }
 
     /**
