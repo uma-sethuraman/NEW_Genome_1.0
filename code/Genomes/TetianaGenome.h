@@ -10,26 +10,24 @@
 
 class TetianaGenome : public AbstractGenome {
 private:
-    // custom properties & functions
     std::vector<std::byte> sites;
     
     std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}}; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
-    bool genome_empty = false; // keeps track if current genome offspring is empty
     
-    //size_t genomeSize;
+    size_t genomeSize;
     
 public:
     TetianaGenome(size_t _size);
-    ~TetianaGenome() override {
-        //std::cout << "done" << std::endl;
-    }
+    ~TetianaGenome() override {}
     
     virtual size_t size() override;
     
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
     
     virtual void resize(size_t new_size) override;
+    
+    virtual AbstractGenome* clone(bool forceCopy = false) override;
     
     virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
         // geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and

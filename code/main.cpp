@@ -509,11 +509,38 @@ int main(int argc, char* argv[]) {
 //    std::cout << std::endl;
     
     
+//    AbstractGenome* testGenome1 = new TestGenome(11);
+//
+//    GN::genomeWrite<std::byte>(testGenome1, 0, (std::byte)21);
+//    GN::genomeWrite<std::byte>(testGenome1, 1, (std::byte)35);
+//    GN::genomeWrite<std::byte>(testGenome1, 2, (std::byte)43);
+//    GN::genomeWrite<std::byte>(testGenome1, 3, (std::byte)84);
+//    GN::genomeWrite<std::byte>(testGenome1, 4, (std::byte)12);
+//    GN::genomeWrite<std::byte>(testGenome1, 5, (std::byte)15);
+//    GN::genomeWrite<std::byte>(testGenome1, 6, (std::byte)19);
+//    GN::genomeWrite<std::byte>(testGenome1, 7, (std::byte)28);
+//    GN::genomeWrite<std::byte>(testGenome1, 8, (std::byte)39);
+//    GN::genomeWrite<std::byte>(testGenome1, 9, (std::byte)45);
+//    GN::genomeWrite<std::byte>(testGenome1, 10, (std::byte)51);
+//
+//    AbstractGenome* testGenome2 = testGenome1->clone();
+//
+//    testGenome1->show();
+//    testGenome2->show();
+//
+//    for (size_t i(0); i < testGenome1->size(); i++)
+//    {
+//        assert(*testGenome1->data(i) == *testGenome2->data(i));
+//    }
+//
+//    assert(testGenome1->size() == testGenome2->size());
+//    assert(*testGenome1->data(0,0) == *testGenome2->data(0,0));
+
     std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
     runUmaChangelogTests<TetianaGenome>(0);
     std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-    
 //
+
     int result = Catch::Session().run(argc, argv);
     return result;
 }
