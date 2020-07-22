@@ -295,254 +295,86 @@ void test_alterations_tetiana() {
     std::cout << "---------------------------" << std::endl << std::endl;
 }
 
+std::string currentDir() {
+    char buff[FILENAME_MAX]; //create string buffer to hold path
+    getcwd( buff, FILENAME_MAX );
+    std::string current_working_dir(buff);
+    return current_working_dir;
+}
+
+std::vector<size_t> randomList(size_t size, double rate=0.01)
+{
+    // Abort if larger than 0.01 mutation rate
+    if (rate > 0.01)
+    {
+        std::cout << "Error: Mutation rate larger than 0.01" << std::endl;
+        exit(1);
+    }
+    
+    // init vector
+    std::vector<size_t> randomList;
+    randomList.reserve((double)size*rate);
+    
+    // open file
+    std::string file = "/Users/tetianad/Documents/Education/CS/WAVES/mabe/newgenome/code/Tools/Sequences/"+std::to_string(size)+"List.txt";
+    
+    std::cout << "file: " << file << std::endl;
+    std::ifstream infile(file.c_str());
+    
+    // get random numbers
+    size_t num;
+    while (infile >> num)
+    {
+        randomList.push_back(num);
+        if (randomList.size()+1 > randomList.capacity())
+            break;
+    }
+    
+    infile.close();
+    
+    return randomList;
+}
+
+
 int main(int argc, char* argv[]) {
+ 
     
-//    test_alterations();
-//
-//    find_patterns_tests();
-//
-//    AbstractGenome* genome = new TestGenome(8);
-//    // AbstractGenome  & y = *(new TestGenome);
-//
-//    runTests(genome);
-//    testData(genome);
-//    delete genome;
-//
-    //AbstractGenome* secondGenome = new TestGenome(200);
-    //runGeneTest(secondGenome);
-    //delete secondGenome;
+    // Variables
+#define MutationRate 0.005     //< any mutation rate <= 0.01
+#define Size 500000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable
     
+    typedef std::byte Byte;
     
-//    //=========================================================
-//    AbstractGenome* myGenome = new TetianaGenome(11);
-//
-//    GN::genomeWrite<std::byte>(myGenome, 0, (std::byte)21);
-//    GN::genomeWrite<std::byte>(myGenome, 1, (std::byte)35);
-//    GN::genomeWrite<std::byte>(myGenome, 2, (std::byte)43);
-//    GN::genomeWrite<std::byte>(myGenome, 3, (std::byte)84);
-//    GN::genomeWrite<std::byte>(myGenome, 4, (std::byte)12);
-//    GN::genomeWrite<std::byte>(myGenome, 5, (std::byte)15);
-//    GN::genomeWrite<std::byte>(myGenome, 6, (std::byte)19);
-//    GN::genomeWrite<std::byte>(myGenome, 7, (std::byte)28);
-//    GN::genomeWrite<std::byte>(myGenome, 8, (std::byte)39);
-//    GN::genomeWrite<std::byte>(myGenome, 9, (std::byte)45);
-//    GN::genomeWrite<std::byte>(myGenome, 10, (std::byte)51);
-//
-//    myGenome->show();
-//
-//    myGenome->remove(3, 1);
-//    myGenome->show();
-//
-//    std::vector<std::byte> segment1{
-//        (std::byte)1
-//    };
-//    myGenome->insert(4, segment1);
-//    myGenome->show();
-//
-//    std::cout << "myGenome->size():" << myGenome->size() << std::endl;
+    std::vector<size_t> mutations = randomList(Size, MutationRate);
+    
+    AbstractGenome* genome = new TetianaGenome(Size);
+    
+    std::cout << "genome->size(): " << genome->size() << std::endl;
+    std::cout << "mutations.size(): " << mutations.size() << std::endl;
+    
+    //sort(mutations.begin(), mutations.end());
+    
+    int ind = 0;
+    for (const auto& site : mutations)
+    {
+        std::cout << "ind: " << ind << ", site: " << site << std::endl;
+        genome->insert(site, std::vector< Byte >(1, (Byte)1));
+        
+        std::cout << "genome->size(): " << genome->size() << std::endl;
 
+        ++ind;
+    }
     
     
     
     
-    
-//
-//    //=========================================================
-//    AbstractGenome* genome = new TetianaGenome(10);
-////    GN::genomeWrite<std::byte>(genome, 0, (std::byte)11);
-////    GN::genomeWrite<std::byte>(genome, 1, (std::byte)22);
-////    GN::genomeWrite<std::byte>(genome, 2, (std::byte)33);
-////    GN::genomeWrite<std::byte>(genome, 3, (std::byte)44);
-////    GN::genomeWrite<std::byte>(genome, 4, (std::byte)55);
-////    GN::genomeWrite<std::byte>(genome, 5, (std::byte)66);
-////    GN::genomeWrite<std::byte>(genome, 6, (std::byte)77);
-////    GN::genomeWrite<std::byte>(genome, 7, (std::byte)88);
-////    GN::genomeWrite<std::byte>(genome, 8, (std::byte)99);
-////    GN::genomeWrite<std::byte>(genome, 9, (std::byte)111);
-//
-//    genome->resize(11);
-//    GN::genomeWrite<std::byte>(genome, 0, (std::byte)21);
-//    GN::genomeWrite<std::byte>(genome, 1, (std::byte)35);
-//    GN::genomeWrite<std::byte>(genome, 2, (std::byte)43);
-//    GN::genomeWrite<std::byte>(genome, 3, (std::byte)84);
-//    GN::genomeWrite<std::byte>(genome, 4, (std::byte)12);
-//    GN::genomeWrite<std::byte>(genome, 5, (std::byte)15);
-//    GN::genomeWrite<std::byte>(genome, 6, (std::byte)19);
-//    GN::genomeWrite<std::byte>(genome, 7, (std::byte)28);
-//    GN::genomeWrite<std::byte>(genome, 8, (std::byte)39);
-//    GN::genomeWrite<std::byte>(genome, 9, (std::byte)45);
-//    GN::genomeWrite<std::byte>(genome, 10, (std::byte)51);
-//
-//    std::cout << "genome->size() init: " << genome->size() << std::endl;
-//    genome->show();
-//
-////    genome->insert(7, std::vector<std::byte>({(std::byte)(212)}));
-////    genome->show();
+//    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
+//    runUmaChangelogTests<TetianaGenome>(0);
+//    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
 ////
-////    genome->remove(5, 3);
-////    genome->show();
 //
-//
-////    // insert {200, 250} starting at position 5
-////    genome->insert(5, std::vector<std::byte>({(std::byte)(200), (std::byte)(250)}));
-////    genome->show();
-////
-////    // remove positions 5,6,7,8
-////    genome->remove(5, 4);
-////    genome->show();
-//
-////    // insert {100, 110, 120, 130, 140} starting at position 6
-////    genome->insert(6, std::vector<std::byte>({(std::byte)(100), (std::byte)(110), (std::byte)(120), (std::byte)(130), (std::byte)(140)}));
-////    genome->show();
-//
-////    // remove positions 7 and 8
-////    genome->remove(7, 2);
-////    genome->show();
-//
-//
-//
-//
-////    // insert value 212 at position 7
-////    genome->insert(7, std::vector<std::byte>({(std::byte)(212)}));
-////    genome->show();
-////
-////    // point mutation - change position 5's value to 200
-////    genome->overwrite(5, std::vector<std::byte>({(std::byte)(200)}));
-////    genome->show();
-////
-////    // insert {15,16} starting at position 2
-////    genome->insert(2, std::vector<std::byte>({(std::byte)(15), (std::byte)(16)}));
-////    genome->show();
-////
-////
-////    // copy mutation: replace positions 1,2,3 with the last 3 values in the genome
-////    std::vector<std::byte> copyVals(3);
-////    int genIndex = genome->size()-copyVals.size();
-////    for (int copyPos = 0; copyPos < copyVals.size(); copyPos++){
-////        copyVals[copyPos] = GN::genomeRead<std::byte>(genome, genIndex);
-////        genIndex++;
-////    }
-////    //11 88 99 111 33 44 55 200 77 212 88 99 111
-////    genome->overwrite(1, copyVals);
-////    genome->show();
-//
-//
-//    genome->remove(3, 1);
-//    genome->show();
-//
-//    std::vector<std::byte> segment1{
-//        (std::byte)1
-//    };
-//    genome->insert(4, segment1);
-//    genome->show();
-//
-//    genome->remove(6, 2);
-//    genome->show();
-//
-//    std::vector<std::byte> segment2{
-//        (std::byte)2,
-//        (std::byte)3,
-//        (std::byte)4
-//    };
-//    genome->insert(5, segment2);
-//    genome->show();
-//
-//    genome->remove(6, 3);
-//    genome->show();
-//
-//    genome->remove(6, 2);
-//    genome->show();
-//
-//    std::vector<std::byte> segment3{
-//        (std::byte)5,
-//        (std::byte)6,
-//        (std::byte)7
-//    };
-//    genome->insert(0, segment3);
-//    genome->show();
-//
-//
-//    std::cout << "test_offspring_data: " << std::endl;
-//    std::cout << "genome->size(): " << genome->size() << std::endl;
-//
-//    std::byte* my_offspring_data = genome->data(0, 0);
-//    for(int i = 0; i < genome->size(); i++) {
-//        std::cout << (int)(*(my_offspring_data + i)) << " ";
-//    }
-//    std::cout << std::endl;
-//
-////    genome->resize(0);
-//
-////    GN::genomeWrite<std::byte>(genome, 0, (std::byte)21);
-////    GN::genomeWrite<std::byte>(genome, 1, (std::byte)35);
-////    GN::genomeWrite<std::byte>(genome, 2, (std::byte)43);
-////    GN::genomeWrite<std::byte>(genome, 3, (std::byte)84);
-////    GN::genomeWrite<std::byte>(genome, 4, (std::byte)12);
-//
-
-    
-    
-//    AbstractGenome* myGenome = new TetianaGenome(0);
-//    myGenome->resize(0);
-//    myGenome->show();
-//
-//    std::cout << "my_offspring_data: " << std::endl;
-//    std::cout << "genome->size(): " << myGenome->size() << std::endl;
-//
-//    std::byte* my_offspring_data = myGenome->data(0, 0);
-//    for(int i = 0; i < myGenome->size(); i++) {
-//        std::cout << (int)(*(my_offspring_data + i)) << " ";
-//    }
-//    std::cout << std::endl;
-//
-//
-//    std::cout << "insert: " << std::endl;
-//    myGenome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
-//    myGenome->show();
-//
-//    std::cout << "my_offspring_data: " << std::endl;
-//    std::cout << "genome->size(): " << myGenome->size() << std::endl;
-//    my_offspring_data = myGenome->data(0, 0);
-//    for(int i = 0; i < myGenome->size(); i++) {
-//        std::cout << (int)(*(my_offspring_data + i)) << " ";
-//    }
-//    std::cout << std::endl;
-    
-    
-//    AbstractGenome* testGenome1 = new TestGenome(11);
-//
-//    GN::genomeWrite<std::byte>(testGenome1, 0, (std::byte)21);
-//    GN::genomeWrite<std::byte>(testGenome1, 1, (std::byte)35);
-//    GN::genomeWrite<std::byte>(testGenome1, 2, (std::byte)43);
-//    GN::genomeWrite<std::byte>(testGenome1, 3, (std::byte)84);
-//    GN::genomeWrite<std::byte>(testGenome1, 4, (std::byte)12);
-//    GN::genomeWrite<std::byte>(testGenome1, 5, (std::byte)15);
-//    GN::genomeWrite<std::byte>(testGenome1, 6, (std::byte)19);
-//    GN::genomeWrite<std::byte>(testGenome1, 7, (std::byte)28);
-//    GN::genomeWrite<std::byte>(testGenome1, 8, (std::byte)39);
-//    GN::genomeWrite<std::byte>(testGenome1, 9, (std::byte)45);
-//    GN::genomeWrite<std::byte>(testGenome1, 10, (std::byte)51);
-//
-//    AbstractGenome* testGenome2 = testGenome1->clone();
-//
-//    testGenome1->show();
-//    testGenome2->show();
-//
-//    for (size_t i(0); i < testGenome1->size(); i++)
-//    {
-//        assert(*testGenome1->data(i) == *testGenome2->data(i));
-//    }
-//
-//    assert(testGenome1->size() == testGenome2->size());
-//    assert(*testGenome1->data(0,0) == *testGenome2->data(0,0));
-
-    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-    runUmaChangelogTests<TetianaGenome>(0);
-    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-//
-
-    int result = Catch::Session().run(argc, argv);
-    return result;
+//    int result = Catch::Session().run(argc, argv);
+//    return result;
 }
 
 
