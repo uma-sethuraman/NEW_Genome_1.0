@@ -3,10 +3,6 @@
  * \author Victoria Cao
  **/
 
-#define pageSize 3000
-#define mutationRate 33 // total all mutations 1 in every 100 sites
-
-
 #include <cstdint>
 #include <vector>
 #include <utility>
@@ -18,6 +14,9 @@
 #define RESET   "\033[0m"
 #define CYAN    "\033[36m"      /* Cyan */
 
+#define page 65000
+#define mutationRate 0.001 // mutation rate on page
+
 /** 
  * Constructor 
  * \param size of new list
@@ -25,7 +24,7 @@
 SegmentList::SegmentList(size_t size)
     : SiteCount(size)
 {
-    size_t poolSize = std::max((size_t)10, (size_t)(std::ceil(size/pageSize)+std::ceil(size/mutationRate)));
+    size_t poolSize = std::max((size_t)10, (size_t)((size/page)+(page*mutationRate)));
     Pool = new SegmentPool(poolSize);
     IndexTable.reserve(poolSize);
 
@@ -36,7 +35,7 @@ SegmentList::SegmentList(size_t size)
     while(start < size)
     {
         // creates new node
-        size_t nodeSize = std::min((size_t)pageSize, size - start);
+        size_t nodeSize = std::min((size_t)page, size - start);
         size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
 
         // updates root if at start 
@@ -84,7 +83,7 @@ SegmentList* SegmentList::Reallocate()
     // copy until end of sites
     while(start < SiteCount)
     {
-        size_t nodeSize = std::min((size_t)pageSize, SiteCount - start);
+        size_t nodeSize = std::min((size_t)page, SiteCount - start);
         size_t newNode = newList->Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
         if (start == 0)
             newList->Root = newNode;
@@ -96,7 +95,7 @@ SegmentList* SegmentList::Reallocate()
         // copying into node (limited to page size)
         while(newlyAllocated < nodeSize)
         {
-            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, pageSize-newlyAllocated, SiteCount-start});
+            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, page-newlyAllocated, SiteCount-start});
 
             newList->Pool->Overwrite(newNode, newlyAllocated, Pool->GetData(oldNode, oldOffset), moveSize);
 
@@ -147,7 +146,7 @@ TableEntry SegmentList::Find(size_t index)
     // binary sesarch through Index Table 
     auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0))-IndexTable.begin();
 
-    if (entry >= IndexTable.size() || (IndexTable[entry].first != index && entry > 0))
+    if (entry >= IndexTable.size() || (IndexTable[entry].first != index && entry))
     {
         --entry;
     }
@@ -163,12 +162,13 @@ TableEntry SegmentList::Find(size_t index)
         node = Pool->GetNext(node);
 
         // update index table
-        IndexTable.push_back(std::make_pair<size_t, size_t>((size_t)(left), (size_t(node))));
-        entry = IndexTable.size()-1;
+        IndexTable.push_back( {(size_t)(left), (size_t(node))} );
+        ++entry;
     }
 
     return TableEntry(entry, node, left);
 }
+
 
 /** 
  * Gets Byte poitner to data
@@ -217,7 +217,7 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
             auto rightOffset = leftOffset;
             auto tempIndex = startIndex;
 
-            while(!Pool->Unique(right) && startIndex < segment.size())
+            while(startIndex < segment.size() && !Pool->Unique(right))
             {
                 // remove end 
                 if (startIndex + Pool->GetSize(right) - rightOffset > segment.size())
@@ -290,6 +290,7 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 
 }
 
+
 /** 
  * Inserts into list
  * \param index 
@@ -305,16 +306,6 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
     // overwrite current genome
     if (Pool->Unique(left))
     {
-        if (Pool->GetSize(left) > 4098)
-        {
-            size_t cut = Pool->Split(left);
-            if (Pool->GetSize(left) < leftOffset)
-            {
-                leftOffset -= Pool->GetSize(left);
-                left = cut;
-            }
-        }
-
         Pool->Insert(left, leftOffset, segment);
     }
 

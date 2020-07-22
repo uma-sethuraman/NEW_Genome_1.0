@@ -2,4 +2,5 @@
 code/.vscode
 
 code/build/test
-code/build/simpleBench
+code/build/bench
+code/build/logs/*

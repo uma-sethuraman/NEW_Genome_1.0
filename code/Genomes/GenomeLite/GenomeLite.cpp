@@ -60,6 +60,12 @@ Byte* GenomeLite::data(size_t index, size_t byteSize)
  **/
 void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
 {
+    if (index + segment.size() > List->GetSiteCount() || index >= List->GetSiteCount()) 
+    {
+        std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
+        exit(1);
+	}
+
     if (List->IsFull())
     {
         SegmentList* oldList = List;
@@ -77,6 +83,12 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
 {
+    if (index > List->GetSiteCount()+1) 
+    {
+        std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
+        exit(1);
+	}
+
     if (List->IsFull())
     {
         SegmentList* oldList = List;
@@ -94,6 +106,12 @@ void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
  **/
 void GenomeLite::remove(size_t index, size_t segmentSize)
 {
+    if (index + segmentSize > List->GetSiteCount()) 
+    {
+        std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
+        exit(1);
+	}
+
     if (List->IsFull())
     {
         SegmentList* oldList = List;

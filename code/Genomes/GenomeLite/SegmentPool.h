@@ -60,7 +60,7 @@ public:
 
     /** Gets number of Bytes of data
      * \return number of bytes of data **/
-    const bool IsFull() { return Pool.size()+2 > Pool.capacity(); }
+    const bool IsFull() { return Pool.size()+4 > Pool.capacity(); }
 
 
     /** Creates a new node in the pool
@@ -83,25 +83,6 @@ public:
         return Pool.size()-1;
     }
 
-    /** Creates a new node in the pool
-     * \param index of node to copy
-     * \return index of newly copied node **/
-    size_t Split(size_t index) 
-    {
-        size_t cutIndex = Pool.size();
-        auto cutSize = Pool[index].Size/2;
-
-        Pool.push_back(SegmentNode(std::make_shared< Gene >(Pool[index].Data->begin()+cutSize, Pool[index].Data->end()), Pool.size()));
-      
-        Pool[cutIndex].Next = Pool[index].Next;
-        Pool[index].Next = cutIndex;
-
-        Pool[index].Size -= cutSize;
-        Pool[index].Data->resize(Pool[index].Size);
-
-        return cutIndex;
-    }
-
     /** Gets use count 
      * \returns use count of the smart pointer **/
     bool Unique(size_t index) 
@@ -121,6 +102,13 @@ public:
     Byte* GetData(size_t index, size_t localIndex)
     {
         return &(Pool[index].Data->at(Pool[index].Start+localIndex));
+    }
+
+    /** Gets number of Bytes of data
+     * \return number of bytes of data **/
+    const size_t GetCapacity(size_t index) 
+    {  
+        return Pool[index].Data->capacity(); 
     }
 
     /** Gets position
@@ -227,17 +215,9 @@ public:
      * \param segment to insert **/
     void Insert(size_t index, size_t localIndex, const Gene& segment)
     {
-        auto newSize = Pool[index].Data->size()+segment.size();
-        Pool[index].Size = newSize;
+        Pool[index].Size += segment.size();
 
-        auto newData = std::make_shared< Gene >(newSize);
-
-        std::copy_n(Pool[index].Data->begin(), localIndex, newData->begin());
-        std::copy_n(segment.begin(), segment.size(), newData->begin()+localIndex);
-        std::copy_n(Pool[index].Data->begin()+localIndex, Pool[index].Data->size()-localIndex, newData->begin()+localIndex+segment.size());
-
-        Pool[index].Data.swap(newData);
-
+        Pool[index].Data->insert(Pool[index].Data->begin()+localIndex, segment.begin(), segment.end());
     }
 
     /** Removes the data into node
