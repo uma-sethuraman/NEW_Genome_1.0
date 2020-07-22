@@ -43,20 +43,16 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
             end = index+byteSize;
         }
 
-        // allocate required amount of data based on dataSize
-        std::byte* ret = (std::byte*)malloc(dataSize*sizeof(std::byte));
-        if (ret == nullptr) {
-            std::cout << "data allocation failed, exiting" << std::endl;
-            exit(-1);
+        // create data vector of given size and fill it with genome values
+        std::vector<std::byte> data_returned(dataSize);
+        int data_index = 0;
+        for (int gen_index = index; gen_index < end && data_index < dataSize; gen_index++) {
+            data_returned[data_index] = getCurrentGenomeAt(gen_index);
+            data_index++;
         }
 
-        // get values in range requested by user
-        int ret_index = 0;
-        for (int gen_index = index; gen_index < end && ret_index < dataSize; gen_index++) {
-            ret[ret_index] = getCurrentGenomeAt(gen_index);
-            ret_index++;
-        }
-        return ret;
+        // return pointer to beginning of data vector
+        return static_cast<std::byte*>(&data_returned[0]);
    }
 }
 
@@ -83,7 +79,6 @@ int UmaGenome::getLowerBoundOffset(int key) {
    in the clone. */
 AbstractGenome* UmaGenome::clone(bool forceCopy) {
     if (forceCopy) {
-
         // reconstruct current genome using changelog and offset map
         std::vector<std::byte> new_sites(currentGenomeSize);
         for (int new_sites_ind = 0; new_sites_ind < currentGenomeSize; new_sites_ind++) {

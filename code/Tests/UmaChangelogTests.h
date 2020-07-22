@@ -872,7 +872,7 @@ void removeTest12(bool debug) {
 
     // insert {100, 110, 120, 130, 140} starting at position 6
     genome->insert(6, std::vector<std::byte>({(std::byte)(100), (std::byte)(110), (std::byte)(120), (std::byte)(130), (std::byte)(140)}));
-    
+
     // remove positions 7 and 8
     genome->remove(7, 2);
 
