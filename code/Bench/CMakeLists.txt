@@ -7,21 +7,23 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # set the project name
 project( bench )
 
-# include source
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Genomes)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Genomes/GenomeLite)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Tools)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Tests)
 
+# include source
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+
+include_directories(${PARENT_DIR}/Genomes)
+include_directories(${PARENT_DIR}/Genomes/GenomeLite)
+include_directories(${PARENT_DIR}/Tools)
+include_directories(${PARENT_DIR}/Tests)
+
+add_subdirectory(${PARENT_DIR}/Genomes ${CMAKE_CURRENT_BINARY_DIR}/Genomes)
 
 # include flags
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall" )
 
 # Can manually add the sources using the set command as follows:
-file( GLOB_RECURSE GENOME_SOURCES ../Genomes/*.cpp )
-set( SIMPLE SimpleBench.cpp )
-# set( CLONE CloneBench.cpp )
+set( MAINEXEC bench.cpp )
 
 # add main executable
-add_executable( simpleBench ${SIMPLE} ${GENOME_SOURCES} )
-# add_executable( cloneBench ${CLONE} ${GENOME_SOURCES} )
+add_executable( bench ${MAINEXEC} )
+target_link_libraries( bench genomes )

@@ -43,11 +43,18 @@ void printTime() {
  * \param size of genome
  * \returns vector of predetermined random numbers 
  **/
-std::vector<size_t> randomList(size_t size)
+std::vector<size_t> randomList(size_t size, double rate=0.01)
 {
+    // Abort if larger than 0.01 mutation rate
+    if (rate > 0.01)
+    {
+        std::cout << "Error: Mutation rate larger than 0.01" << std::endl;
+        exit(1);
+    }
+
     // init vector
     std::vector<size_t> randomList;
-    randomList.reserve((double)size*0.01);
+    randomList.reserve((double)size*rate);
     
     // open file
     std::string file = currentDir()+"/../Tools/Sequences/"+std::to_string(size)+"List.txt";
@@ -58,6 +65,8 @@ std::vector<size_t> randomList(size_t size)
     while (infile >> num)
     {
         randomList.push_back(num);
+        if (randomList.size()+1 > randomList.capacity())
+            break;
     }
     
     infile.close();
