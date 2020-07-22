@@ -25,7 +25,7 @@
 
 // Variables
 #define MutationRate 0.005     //< any mutation rate <= 0.01
-#define Size 500000    //< 500,000 ; 100,000 ; 20,000 avaliable 
+#define Size 500000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable 
 
 typedef std::byte Byte;
 typedef TestGenome GenomeType;  //< change to genomeType
