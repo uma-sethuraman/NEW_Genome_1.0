@@ -17,9 +17,8 @@ void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::stri
     if (gen->size() != answer.size())
         failed = true;
     else {
-        std::byte* genomeData = gen->data(0,0);
         for(int i = 0; i < answer.size(); i++) {
-            if((*(genomeData+i)) != answer[i]){
+            if((*(gen->data(i, 1))) != answer[i]){
                 failed = true;
             }
         }
@@ -209,6 +208,18 @@ void copyTest1(bool debug) {
     printResults(answer, genome, "Copy Test 1: ");
     
     delete genome;
+}
+
+/* overwriting at position past end of genome,
+   should exit with error message, 
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidOverwriteTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+    // trying to overwrite at position 110 in size 100 genome
+    genome->overwrite(110, std::vector<std::byte>({(std::byte)10}));
 }
 
 // deletion in the middle of size 10 genome
@@ -942,6 +953,19 @@ void removeTest13(bool debug) {
     delete genome;
 }
 
+/* removing past end of genome,
+   should exit with error message,
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidRemoveTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+    // removing 5 at position 100 will try to remove past end of genome
+    genome->remove(100, 5);
+}
+
+
 // inserting single value into size 5 genome
 template <class genomeName>
 void insertTest1(bool debug) {
@@ -1454,6 +1478,18 @@ void insertTest10(bool debug) {
     printResults(answer, genome, "Insert Test 10: ");
 
     delete genome;
+}
+
+/* inserting starting at position past end of genome,
+   should exit with error message,
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidInsertTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+    // trying to insert at position 110 in size 100 genome
+    genome->insert(110, std::vector<std::byte>({(std::byte)10}));
 }
 
 // point, insert, and remove mutations on size 5 genome

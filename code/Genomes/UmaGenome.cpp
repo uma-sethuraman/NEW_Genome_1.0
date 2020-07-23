@@ -122,9 +122,9 @@ void UmaGenome::pointMutate(size_t index, std::byte value) {
 
 void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
     if (index + segment.size() > currentGenomeSize) {
-		std::cout << "attempt to overwrite would write past end of genome! exiting..." << std::endl;
-		exit(1);
-	}
+        std::cout << "attempt to overwrite would write past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
 
     int size = segment.size();
     int seg_index = 0;
@@ -140,9 +140,9 @@ void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
 
 void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
     if (index > currentGenomeSize) {
-		std::cout << "attempt to insert past end of genome! exiting..." << std::endl;
-		exit(1);
-	}
+        std::cout << "attempt to insert past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
 
     int size = segment.size(); // insertion size
 
@@ -205,9 +205,9 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 
 void UmaGenome::remove(size_t index, size_t segmentSize) {
     if (index + segmentSize > currentGenomeSize) {
-		std::cout << "attempt to remove past end of genome! exiting..." << std::endl;
-		exit(1);
-	}
+        std::cout << "attempt to remove past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
 
     // Remove all keys in deletion from changelog
     for (int deleteInd = index; deleteInd < (index+segmentSize); deleteInd++) {
