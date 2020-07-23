@@ -318,7 +318,7 @@ std::vector<size_t> randomList(size_t size, double rate=0.01)
     // open file
     std::string file = "/Users/tetianad/Documents/Education/CS/WAVES/mabe/newgenome/code/Tools/Sequences/"+std::to_string(size)+"List.txt";
     
-    std::cout << "file: " << file << std::endl;
+    //std::cout << "file: " << file << std::endl;
     std::ifstream infile(file.c_str());
     
     // get random numbers
@@ -337,44 +337,62 @@ std::vector<size_t> randomList(size_t size, double rate=0.01)
 
 
 int main(int argc, char* argv[]) {
- 
+    
     
     // Variables
 #define MutationRate 0.005     //< any mutation rate <= 0.01
 #define Size 500000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable
-    
+
     typedef std::byte Byte;
-    
+
     std::vector<size_t> mutations = randomList(Size, MutationRate);
-    
+
     AbstractGenome* genome = new TetianaGenome(Size);
+    AbstractGenome* genometest = new TestGenome(Size);
     
-    std::cout << "genome->size(): " << genome->size() << std::endl;
-    std::cout << "mutations.size(): " << mutations.size() << std::endl;
     
-    //sort(mutations.begin(), mutations.end());
+    for (size_t i(0); i < genome->size(); i++)
+    {
+        *genome->data(i) = (std::byte)(i*2);
+        *genometest->data(i) = (std::byte)(i*2);
+    }
     
+    for (size_t i(0); i < genome->size(); i++) {
+        assert(*genome->data(i) == *genometest->data(i));
+    }
+    
+
     int ind = 0;
     for (const auto& site : mutations)
     {
-        std::cout << "ind: " << ind << ", site: " << site << std::endl;
         genome->insert(site, std::vector< Byte >(1, (Byte)1));
-        
-        std::cout << "genome->size(): " << genome->size() << std::endl;
-
         ++ind;
     }
     
+    ind = 0;
+    for (const auto& site : mutations)
+    {
+        genometest->insert(site, std::vector< Byte >(1, (Byte)1));
+        ++ind;
+    }
+    
+    std::cout << "genome->size() " << genome->size() <<std::endl;
+    std::cout << "genometest->size() " << genometest->size() <<std::endl;
+
+    for (size_t i(0); i < genome->size(); i++) {
+        assert(*genome->data(i) == *genometest->data(i));
+    }
+
     
     
     
-//    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-//    runUmaChangelogTests<TetianaGenome>(0);
-//    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-////
+//        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
+//        runUmaChangelogTests<TetianaGenome>(0);
+//        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
 //
-//    int result = Catch::Session().run(argc, argv);
-//    return result;
+//
+//        int result = Catch::Session().run(argc, argv);
+//        return result;
 }
 
 
