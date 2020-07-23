@@ -24,11 +24,11 @@
 #include "catch.hpp"
 
 // Variables
-#define MutationRate 0.005     //< any mutation rate <= 0.01
-#define Size 500000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable 
+#define MutationRate 0.01     //< any mutation rate <= 0.01
+#define Size 100000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable 
 
 typedef std::byte Byte;
-typedef TestGenome GenomeType;  //< change to genomeType
+typedef GenomeLite GenomeType;  //< change to genomeType
 
 std::string name = typeid(GenomeType).name();  
 const std::vector<size_t> mutations = randomList(Size, MutationRate);

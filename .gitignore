@@ -1,5 +1,5 @@
 # IDE files
-code/.vscode
+.vscode/
 
 code/build/test
 code/build/bench
