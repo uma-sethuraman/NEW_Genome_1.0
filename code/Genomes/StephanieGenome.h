@@ -17,6 +17,7 @@ private:
 	size_t genomeSize;
 	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
+	std::vector<std::byte> modifiedSites; //added
 	std::vector<size_t> keys; //TODO: check if this is needed?
 
 public:
@@ -57,7 +58,7 @@ public:
 		return(geneMap);
 	}
 
-	std::vector<std::byte> generateNewGenome();
+	void generateNewGenome();
 
 	void shiftChangelogLeft();
 
