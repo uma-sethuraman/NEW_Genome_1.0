@@ -37,11 +37,6 @@ void StephanieGenome::resize(size_t new_size) {
 	genomeSize = new_size;
 };
 
-/* Returns a clone of the current genome.
-   If forceCopy is true, then it resets the "parent" genome of the clone
-   to the actual current genome. If forceCopy is false, it directly clones
-   the current genome, leaving the "parent", changelog, and offset map the same
-   in the clone. */
 AbstractGenome* StephanieGenome::clone(bool forceCopy) {
 	if (forceCopy) {
 		AbstractGenome* genomeClone = new StephanieGenome(genomeSize);
@@ -137,6 +132,7 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 			changelog.insert(std::pair<size_t, ChangelogStruct>(site, c));
 		}
 	}
+	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	//printChangelog();
@@ -202,7 +198,8 @@ void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment
 			}
 			indexCounter++;
 		}
-	};
+	}
+	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	genomeSize += segment.size();
@@ -418,6 +415,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 		}
 		genomeSize -= segmentSize;
 	}
+	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	//printChangelog();
