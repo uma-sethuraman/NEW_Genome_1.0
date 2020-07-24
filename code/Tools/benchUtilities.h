@@ -46,9 +46,9 @@ void printTime() {
 std::vector<size_t> randomList(size_t size, double rate=0.01)
 {
     // Abort if larger than 0.01 mutation rate
-    if (rate > 0.01)
+    if (rate > 0.02)
     {
-        std::cout << "Error: Mutation rate larger than 0.01" << std::endl;
+        std::cout << "Error: Mutation rate larger than 0.02" << std::endl;
         exit(1);
     }
 
