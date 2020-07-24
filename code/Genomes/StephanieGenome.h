@@ -14,6 +14,7 @@ private:
 		size_t removeOffset;
 	};
 	bool mutationFlag = false;
+	bool genomeGenerated = false;
 	size_t genomeSize;
 	std::map<size_t, ChangelogStruct> changelog;
 	std::vector<std::byte> sites;
