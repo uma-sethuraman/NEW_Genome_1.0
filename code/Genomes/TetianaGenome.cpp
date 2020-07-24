@@ -240,10 +240,6 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     std::map<int, std::pair<int, bool>> change_log_temp;
     std::unordered_map<int, std::vector<std::byte>> segments_log_temp;
 
-    
-    
-    
-    
     if (prev_key->second.second == true) { // prev_key == lb_key is key == index
         
         // Keys before insertion
@@ -316,121 +312,11 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
 
             segments_log_temp.insert({{index, segment}});
             
-            // in this situation wto inserted segments will never have to merge
+            // in this situation two inserted segments will never have to merge
 
             segments_log = segments_log_temp;
-        
-        
-            
-       // }
-        
-        // Seems like the following part is taken care for if "if"
-//        else { // lb_key->first == index && next_key->second.second == true; lb_key == next_key when key exists in the map
-//
-//            // Before index
-//            for (auto it = change_log.begin(); it != next_key; ++it) { // Jul 23: next_key instead of lb_key
-//                change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-//                if (it->second.second == true) {
-//                    segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
-//                }
-//            }
-//            // After index
-//            for (auto it = next_key; it != change_log.end(); ++it) {
-//                int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
-//                change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
-//
-//                // update segments_log
-//                if (it->second.second == true) {
-//                    segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
-//                }
-//            }
-//
-//            //change_log_temp[index] = {0, true}; // want to replace if exists
-//
-//            segments_log = segments_log_temp;
-//        }
-        
     }
-    
-    
-    
-    // The following part is the same as if (next_key != change_log.end() && next_key->second.second == true)
-    // Because when we insert index, the keys above it will be moved to the right, we just need to move them and not care if they are true or false
-    
-    
-//    else {
-//
-//        // no insertions before nor after ind
-//        // also takes care of "next_key == change_log.end()"
-//
-//        // Before index
-//        for (auto it = change_log.begin(); it != lb_key; ++it) {
-//            change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-//            if (it->second.second == true) {
-//                segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
-//            }
-//        }
-//
-//        // After index
-//        for (auto it = lb_key; it != change_log.end(); ++it) {
-//            int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
-//            change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
-//
-//            // update segments_log
-//            if (it->second.second == true) {
-//                segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
-//            }
-//        }
-//
-//
-//        change_log_temp.insert(std::make_pair(index, std::make_pair(0, true)));
-//
-//        // also add shift just after insertion, e.g. "Insert(2, {1})" on slides
-////        if ((index + segmentSize) <= next_key->first) { //next_key == end() already checked
-////            change_log_temp[index + segmentSize] = {segmentSize, false};
-////        }
-//        change_log_temp[index + segmentSize] = {prev_key->second.first + segmentSize, false}; // [] are not really necessary, it should be there yet
-//
-//        segments_log_temp.insert({{index, segment}});
-//
-//        segments_log = segments_log_temp;
-//    }
-    
-    
     change_log = change_log_temp; // is this constant time? would std::move make it constant time?
-    
-//    // Merge any insertions that are one after another
-//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-//        if (it->second.second == true) {
-//            if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
-//                auto next_it = std::next(it);
-//                std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
-//                std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
-//                segm_merged.insert(segm_merged.end(), segm_to_merge.begin(), segm_to_merge.end());
-//                segments_log.find(it->first)->second = segm_merged; // rempace in segments_log
-//
-//                int to_erase = next_it->first;
-//                change_log.erase(to_erase);
-//                segments_log.erase(to_erase);
-//            }
-//        }
-//    }
-    
-//    std::cout << "+++++ change_log: +++++" << std::endl;
-//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-//        std::cout << it->first << " : " <<
-//        it->second.first << " : " << it->second.second << std::endl;
-//    }
-//    std::cout << "+++++ segments_log: +++++:" << std::endl;
-//    std::cout << "segments_log.empty(): " << segments_log.empty() << std::endl;
-//
-//    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
-//        std::cout << it->first << " : ";
-//        for (auto v : it->second) {
-//            std::cout << (int)v << " ";
-//        }
-//        std::cout << std::endl;
-//    }
 }
 
 std::vector<std::byte> TetianaGenome::offspring_recon() {
