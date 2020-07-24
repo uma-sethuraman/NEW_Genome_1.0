@@ -32,34 +32,27 @@ size_t SegmentList::CalculatePage(size_t size)
  * Constructor 
  * \param size of new list
  **/
-SegmentList::SegmentList(size_t size, double mutationRate)
-    : SiteCount(size), Page(CalculatePage(size)), MutationRate(mutationRate)
+SegmentList::SegmentList(size_t size)
+    : SiteCount(size), Page(CalculatePage(size))
 {
-    size_t poolSize = std::max((size_t)10, (size_t)((size/Page)+(size*(MutationRate+0.005))));
-    Pool = new SegmentPool(poolSize);
+    size_t poolSize = std::ceil(SiteCount/Page);
+    Pool.reserve(poolSize);
     IndexTable.reserve(poolSize);
 
     // Creates list
     size_t node = 0;
-    size_t start = 0;
+    size_t currSize = 0;
 
-    while(start < size)
+    while(currSize < SiteCount)
     {
         // creates new node
-        size_t nodeSize = std::min((size_t)Page, size - start);
-        size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
-
-        // updates root if at start 
-        if (start == 0)
-            Root = newNode;
+        size_t nodeSize = std::min((size_t)Page, SiteCount - currSize);
+        Pool.push_back(std::vector<Byte>(nodeSize));
 
         // adds node to indexing table
-        IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
+        IndexTable.push_back(currSize);   
 
-        // links node
-        Pool->SetNext(node, newNode);
-        node = newNode;
-        start += nodeSize;
+        currSize += nodeSize;
     }
 
 }
@@ -69,64 +62,39 @@ SegmentList::SegmentList(size_t size, double mutationRate)
  * \param list to copy from
  **/
 SegmentList::SegmentList(const SegmentList &list)
-    : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount)
-    , Page(list.Page), MutationRate(list.MutationRate) 
-{}
-
-
-/** 
- * Reallocates the current list to a new list
- * \returns pointer to newly created list
- **/
-SegmentList* SegmentList::Reallocate()
+    : SiteCount(list.SiteCount), Page(list.Page)
 {
-    // create new list
-    SegmentList* newList = new SegmentList();
-    newList->Pool = new SegmentPool(Pool->Capacity()*2);
-    newList->IndexTable.reserve(Pool->Capacity()*2);
-    newList->SiteCount = SiteCount;
-    Page = CalculatePage(SiteCount);
-
-    size_t node = 0;
-    size_t start = 0;
-    size_t oldNode = Root;
-    size_t oldOffset = 0;
-
-    // copy until end of sites
-    while(start < SiteCount)
+    if (CalculatePage(SiteCount) < Page*2)
     {
-        size_t nodeSize = std::min((size_t)Page, SiteCount - start);
-        size_t newNode = newList->Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
-        if (start == 0)
-            newList->Root = newNode;
-
-        // copy data from old list to new list
-        size_t newlyAllocated = 0;
-        newList->IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
-
-        // copying into node (limited to Page size)
-        while(newlyAllocated < nodeSize)
-        {
-            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, Page-newlyAllocated, SiteCount-start});
-
-            newList->Pool->Overwrite(newNode, newlyAllocated, Pool->GetData(oldNode, oldOffset), moveSize);
-
-            newlyAllocated += moveSize;
-            oldOffset += moveSize;
-            start += moveSize;
-
-            if (oldOffset >= Pool->GetSize(oldNode))
-            {
-                oldOffset = 0;
-                oldNode = Pool->GetNext(oldNode);
-            }
-        }
-
-        newList->Pool->SetNext(node, newNode);
-        node = newNode;
+        Pool = list.Pool;
+        IndexTable = list.IndexTable;
     }
+    else
+    {
+        Page = CalculatePage(SiteCount);
+        Pool.reserve(list.Pool.size()/2);
+        IndexTable.reserve(list.Pool.size()/2);
 
-    return newList;
+        size_t currSize = 0;
+
+        for (size_t i(0); i < list.Pool.size(); i+=2)
+        {
+            IndexTable.push_back(currSize);
+
+            size_t first = list.Pool.at(i).size();
+            size_t second = 0 ? i+1 > list.Pool.size() : list.Pool.at(i+1).size();
+
+            Pool.push_back(std::vector<Byte>(first+second));
+            std::copy(list.Pool.at(i).begin(), list.Pool.at(i).end(), Pool.back().begin());
+
+            if (second)
+                std::copy(list.Pool.at(i+1).begin(), list.Pool.at(i+1).end(), Pool.back().begin()+first);
+
+            currSize += first + second;
+        }
+    }
+    
+    
 }
 
 
@@ -156,29 +124,24 @@ void SegmentList::Resize(size_t size)
 TableEntry SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
-    auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0)) - IndexTable.begin();
+    auto poolIndex = std::upper_bound(IndexTable.begin(), IndexTable.end(), index) - IndexTable.begin();
+    --poolIndex;
+    size_t left = IndexTable.at(poolIndex);
 
-    if (entry >= IndexTable.size() || (IndexTable[entry].first != index && entry))
+    // iterate through segment list if not in index
+    while (poolIndex < Pool.size()-1)
     {
-        --entry;
-    }
-
-    auto found = IndexTable[entry];
-    size_t node = found.second;
-    size_t left = found.first;
-
-    // iterate through segment list if not in node
-    while (left + Pool->GetSize(node)-1 < index && left + Pool->GetSize(node) < SiteCount)
-    {
-        left += Pool->GetSize(node);
-        node = Pool->GetNext(node);
-
+        if (left + Pool.at(poolIndex).size() > index)
+            break;
+            
         // update index table
-        IndexTable.push_back( {(size_t)(left), (size_t(node))} );
-        ++entry;
+        left += Pool.at(poolIndex).size();
+        IndexTable.push_back(left);
+
+        ++poolIndex;
     }
 
-    return TableEntry(entry, node, left);
+    return TableEntry(poolIndex, left);
 }
 
 
@@ -190,7 +153,7 @@ TableEntry SegmentList::Find(size_t index)
 Byte* SegmentList::GetData(size_t index)
 {
     auto found = Find(index);
-    return Pool->GetData(found.PoolIndex, index-found.Offset);
+    return Pool.at(found.PoolIndex).data()+(index-found.Offset);
 }
 
 
@@ -202,103 +165,22 @@ Byte* SegmentList::GetData(size_t index)
 void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 {
     auto found = Find(index);
-    auto left = found.PoolIndex;
-    auto leftOffset = index-found.Offset;
-    auto entry = ++found.Entry;
+    auto poolIndex = found.PoolIndex;
+    auto localIndex = index-found.Offset;
 
     size_t startIndex = 0;
 
     // loop until overwrite is all written
     while(startIndex < segment.size())
     {
-        // overwrite the node if current genome is only one with data
-        if (Pool->Unique(left))
-        {
-            size_t size = std::min((Pool->GetSize(left)-leftOffset), (segment.size()-startIndex));
-   
-            Pool->Overwrite(left, leftOffset, segment, startIndex, size);
-            startIndex += size;
-            leftOffset = 0;
-            left = Pool->GetNext(left);      
-        }
+        size_t size = std::min((Pool.at(poolIndex).size()-localIndex), (segment.size()-startIndex));
+        std::copy_n(segment.begin()+startIndex, size, Pool.at(poolIndex).begin()+localIndex);
 
-        // create a new node to replace
-        else
-        {      
-            auto right = left;
-            auto rightOffset = leftOffset;
-            auto tempIndex = startIndex;
-
-            // find the end of overwrite or the next unique node
-            while(startIndex < segment.size() && !Pool->Unique(right))
-            {
-                // rest of overwrite fits within current node
-                if (startIndex + Pool->GetSize(right) - rightOffset > segment.size())
-                {
-                    rightOffset = leftOffset + segment.size() - startIndex;
-
-                    if (left == right) // split if overwrite is only on this node
-                    {
-                        if (leftOffset)
-                        {
-                            right = Pool->Copy(left);
-                            Pool->TruncateRight(left, leftOffset);
-                        }
-                        else
-                            left = Pool->GetPrev(left);
-                    }
-
-                    Pool->TruncateLeft(right, rightOffset);
-                    startIndex = segment.size();
-                }
-
-                // remove rest of node
-                else 
-                {
-                    // if not whole node
-                    if (rightOffset)
-                    {
-                        startIndex += Pool->GetSize(right)-rightOffset;
-                        Pool->TruncateRight(right, rightOffset);
-                    }
-                    // remove whole node
-                    else
-                    {
-                        startIndex += Pool->GetSize(right);
-                        Pool->Clear(right);
-                    }
-
-                    right = Pool->GetNext(right); 
-                    rightOffset = 0; 
-                    leftOffset = 0;
-                }
-            }
-            // insert segment
-            size_t mutation = Pool->Allocate(std::make_shared< std::vector<Byte> >(segment.begin()+tempIndex, segment.begin()+startIndex));
-            
-            // move left node if removed
-            if (!Pool->Allocated(left))
-            {
-                left = Pool->GetPrev(left);
-                // set new root if needed
-                if (!left)
-                {
-                    Root = mutation;
-                    IndexTable[0].second = (size_t)(Root);
-                }
-            }
-            
-            Pool->SetNext(left, mutation);
-            Pool->SetNext(mutation, right);
-
-            left = right;
-            leftOffset = rightOffset;
-
-            IndexTable.resize(entry);
-        }
+        startIndex += size;
+        localIndex = 0;
+        
+        ++poolIndex;      
     }
-
-
 }
 
 
@@ -310,60 +192,19 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 {
     auto found = Find(index);
-    auto left = found.PoolIndex;
-    auto leftOffset = index-found.Offset;
-    auto entry = ++found.Entry;
+    auto localIndex = index-found.Offset;
 
     // overwrite current genome
-    if (Pool->Unique(left))
-        Pool->Insert(left, leftOffset, segment);
+    Pool.at(found.PoolIndex).insert(Pool.at(found.PoolIndex).begin()+localIndex, segment.begin(), segment.end());
 
-    // insert in between segments
-    else
-    {
-        // create new mutation
-        size_t mutation = Pool->Allocate(std::make_shared< std::vector<Byte> >(segment));
-        size_t right = left;
-
-        // in middle
-        if (leftOffset && leftOffset != Pool->GetSize(left))
-        {
-            right = Pool->Copy(left);
-
-            Pool->TruncateRight(left, leftOffset);
-            Pool->TruncateLeft(right, leftOffset); 
-
-            Pool->SetNext(left, mutation);
-        }
-
-        // front case
-        else if (!leftOffset)
-        {
-            if (left != Root)
-            {
-                left = Pool->GetPrev(left);
-                Pool->SetNext(left, mutation);
-                IndexTable[--entry].second = mutation;
-            }
-            else
-            {
-                Root = mutation;
-                IndexTable[0].second = (size_t)(Root);
-            }
-        }
-
-        // back case
-        else
-        {
-            right = Pool->GetNext(right);
-            Pool->SetNext(left, mutation);
-        } 
-        
-        Pool->SetNext(mutation, right);
-    }
-
+    // update size
     SiteCount += segment.size();
-    IndexTable.resize(entry);
+
+    // update table
+    if (found.PoolIndex < IndexTable.size()-1)
+    {
+        IndexTable.resize(++found.PoolIndex);
+    }
 }
 
 
@@ -375,93 +216,38 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 void SegmentList::Remove(size_t index, size_t segmentSize)
 {
     auto found = Find(index);
-    auto left = found.PoolIndex;
-    auto leftOffset = index-found.Offset;
-    auto entry = ++found.Entry;
+    auto poolIndex = found.PoolIndex;
+    auto localIndex = index-found.Offset;
 
-    auto right = left;
-    auto rightOffset = leftOffset;
-
+    // update size
     SiteCount -= segmentSize;
 
     // loop until the whole segment is removed
     while(segmentSize)
     {
-        // move rightOffset of node 
-        if (Pool->GetSize(right)-rightOffset > segmentSize)
+        size_t removeSize = std::min(Pool.at(poolIndex).size()-localIndex, segmentSize);
+
+        // remove whole node
+        if (!localIndex && removeSize == Pool.at(poolIndex).size())
         {
-            if (Pool->Unique(right))
-            {
-                Pool->Remove(right, rightOffset, segmentSize);
-
-                if (left == right)
-                    right = Pool->GetNext(right);
-            }
-
-            else      
-            {
-                rightOffset = leftOffset+segmentSize;
-                if (left == right)
-                {
-                    if (leftOffset)
-                    {
-                        right = Pool->Copy(left);
-                        Pool->TruncateRight(left, leftOffset);
-                    }
-                    else
-                        left = Pool->GetPrev(left);
-                }
-                Pool->TruncateLeft(right, rightOffset);  
-            }          
-
-            segmentSize = 0;
+            Pool.erase(Pool.begin()+poolIndex);
         }
-
-        // remove part of node/whole node
-        else 
+        else
         {
-            // remove part of node
-            if (rightOffset)
-            {
-                auto removeSize = std::min((long)(Pool->GetSize(right)-rightOffset), (long)segmentSize);
-                
-                if (Pool->Unique(right))
-                    Pool->Remove(right, rightOffset, removeSize);
-
-                else
-                    Pool->TruncateRight(right, rightOffset);
-
-                segmentSize -= removeSize; 
-            }
-
-            // remove whole node
-            else
-            {
-                segmentSize -= Pool->GetSize(right);
-                Pool->Clear(right);
-            }
-
-            right = Pool->GetNext(right); 
-            rightOffset = 0;  
-            leftOffset = 0;         
-        } 
+            Pool.at(poolIndex).erase(Pool.at(poolIndex).begin()+localIndex, Pool.at(poolIndex).begin()+localIndex+removeSize);
+            poolIndex++;
+        }
+        
+        segmentSize -= removeSize;
+        localIndex = 0;
     }
 
-    // move left node if removed
-    if (!Pool->Allocated(left))
+    // update table
+    if (found.PoolIndex < IndexTable.size()-1)
     {
-        left = Pool->GetPrev(left);
-
-        // set new root if needed
-        if (!left)
-        {
-            Root = right;
-            IndexTable[0].second = (size_t)(right);
-        }
+        IndexTable.resize(++found.PoolIndex);
     }
         
-    Pool->SetNext(left, right);
-    IndexTable.resize(entry);
 }
 
 /** 
@@ -470,20 +256,23 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
 void SegmentList::Print()
 {
     // print index table
-    std::cout << CYAN;
+    std::cout << CYAN << "\nIndex Table:" << std::endl;;
     for (const auto &entry : IndexTable)
     {
-        std::cout << entry.first << ", " << entry.second << std::endl;
+        std::cout << entry << ",";
     }
 
-    std::cout << RESET << std::endl;
+    std::cout << "\n" << RESET << std::endl;
 
     
     // print segment list
-    size_t node = Root;
-    while (node)
+    for (const auto &segment : Pool)
     {
-        Pool->Print(node);
-        node = Pool->GetNext(node);
+        std::cout << "\nSegment" << std::endl;
+        for (const auto &site : segment)
+        {
+            std::cout << (int)site << ", ";
+        }
     }
+    std::cout << std::endl;
 }

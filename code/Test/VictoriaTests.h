@@ -165,7 +165,7 @@ namespace VictoriaTests
             genome->show();
 
         // assertions
-        for (size_t i(0); i < size; i++)
+        for (size_t i(4001); i < size; i++)
         {
             assert(*(genome->data(i, 1)) == (Byte)10);
         }
@@ -192,8 +192,10 @@ namespace VictoriaTests
             genome->show();
 
         // assertions
-        for (size_t i(0); i < size; i++)
+        for (size_t i(64999); i < size; i++)
         {
+            if (*(genome->data(i, 1)) != (Byte)10)
+                std::cout << i << std::endl;
             assert(*(genome->data(i, 1)) == (Byte)10);
         }
         assert(genome->size() == size);
@@ -474,7 +476,7 @@ namespace VictoriaTests
             genome->show();
 
         // assertions
-        for (size_t i(32); i < genome->size(); i++)
+        for (size_t i(0); i < genome->size(); i++)
         {
             if (i < 10)
                 assert(*(genome->data(i, 1)) == (Byte)10);
@@ -1284,6 +1286,8 @@ namespace VictoriaTests
             else if (i >= 3300 && i < 5300)
                 assert(*clone->data(i) == (Byte)(i-300));
 
+            if (*clone->data(i) != *forceClone->data(i))
+                std::cout << i << "\t" << (int)*clone->data(i) << "\t"  << (int)*forceClone->data(i) << std::endl;
             assert(*clone->data(i) == *forceClone->data(i));
         }
 

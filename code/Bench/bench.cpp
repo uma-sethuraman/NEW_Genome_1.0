@@ -15,6 +15,7 @@
 #include "GenomeLite.h"
 #include "TestGenome.h"
 #include "UmaGenome.h"
+#include "StephanieGenome.h"
 
 #include "benchUtilities.h"
 
@@ -24,7 +25,7 @@
 #include "catch.hpp"
 
 // Variables
-#define MutationRate 0.01     //< any mutation rate <= 0.02
+#define MutationRate 0.02     //< any mutation rate <= 0.02
 #define Size 250000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 ; 5,000 avaliable 
 
 typedef std::byte Byte;
@@ -52,11 +53,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Overwrites") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         for (const auto& site : mutations)
         {
@@ -68,11 +65,7 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
 
     BENCHMARK("Whole Genome Overwrite") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         genome->overwrite(0, std::vector<Byte>(Size, (Byte)0));
 
@@ -94,11 +87,7 @@ TEST_CASE("Insertion Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Insertion") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         for (const auto& site : mutations)
         {
@@ -123,11 +112,7 @@ TEST_CASE("Deletion Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Deletion") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         for (size_t i(0); i < mutations.size(); i++)
         {
@@ -152,11 +137,7 @@ TEST_CASE("Multi-Mutation Benchmarks", "[benchmark]")
 
     BENCHMARK("Random Multi-Mutation") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         for (size_t i(0); i < mutations.size(); i++)
         {
@@ -190,11 +171,7 @@ TEST_CASE("Resize Benchmarks", "[benchmark]")
 
     BENCHMARK("Resize") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         genome->resize(newSize);
 
@@ -209,11 +186,7 @@ TEST_CASE("Clone Construction Benchmarks", "[benchmark]")
     freopen(file.c_str(), "a", stdout);
 
     // Apply multi mutations to genome
-    AbstractGenome* genome;
-    if (typeid(GenomeType) == typeid(GenomeLite))
-        genome = new GenomeType(Size, MutationRate);
-    else
-        genome = new GenomeType(Size);
+    AbstractGenome* genome = new GenomeType(Size);
 
     for (size_t i(0); i < mutations.size(); i++)
     {
@@ -248,21 +221,21 @@ TEST_CASE("Clone Construction Benchmarks", "[benchmark]")
         }
     };
 
-    BENCHMARK("Force Clone Constructor") 
-    {        
-        std::vector<AbstractGenome*> children;
-        children.reserve(childNum);
+    // BENCHMARK("Force Clone Constructor") 
+    // {        
+    //     std::vector<AbstractGenome*> children;
+    //     children.reserve(childNum);
 
-        for (size_t i(0); i < childNum; ++i)
-        {
-            children.push_back(genome->clone(1));
-        }
+    //     for (size_t i(0); i < childNum; ++i)
+    //     {
+    //         children.push_back(genome->clone(1));
+    //     }
 
-        for (size_t i(0); i < childNum; i++)
-        {
-            delete children[i];
-        }
-    };
+    //     for (size_t i(0); i < childNum; i++)
+    //     {
+    //         delete children[i];
+    //     }
+    // };
 
     delete genome;
 }
@@ -281,11 +254,7 @@ TEST_CASE("Clone Mutation Benchmarks", "[benchmark]")
  
     BENCHMARK("Single Clone Mutation") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         AbstractGenome* child = genome->clone();
 
@@ -312,11 +281,7 @@ TEST_CASE("Clone Mutation Benchmarks", "[benchmark]")
 
     BENCHMARK("Multiple Clone Mutation") 
     {
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         std::vector<AbstractGenome*> children;
         children.reserve(childNum);
@@ -358,11 +323,7 @@ TEST_CASE("Clone Mutation Benchmarks", "[benchmark]")
         std::vector<AbstractGenome*> children;
         children.reserve(childNum+1);
 
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         children.push_back(genome);
 
@@ -401,17 +362,13 @@ TEST_CASE("Clone Mutation Benchmarks", "[benchmark]")
         delete children[0];
     };
 
-
+    /**
     BENCHMARK("Generation Clone Mutation, Force Copy") 
     {
         std::vector<AbstractGenome*> children;
         children.reserve(childNum+1);
 
-        AbstractGenome* genome;
-        if (typeid(GenomeType) == typeid(GenomeLite))
-            genome = new GenomeType(Size, MutationRate);
-        else
-            genome = new GenomeType(Size);
+        AbstractGenome* genome = new GenomeType(Size);
 
         children.push_back(genome);
 
@@ -448,10 +405,7 @@ TEST_CASE("Clone Mutation Benchmarks", "[benchmark]")
         }
 
         delete children[0];
-    };
-
-    
-
+    }; **/
 }
 
 

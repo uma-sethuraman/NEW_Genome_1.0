@@ -5,9 +5,9 @@
 
 #include "GenomeLite.h"
 
-GenomeLite::GenomeLite(size_t size, double mutationRate)
+GenomeLite::GenomeLite(size_t size)
 {
-    List = new SegmentList(size, mutationRate);
+    List = new SegmentList(size);
 }
 
 /**
@@ -16,13 +16,6 @@ GenomeLite::GenomeLite(size_t size, double mutationRate)
  **/
 AbstractGenome* GenomeLite::clone(bool forceCopy)
 {
-    if (forceCopy)
-    {
-        GenomeLite* newGenome = new GenomeLite();
-        newGenome->List = List->Reallocate();
-        return newGenome;
-    }
-
     return new GenomeLite(*this);
 }
 
@@ -65,13 +58,6 @@ void GenomeLite::overwrite(size_t index, const std::vector<std::byte>& segment)
         std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
         exit(1);
 	}
-
-    if (List->IsFull())
-    {
-        SegmentList* oldList = List;
-        List = oldList->Reallocate();
-        delete oldList;
-    }
         
     List->Overwrite(index, segment);
 }
@@ -88,13 +74,6 @@ void GenomeLite::insert(size_t index, const std::vector<std::byte>& segment)
         std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
         exit(1);
 	}
-
-    if (List->IsFull())
-    {
-        SegmentList* oldList = List;
-        List = oldList->Reallocate();
-        delete oldList;
-    }
         
     List->Insert(index, segment);
 }
@@ -111,13 +90,6 @@ void GenomeLite::remove(size_t index, size_t segmentSize)
         std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
         exit(1);
 	}
-
-    if (List->IsFull())
-    {
-        SegmentList* oldList = List;
-        List = oldList->Reallocate();
-        delete oldList;
-    }
 
     List->Remove(index, segmentSize);
 }
