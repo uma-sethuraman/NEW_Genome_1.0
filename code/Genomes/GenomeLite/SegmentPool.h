@@ -2,7 +2,7 @@
  * \file SegmentPool.h
  * \author Victoria Cao
  * 
- * \brief SegmentPool to localize all nodes for a SegmentTree
+ * \brief SegmentPool to localize all nodes for a SegmentList
  **/
 
 #pragma once

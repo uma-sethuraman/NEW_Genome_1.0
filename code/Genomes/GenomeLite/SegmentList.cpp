@@ -144,7 +144,7 @@ void SegmentList::Resize(size_t size)
 TableEntry SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
-    auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0))-IndexTable.begin();
+    auto entry = std::lower_bound(IndexTable.begin(), IndexTable.end(), std::make_pair<size_t, size_t>((size_t)index, 0)) - IndexTable.begin();
 
     if (entry >= IndexTable.size() || (IndexTable[entry].first != index && entry))
     {
