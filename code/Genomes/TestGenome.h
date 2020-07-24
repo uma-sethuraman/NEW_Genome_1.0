@@ -16,10 +16,19 @@ public:
 		std::cout << "done" << std::endl;
 	}
 
+	// copy constructor to copy sites vector
+	TestGenome(const TestGenome &genome) {
+		sites = genome.sites;
+	}
+
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
 	virtual size_t size() override;
 	virtual void resize(size_t new_size) override;
+
+	virtual AbstractGenome* clone(bool forceCopy = false) override {
+		return new TestGenome(*this);
+	}
 
 	virtual int initGeneSet(std::vector<GeneDefinition> geneInfo) override {
 		// geneInfo is a struct of GeneDefinition. Genome will localize the geneInfo and
