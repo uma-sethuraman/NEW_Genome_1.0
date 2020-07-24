@@ -45,10 +45,14 @@ private:
     size_t Root; ///< Root node of tree
 
     size_t SiteCount = 0;
+    size_t Page;
+    double MutationRate;
+
+    size_t CalculatePage(size_t size);
 
 public:
     SegmentList() = default;
-    SegmentList(size_t size);
+    SegmentList(size_t size, double mutationRate = 0.01);
     SegmentList(const SegmentList &List);
     SegmentList* Reallocate();
 

@@ -14,17 +14,28 @@
 #define RESET   "\033[0m"
 #define CYAN    "\033[36m"      /* Cyan */
 
-#define page 65000
-#define mutationRate 0.001 // mutation rate on page
+
+/** 
+ * Calculates approximate page size for largest SegmentNode
+ * \param size of genome
+ * \return page size
+ **/
+size_t SegmentList::CalculatePage(size_t size)
+{
+    if (size > 30000)
+        return 0.13*size;
+    else
+        return 4000;
+}
 
 /** 
  * Constructor 
  * \param size of new list
  **/
-SegmentList::SegmentList(size_t size)
-    : SiteCount(size)
+SegmentList::SegmentList(size_t size, double mutationRate)
+    : SiteCount(size), Page(CalculatePage(size)), MutationRate(mutationRate)
 {
-    size_t poolSize = std::max((size_t)10, (size_t)((size/page)+(page*mutationRate)));
+    size_t poolSize = std::max((size_t)10, (size_t)((size/Page)+(size*(MutationRate+0.005))));
     Pool = new SegmentPool(poolSize);
     IndexTable.reserve(poolSize);
 
@@ -35,7 +46,7 @@ SegmentList::SegmentList(size_t size)
     while(start < size)
     {
         // creates new node
-        size_t nodeSize = std::min((size_t)page, size - start);
+        size_t nodeSize = std::min((size_t)Page, size - start);
         size_t newNode = Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
 
         // updates root if at start 
@@ -58,9 +69,9 @@ SegmentList::SegmentList(size_t size)
  * \param list to copy from
  **/
 SegmentList::SegmentList(const SegmentList &list)
-    : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount) 
-{
-}
+    : Pool(new SegmentPool(*(list.Pool))), IndexTable(list.IndexTable), Root(list.Root), SiteCount(list.SiteCount)
+    , Page(list.Page), MutationRate(list.MutationRate) 
+{}
 
 
 /** 
@@ -69,21 +80,22 @@ SegmentList::SegmentList(const SegmentList &list)
  **/
 SegmentList* SegmentList::Reallocate()
 {
-    size_t oldNode = Root;
-    size_t oldOffset = 0;
-
+    // create new list
     SegmentList* newList = new SegmentList();
     newList->Pool = new SegmentPool(Pool->Capacity()*2);
     newList->IndexTable.reserve(Pool->Capacity()*2);
     newList->SiteCount = SiteCount;
+    Page = CalculatePage(SiteCount);
 
     size_t node = 0;
     size_t start = 0;
+    size_t oldNode = Root;
+    size_t oldOffset = 0;
 
     // copy until end of sites
     while(start < SiteCount)
     {
-        size_t nodeSize = std::min((size_t)page, SiteCount - start);
+        size_t nodeSize = std::min((size_t)Page, SiteCount - start);
         size_t newNode = newList->Pool->Allocate(std::make_shared< std::vector<Byte> >(nodeSize));
         if (start == 0)
             newList->Root = newNode;
@@ -92,10 +104,10 @@ SegmentList* SegmentList::Reallocate()
         size_t newlyAllocated = 0;
         newList->IndexTable.push_back( {(size_t)(start), (size_t)(newNode)} );   
 
-        // copying into node (limited to page size)
+        // copying into node (limited to Page size)
         while(newlyAllocated < nodeSize)
         {
-            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, page-newlyAllocated, SiteCount-start});
+            size_t moveSize = std::min({Pool->GetSize(oldNode)-oldOffset, Page-newlyAllocated, SiteCount-start});
 
             newList->Pool->Overwrite(newNode, newlyAllocated, Pool->GetData(oldNode, oldOffset), moveSize);
 
@@ -196,6 +208,7 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 
     size_t startIndex = 0;
 
+    // loop until overwrite is all written
     while(startIndex < segment.size())
     {
         // overwrite the node if current genome is only one with data
@@ -203,7 +216,6 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
         {
             size_t size = std::min((Pool->GetSize(left)-leftOffset), (segment.size()-startIndex));
    
-            auto ele = &(*segment.begin()); 
             Pool->Overwrite(left, leftOffset, segment, startIndex, size);
             startIndex += size;
             leftOffset = 0;
@@ -217,14 +229,15 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
             auto rightOffset = leftOffset;
             auto tempIndex = startIndex;
 
+            // find the end of overwrite or the next unique node
             while(startIndex < segment.size() && !Pool->Unique(right))
             {
-                // remove end 
+                // rest of overwrite fits within current node
                 if (startIndex + Pool->GetSize(right) - rightOffset > segment.size())
                 {
                     rightOffset = leftOffset + segment.size() - startIndex;
 
-                    if (left == right)
+                    if (left == right) // split if overwrite is only on this node
                     {
                         if (leftOffset)
                         {
@@ -248,12 +261,11 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
                         startIndex += Pool->GetSize(right)-rightOffset;
                         Pool->TruncateRight(right, rightOffset);
                     }
-
+                    // remove whole node
                     else
                     {
                         startIndex += Pool->GetSize(right);
                         Pool->Clear(right);
-                        
                     }
 
                     right = Pool->GetNext(right); 
@@ -268,7 +280,6 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
             if (!Pool->Allocated(left))
             {
                 left = Pool->GetPrev(left);
-
                 // set new root if needed
                 if (!left)
                 {
@@ -305,9 +316,7 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 
     // overwrite current genome
     if (Pool->Unique(left))
-    {
         Pool->Insert(left, leftOffset, segment);
-    }
 
     // insert in between segments
     else
@@ -325,7 +334,6 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
             Pool->TruncateLeft(right, leftOffset); 
 
             Pool->SetNext(left, mutation);
-
         }
 
         // front case
@@ -342,8 +350,6 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
                 Root = mutation;
                 IndexTable[0].second = (size_t)(Root);
             }
-
-
         }
 
         // back case
@@ -378,12 +384,12 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
 
     SiteCount -= segmentSize;
 
+    // loop until the whole segment is removed
     while(segmentSize)
     {
-        // move rightOffset
+        // move rightOffset of node 
         if (Pool->GetSize(right)-rightOffset > segmentSize)
         {
-            // cut 
             if (Pool->Unique(right))
             {
                 Pool->Remove(right, rightOffset, segmentSize);

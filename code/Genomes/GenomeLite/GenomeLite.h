@@ -30,7 +30,7 @@ public:
     GenomeLite() = default;
 
     /** size constructor **/
-    GenomeLite(size_t size);
+    GenomeLite(size_t size, double mutationRate = 0.01);
 
     /** size constructor **/
     GenomeLite(const GenomeLite &genome) 

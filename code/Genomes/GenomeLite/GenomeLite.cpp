@@ -5,9 +5,9 @@
 
 #include "GenomeLite.h"
 
-GenomeLite::GenomeLite(size_t size)
+GenomeLite::GenomeLite(size_t size, double mutationRate)
 {
-    List = new SegmentList(size);
+    List = new SegmentList(size, mutationRate);
 }
 
 /**
