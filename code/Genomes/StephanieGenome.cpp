@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <stdlib.h>
 
-//todo copy mutation
-//todo checking for out of bounds
 
 StephanieGenome::StephanieGenome(size_t _size) {
 	sites.resize(_size);
@@ -132,7 +130,6 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 			changelog.insert(std::pair<size_t, ChangelogStruct>(site, c));
 		}
 	}
-	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	//printChangelog();
@@ -140,66 +137,73 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 
 void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 	//std::cout << "=========== INSERT " << index << " " << segment.size() << " ============ " << std::endl;
+	//std::cout << "=========== SEGMENTS ";
+	bool insertFlag = false;
+	for (int i = 0; i < segment.size(); i++) {
+		//std::cout << (int)segment[i] << " ";
+	}
+	//std::cout << " ============ " << std::endl;
+	//printChangelog();
 	//if the mutation is within the genome size
 	if (index <= genomeSize) {
 		size_t indexCounter = index;
-		//loop through the sites that will be inserted
-		for (int i = 0; i < segment.size(); i++) {
-			//check if the site exists in the changelog
-			if (changelog.count(indexCounter)) {
-				//generate a vector of sites that will be shifted to the right
-				keys.clear();
-				std::map<size_t, ChangelogStruct>::iterator site = changelog.find(indexCounter);
-				for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
-					keys.push_back(it->first);
-				}
+		//generate a vector of sites that will be shifted to the right
+		std::map<size_t, ChangelogStruct>::iterator site;
+		if (changelog.count(indexCounter)) {
+			//std::cout << indexCounter << " exists in the changelog" << std::endl;
+			site = changelog.find(indexCounter);
+			insertFlag = true;
+		}
 
-				//shift sites in vector to the right
-				for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
-					auto keyIndex = *rit;
-					auto nh = changelog.extract(keyIndex);
-					keyIndex = keyIndex + (size_t)1;
-					nh.key() = keyIndex;
-					changelog.insert(move(nh));
-				}
-
-				//add in new site
-				ChangelogStruct c = ChangelogStruct();
-				c.value = segment[i];
-				c.insertOffset = 1;
-				c.removeOffset = 0;
-				changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
+		else {
+			//std::cout << indexCounter << " does not exist in the changelog" << std::endl;
+			if (!changelog.empty()) {
+				//std::cout << "\tchangelog is not empty" << std::endl;
 			}
-			//site does not exist in the changelog
-			else {
-				//add in new site
-				ChangelogStruct c = ChangelogStruct();
-				c.value = segment[i];
-				c.insertOffset = 1;
-				c.removeOffset = 0;
-				changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
-
-				//generate a vector of sites that will be shifted to the right
-				keys.clear();
-				std::map<size_t, ChangelogStruct>::iterator site = changelog.find(indexCounter);
-				for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
-					keys.push_back(it->first);
-				}
-				keys.erase(keys.begin());
-
-				//shift sites in vector to the right
-				for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
-					auto keyIndex = *rit;
-					auto nh = changelog.extract(keyIndex);
-					keyIndex = keyIndex + (size_t)1;
-					nh.key() = keyIndex;
-					changelog.insert(move(nh));
+			for (auto it = changelog.rbegin(); it != changelog.rend(); ++it) {
+				//std::cout << "\tit->first " << it->first << std::endl;
+				//std::cout << "\tchangelog size " << changelog.size() << std::endl;
+				if (it->first > indexCounter) {
+					//std::cout << "\tit->first " << it->first << std::endl;
+					site = changelog.find(it->first);
+					insertFlag = true;
 				}
 			}
+			//std::cout << "\texiting else case" << std::endl;
+		}
+
+		if (!changelog.empty() && insertFlag == true) {
+			keys.clear();
+			//std::cout << "sites affected: ";
+			for (std::map<size_t, ChangelogStruct>::iterator it = site; it != changelog.end(); ++it) {
+				//std::cout << it->first << " ";
+				keys.push_back(it->first);
+			}
+			//std::cout << std::endl;
+
+
+			//std::cout << "shifting sites to the right..." << std::endl;
+			//shift sites in vector to the right
+			for (auto rit = keys.rbegin(); rit != keys.rend(); ++rit) {
+				auto keyIndex = *rit;
+				auto nh = changelog.extract(keyIndex);
+				keyIndex = keyIndex + (size_t)segment.size();
+				nh.key() = keyIndex;
+				changelog.insert(move(nh));
+			}
+		}
+
+		//std::cout << "adding in new sites..." << std::endl;
+		for (size_t i = 0; i < segment.size(); i++) {
+			//add in new site
+			ChangelogStruct c = ChangelogStruct();
+			c.value = segment[i];
+			c.insertOffset = 1;
+			c.removeOffset = 0;
+			changelog.insert(std::pair<size_t, ChangelogStruct>(indexCounter, c));
 			indexCounter++;
 		}
 	}
-	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	genomeSize += segment.size();
@@ -415,18 +419,19 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 		}
 		genomeSize -= segmentSize;
 	}
-	else { std::cout << "issa nono " << std::endl; }
 	mutationFlag = true;
 	genomeGenerated = false;
 	//printChangelog();
 }
 
 void StephanieGenome::show() {
+	//std::cout << "=========== SHOW ============ " << std::endl;
+	//printChangelog();
 	for (int index = 0; index < genomeSize; index++) {
 		std::byte& num = GN::genomeRead<std::byte>(this, index);
-		//std::cout << (int)num << " ";
+		std::cout << (int)num << " ";
 	}
-	//std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 void StephanieGenome::generateNewGenome() {
