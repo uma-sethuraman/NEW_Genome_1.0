@@ -16,15 +16,12 @@ StephanieGenome::StephanieGenome(size_t _size) {
 
 std::byte* StephanieGenome::data(size_t index, size_t byteSize) {
 	if (!mutationFlag) {
-		//std::cout << "no mutations" << std::endl;
-		return static_cast<std::byte*>(&sites[index]); // cast is for demonstration
+		return static_cast<std::byte*>(&sites[index]);
 	}
 	else if (genomeGenerated == true) {
-		//std::cout << "mutations yes and genome has already been generated" << std::endl;
 		return static_cast<std::byte*>(&modifiedSites[index]);
 	}
 	else {
-		//std::cout << "BRAND NEW BABY" << std::endl;
 		generateNewGenome();
 		genomeGenerated = true;
 		return static_cast<std::byte*>(&modifiedSites[index]);
@@ -39,6 +36,24 @@ void StephanieGenome::resize(size_t new_size) {
 	sites.resize(new_size);
 	genomeSize = new_size;
 };
+
+/* Returns a clone of the current genome.
+   If forceCopy is true, then it resets the "parent" genome of the clone
+   to the actual current genome. If forceCopy is false, it directly clones
+   the current genome, leaving the "parent", changelog, and offset map the same
+   in the clone. */
+AbstractGenome* StephanieGenome::clone(bool forceCopy) {
+	if (forceCopy) {
+		AbstractGenome* genomeClone = new StephanieGenome(genomeSize);
+		generateNewGenome();
+		(static_cast<StephanieGenome*>(genomeClone))->sites = modifiedSites;
+		return genomeClone;
+	}
+	else {
+		return new StephanieGenome(*this);
+	}
+}
+
 
 void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
 	//std::cout << "=========== OVERWRITE " << index << " " << segment.size() << " ============ " << std::endl;
@@ -128,7 +143,7 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 }
 
 void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment) {
-	////std::cout << "=========== INSERT " << index << " " << segment.size() << " ============ " << std::endl;
+	//std::cout << "=========== INSERT " << index << " " << segment.size() << " ============ " << std::endl;
 	//if the mutation is within the genome size
 	if (index <= genomeSize) {
 		size_t indexCounter = index;
@@ -228,14 +243,14 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 
 				//get vector of sites affected
 				keys.clear();
-				//std::cout << "\tvector of sites affected: ";
+				////std::cout << "\tvector of sites affected: ";
 				for (size_t i = index + 1; i < genomeSize; i++) {
 					if (changelog.count(i)) {
-						//std::cout << i << " ";
+						////std::cout << i << " ";
 						keys.push_back(i);
 					}
 				}
-				//std::cout << std::endl;
+				////std::cout << std::endl;
 
 				//shift sites in vector to the left by segmentSize
 				for (auto it = keys.begin(); it != keys.end(); ++it) {
@@ -245,16 +260,10 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 					nh.key() = keyIndex;
 					changelog.insert(move(nh));
 				}
+				//std::cout << segmentCheck << std::endl;
 
-				if (segmentCheck != 0) {
-					//add in new site with segmentSize removeOffset
-					ChangelogStruct c = ChangelogStruct();
-					c.removeOffset = segmentSize;
-					c.insertOffset = 0;
-					c.value = (std::byte)0;
-					changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
-				}
-				else {
+				if (segmentCheck == 0 && segmentSize > 1) {
+					//std::cout << "ooooveerrrr here" << std::endl;
 					size_t lastKeyIndex = keys.size() - 1;
 					size_t changelogIndex = keys[lastKeyIndex];
 					changelogIndex = changelogIndex - segmentSize + 1;
@@ -264,21 +273,33 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 					c.value = (std::byte)0;
 					changelog.insert(std::pair<size_t, ChangelogStruct>(changelogIndex, c));
 				}
+				//else if (segmentCheck != 0) {
+				else {
+					//std::cout << "in here" << std::endl;
+					//add in new site with segmentSize removeOffset
+					ChangelogStruct c = ChangelogStruct();
+					c.removeOffset = segmentSize;
+					c.insertOffset = 0;
+					c.value = (std::byte)0;
+					changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
+				}
 			}
 
 			//sites affected contain insert mutations 
 			else if (removeOffset == 0 && insertOffset > 0) {
+				//std::cout << "sites affected contain insert mutations" << std::endl;
 				//newSegmentSize = segmentSize
 				size_t newSegmentSize = segmentSize;
 				//loop through sites affected vector
 				for (auto siteAffected : keys) {
 					//subtract newSegmentSize by the insertOffset for each site 
+					newSegmentSize--;
 					changelog.erase(siteAffected);
 				}
-
+				//std::cout << "newSegmentSize " << newSegmentSize << std::endl;
 				//get vector of sites affected
 				keys.clear();
-				//std::cout << "\tvector of sites affected: ";
+				////std::cout << "\tvector of sites affected: ";
 				for (size_t i = index + 1; i < genomeSize; i++) {
 					if (changelog.count(i)) {
 						//std::cout << i << " ";
@@ -294,6 +315,15 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 					keyIndex = keyIndex - (size_t)segmentSize;
 					nh.key() = keyIndex;
 					changelog.insert(move(nh));
+				}
+
+				if (newSegmentSize != 0 && !changelog.count(index)) {
+					ChangelogStruct c = ChangelogStruct();
+					c.removeOffset = newSegmentSize;
+					c.insertOffset = 0;
+					c.value = (std::byte)0;
+					changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
+
 				}
 			}
 
@@ -337,9 +367,10 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			size_t modifiedSegmentSize = 0;
 			for (auto siteAffected : keys) {
 				if (changelog[siteAffected].insertOffset > 0) modifiedSegmentSize += changelog[siteAffected].insertOffset;
-				changelog.erase(siteAffected);
+				if (changelog[siteAffected].removeOffset == 0) {
+					changelog.erase(siteAffected);
+				}
 			}
-
 			//update the segmentSize of the remove mutation
 			changelog[index].removeOffset = segmentSize - modifiedSegmentSize;
 
@@ -347,7 +378,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			keys.clear();
 			//std::cout << "\tvector of sites affected: ";
 			for (size_t i = index + 1; i < genomeSize; i++) {
-				if (changelog.count(i)) {
+				if (changelog.count(i) && changelog[i].removeOffset == 0) {
 					//std::cout << i << " ";
 					keys.push_back(i);
 				}
@@ -377,7 +408,13 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 					changelog.insert(move(nh));
 				}
 			}
+			for (size_t i = index + 1; i <= index + changelog[index].removeOffset; i++) {
+				if (changelog.count(i) && changelog[i].removeOffset > 0) {
+					changelog[index].removeOffset += changelog[i].removeOffset;
+					changelog.erase(i);
+				}
 
+			}
 		}
 		genomeSize -= segmentSize;
 	}
@@ -389,9 +426,9 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 void StephanieGenome::show() {
 	for (int index = 0; index < genomeSize; index++) {
 		std::byte& num = GN::genomeRead<std::byte>(this, index);
-		std::cout << (int)num << " ";
+		//std::cout << (int)num << " ";
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
 }
 
 void StephanieGenome::generateNewGenome() {

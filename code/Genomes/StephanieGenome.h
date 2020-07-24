@@ -28,11 +28,21 @@ public:
 		//std::cout << "\ndone" << std::endl;
 	}
 
+	StephanieGenome(const StephanieGenome& genome) {
+		sites = genome.sites;
+		changelog = genome.changelog;
+		modifiedSites = genome.modifiedSites;
+		genomeSize = genome.genomeSize;
+	}
+
+
 	std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
 	virtual size_t size() override;
 
 	virtual void resize(size_t new_size) override;
+
+	virtual AbstractGenome* clone(bool forceCopy = false) override;
 
 	virtual void overwrite(size_t index, const std::vector<std::byte>& segment);
 
