@@ -207,13 +207,7 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
 }
 
 void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
-    
-    std::cout << "--- insert --- " << std::endl;
-    std::cout << "at index: " << index << ", segment of size: " << segment.size() << std::endl;
-    
-    
 
-    
     if (index > genomeSize) {
         std::cout << "index is out of genome's bounds! exiting..." << std::endl;
         exit(1);
@@ -225,286 +219,202 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     auto next_key = change_log.upper_bound(index); // can be end()
     auto lb_key = change_log.lower_bound(index); // can be end()
     auto prev_key = std::prev(change_log.upper_bound(index)); // always valid, as change_log.size() >= 1
-    
-    
-    
-    if (index == 142681) {
-        std::cout << "+++++ change_log: +++++" << std::endl;
-        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-            std::cout << it->first << " : " <<
-            it->second.first << " : " << it->second.second << std::endl;
-        }
-        std::cout << "+++++ segments_log: +++++:" << std::endl;
-        std::cout << "segments_log.empty(): " << segments_log.empty() << std::endl;
         
-        for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
-            std::cout << it->first << " : ";
-            for (auto v : it->second) {
-                std::cout << (int)v << " ";
-            }
-            std::cout << std::endl;
-        }
-        
-        std::cout << "next_key: " << next_key->first << ": " << next_key->second.first << ", " << next_key->second.second << std::endl;
-        std::cout << "lb_key: " << lb_key->first << ": " << lb_key->second.first << ", " << lb_key->second.second << std::endl;
-        std::cout << "prev_key: " << prev_key->first << ": " << prev_key->second.first << ", " << prev_key->second.second << std::endl;
-        
-        
-        //exit(1);
-    }
-    
-    
-    
-    
     if (lb_key == change_log.end()) {
         // the last key will always be false, so if there nothing <= than index: just add index to both maps
+        // and add shift of the segment size to teh change_log map
         
         // update change_log
         change_log.insert({{index, {0, true}}});
-        //change_log.insert({{index + segmentSize, {segmentSize, false}}});
         change_log.insert({{index + segmentSize, {prev_key->second.first + segmentSize, false}}});
 
         // update segments_log
-        //if (segments_log.find(index) != segments_log.end()) {
-            segments_log.insert({{index, segment}});
-        //} else {
-        //    std::cout << "1: SEGMENTS MAP IS WRONG!" << std::endl;
-        //}
+        segments_log.insert({{index, segment}});
                 
         return;
     }
     
-//    if (next_key == change_log.end()) {
-//        // next_key will only be end() if
-//        // lb_key is also end() - took care of this case before
-//        // lb_key is not end(): this means that ind is the last key in the map => last key in the map will always be false, so this will be taken care of in the "else" condition
-//    }
-    
+    // Temporary maps that will be updated
+    // Need to use temporary maps, because as I iterate through map to update it,
+    // the iterators become invalid
     std::map<int, std::pair<int, bool>> change_log_temp;
     std::unordered_map<int, std::vector<std::byte>> segments_log_temp;
 
-    if (prev_key->second.second == true) {
-        std::cout << "if: " << std::endl;
+    
+    
+    
+    
+    if (prev_key->second.second == true) { // prev_key == lb_key is key == index
         
-        // update change_log
-        for (auto it = change_log.begin(); it != std::next(prev_key); ++it) {
+        // Keys before insertion
+        for (auto it = change_log.begin(); it != std::next(prev_key); ++it) { // lb_key instead of std::next(prev_key)?
+            // update change_log
             change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-        }
-        // update segments_log
-        for (auto it = change_log.begin(); it != std::next(prev_key); ++it) {
+            
+            // update segments_log
             if (it->second.second == true) {
                 segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
             }
         }
-            
-        // update change_log
+        
+        // Keys after insertion
         for (auto it = std::next(prev_key); it != change_log.end(); ++it) {
+            // update change_log
             int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
             change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val/*it->second.first + segmentSize*/, it->second.second))); // Jul 22
-        }
-        
-        // update segments_log
-        for (auto it = std::next(prev_key); it != change_log.end(); ++it) {
+            
+            // update segments_log
             if (it->second.second == true) {
                 segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
             }
         }
+
+        segments_log = segments_log_temp; // Could this be replaced by iterating backwards?
         
-        segments_log = segments_log_temp;
-        
+        // Insertion itself
+        // No need to add index to change_log, because index will be merged with prev key
         // update segments_log
+        // Because prev_key is insertion, we don't insert index directly, but instead merge the segments
         auto it_to_merge = segments_log.find(prev_key->first); // find is O(1) here
         std::vector<std::byte> segm_to_merge;
         if (it_to_merge != segments_log.end()) {
             segm_to_merge = it_to_merge->second;
-            segm_to_merge.insert(segm_to_merge.begin() + (index - prev_key->first), segment.begin(), segment.end());
-            // TODO: what is segm_to_merge.begin() + (ind - prev_key->first) is our of range?
+            segm_to_merge.insert(segm_to_merge.begin() + (index - prev_key->first), segment.begin(), segment.end()); // this is slow for small vectors
+            // what is segm_to_merge.begin() + (index - prev_key->first) is our of range? -> should not happen for correct maps
             it_to_merge->second = segm_to_merge; // replace with merged segment in segments_log
         } else {
             // should not happen, because prev_key->second.second == true
-            std::cout << "2 SEGMENTS MAP IS WRONG!" << std::endl;
+            std::cout << "SEGMENTS MAP IS WRONG!" << std::endl;
         }
         
-        
-        
-        
-    } else if (next_key != change_log.end() && next_key->second.second == true) {
-//        std::cout << "else if: " << std::endl;
-//        std::cout << "next_key: " << next_key->first << ": " << next_key->second.first << ", " << next_key->second.second << std::endl;
-//        std::cout << "lb_key: " << lb_key->first << ": " << lb_key->second.first << ", " << lb_key->second.second << std::endl;
-//        std::cout << "prev_key: " << prev_key->first << ": " << prev_key->second.first << ", " << prev_key->second.second << std::endl;
+    } else { //if (next_key != change_log.end() && next_key->second.second == true) {
 
-        if (lb_key->first != index) {
+        //if (lb_key->first != index) { // always the case, lb_key->first == index is is "if"
 
-            // update change_log
+            // Before index
             for (auto it = change_log.begin(); it != lb_key; ++it) { // why prev_key and not lb_key?
-
                 change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-            }
-//            std::cout << "first part of change log updated" << std::endl;
-            for (auto it = next_key; it != change_log.end(); ++it) {
-                // TODO: Jul 22, it = next_key or it = lb_key?
-                int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
-
-                change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
-
-                
-//                // update segments_log
-//                if (it->second.second == true) {
-//                    if (segments_log.find(it->first) != segments_log.end()) {
-//                        auto key_to_shift = segments_log.extract(it->first);
-//                        key_to_shift.key() = it->first + segmentSize;
-//                        if (segments_log.find(it->first + segmentSize) != segments_log.end()) {
-//                            std::cout << "1 THIS KEY ALREADY EXISTS IN THE SEGMENTS MAP!" << std::endl;
-//                        }
-//                        segments_log.insert(move(key_to_shift));
-//                    } else {
-//                        std::cout << "3 SEGMENTS MAP IS WRONG!: " << std::endl;
-//                    }
-//
-//                }
-            }
-//            std::cout << "second part of change log updated" << std::endl;
-
-            
-            for (auto it = change_log.begin(); it != lb_key; ++it) { // why prev_key and not lb_key?
-//                std::cout << "it->first " << it->first << std::endl;
                 if (it->second.second == true) {
                     segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
                 }
             }
-//            std::cout << "first part of segments log updated" << std::endl;
 
-            for (auto it = next_key; it != change_log.end(); ++it) {
-                // update segments_log
-                if (it->second.second == true) {
-                    if (segments_log.find(it->first) != segments_log.end()) {
-                        if (segments_log_temp.find(it->first + segmentSize) != segments_log_temp.end()) {
-                            std::cout << "1 THIS KEY ALREADY EXISTS IN THE SEGMENTS MAP!" << std::endl;
-                        }
-                        segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
-                    } else {
-                        std::cout << "3 SEGMENTS MAP IS WRONG!: " << std::endl;
-                    }
-                }
-            }
-//            std::cout << "second part of segments log updated" << std::endl;
-
-
-            change_log_temp[index] = {0, true}; // want to replace if exists
-
-
-            change_log_temp.insert({{index + segmentSize, {prev_key->second.first + segmentSize, false}}});
-
-
-            // update segments_log
-            //if (segments_log.find(index) != segments_log.end()) {
-                segments_log_temp.insert({{index, segment}});
-            //} else {
-            //    std::cout << "SEGMENTS MAP IS WRONG!: " << std::endl;
-            //}
-            
-            segments_log = segments_log_temp;
-        } else { // lb_key->first == index
-
-            // update change_log
-            for (auto it = change_log.begin(); it != lb_key; ++it) { // is lb_key==prev_key always?
-
-                change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-                
-            }
-            for (auto it = lb_key; it != change_log.end(); ++it) {
-                
+            // After index
+            for (auto it = next_key; it != change_log.end(); ++it) { // next_key == lb_key when lb_key->first != index; always true?
                 int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
                 change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
                 
                 // update segments_log
                 if (it->second.second == true) {
-                    if (segments_log.find(it->first) != segments_log.end()) {
-                        auto key_to_shift = segments_log.extract(it->first);
-                        key_to_shift.key() = it->first + segmentSize;
-                        if (segments_log.find(it->first + segmentSize) != segments_log.end()) {
-                            std::cout << "2 THIS KEY ALREADY EXISTS IN THE SEGMENTS MAP!" << std::endl;
-                        }
-                        segments_log.insert(move(key_to_shift));
-                    } else {
-                        std::cout << "4 SEGMENTS MAP IS WRONG!: " << std::endl;
-                    }
+                    segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
                 }
             }
-            
-            change_log_temp[index] = {0, true}; // want to replace if exists
-            
-            // update segments_log
-            //if (segments_log.find(index) != segments_log.end()) {
-                segments_log.insert({{index, segment}});
-            //} else {
-            //    std::cout << "SEGMENTS MAP IS WRONG!: " << std::endl;
-            //}
-            
-        }
-    } else {
-        std::cout << "else: " << std::endl;
 
-        // no insertions before nor after ind
-        // also takes care of "next_key == change_log.end()"
-        
-        // update change_log
-        for (auto it = change_log.begin(); it != lb_key; ++it) {
-            change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
-        }
-        for (auto it = lb_key; it != change_log.end(); ++it) {
-            int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
-            change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
+            change_log_temp[index] = {0, true}; // want to replace if exists
+            //change_log_temp.insert({{index + segmentSize, {prev_key->second.first + segmentSize, false}}});
+            change_log_temp[index + segmentSize] = {prev_key->second.first + segmentSize, false};
+
+            segments_log_temp.insert({{index, segment}});
             
-            // update segments_log
-            if (it->second.second == true) {
-                if (segments_log.find(it->first) != segments_log.end()) {
-                    auto key_to_shift = segments_log.extract(it->first);
-                    key_to_shift.key() = it->first + segmentSize;
-                    if (segments_log.find(it->first + segmentSize) != segments_log.end()) {
-                        std::cout << "3 THIS KEY ALREADY EXISTS IN THE SEGMENTS MAP!" << std::endl;
-                    }
-                    segments_log.insert(move(key_to_shift));
-                } else {
-                    std::cout << "SEGMENTS MAP IS WRONG!: " << std::endl;
-                }
-            }
-        }
-        change_log_temp.insert(std::make_pair(index, std::make_pair(0, true)));
+            // in this situation wto inserted segments will never have to merge
+
+            segments_log = segments_log_temp;
         
-        // also add shift just after insertion, e.g. "Insert(2, {1})" on slides
-        if ((index + segmentSize) <= next_key->first) { //next_key == end() already checked
-            change_log_temp[index + segmentSize] = {segmentSize, false};
-        }
         
-        // update segments_log
-        //if (segments_log.find(index) != segments_log.end()) {
-            segments_log.insert(std::make_pair(index, segment));
-        //} else {
-        //    std::cout << "SEGMENTS MAP IS WRONG!: " << std::endl;
-        //}
+            
+       // }
+        
+        // Seems like the following part is taken care for if "if"
+//        else { // lb_key->first == index && next_key->second.second == true; lb_key == next_key when key exists in the map
+//
+//            // Before index
+//            for (auto it = change_log.begin(); it != next_key; ++it) { // Jul 23: next_key instead of lb_key
+//                change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
+//                if (it->second.second == true) {
+//                    segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
+//                }
+//            }
+//            // After index
+//            for (auto it = next_key; it != change_log.end(); ++it) {
+//                int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
+//                change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
+//
+//                // update segments_log
+//                if (it->second.second == true) {
+//                    segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
+//                }
+//            }
+//
+//            //change_log_temp[index] = {0, true}; // want to replace if exists
+//
+//            segments_log = segments_log_temp;
+//        }
+        
     }
     
     
-    change_log = change_log_temp; // is this constant time?
     
-    // Merge any insertions that are one after another
-    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-        if (it->second.second == true) {
-            if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
-                auto next_it = std::next(it);
-                std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
-                std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
-                segm_merged.insert(segm_merged.end(), segm_to_merge.begin(), segm_to_merge.end());
-                segments_log.find(it->first)->second = segm_merged; // rempace in segments_log
-                
-                int to_erase = next_it->first;
-                change_log.erase(to_erase);
-                segments_log.erase(to_erase);
-            }
-        }
-    }
+    // The following part is the same as if (next_key != change_log.end() && next_key->second.second == true)
+    // Because when we insert index, the keys above it will be moved to the right, we just need to move them and not care if they are true or false
+    
+    
+//    else {
+//
+//        // no insertions before nor after ind
+//        // also takes care of "next_key == change_log.end()"
+//
+//        // Before index
+//        for (auto it = change_log.begin(); it != lb_key; ++it) {
+//            change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
+//            if (it->second.second == true) {
+//                segments_log_temp.insert({{it->first, segments_log.find(it->first)->second}});
+//            }
+//        }
+//
+//        // After index
+//        for (auto it = lb_key; it != change_log.end(); ++it) {
+//            int updated_val = (it->second.second == true) ? 0 : (it->second.first + segmentSize);
+//            change_log_temp.insert(std::make_pair(it->first + segmentSize, std::make_pair(updated_val, it->second.second)));
+//
+//            // update segments_log
+//            if (it->second.second == true) {
+//                segments_log_temp.insert({{it->first + segmentSize, segments_log.find(it->first)->second}});
+//            }
+//        }
+//
+//
+//        change_log_temp.insert(std::make_pair(index, std::make_pair(0, true)));
+//
+//        // also add shift just after insertion, e.g. "Insert(2, {1})" on slides
+////        if ((index + segmentSize) <= next_key->first) { //next_key == end() already checked
+////            change_log_temp[index + segmentSize] = {segmentSize, false};
+////        }
+//        change_log_temp[index + segmentSize] = {prev_key->second.first + segmentSize, false}; // [] are not really necessary, it should be there yet
+//
+//        segments_log_temp.insert({{index, segment}});
+//
+//        segments_log = segments_log_temp;
+//    }
+    
+    
+    change_log = change_log_temp; // is this constant time? would std::move make it constant time?
+    
+//    // Merge any insertions that are one after another
+//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//        if (it->second.second == true) {
+//            if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
+//                auto next_it = std::next(it);
+//                std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
+//                std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
+//                segm_merged.insert(segm_merged.end(), segm_to_merge.begin(), segm_to_merge.end());
+//                segments_log.find(it->first)->second = segm_merged; // rempace in segments_log
+//
+//                int to_erase = next_it->first;
+//                change_log.erase(to_erase);
+//                segments_log.erase(to_erase);
+//            }
+//        }
+//    }
     
 //    std::cout << "+++++ change_log: +++++" << std::endl;
 //    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
