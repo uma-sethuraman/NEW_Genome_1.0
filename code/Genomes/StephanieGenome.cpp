@@ -342,6 +342,7 @@ void StephanieGenome::show() {
 	std::cout << std::endl;
 }
 
+// Adds site at index to changelog
 void StephanieGenome::addToChangelog(size_t index, size_t insert, size_t remove, std::byte value) {
 	ChangelogStruct c = ChangelogStruct();
 	c.insertOffset = insert;
@@ -350,6 +351,7 @@ void StephanieGenome::addToChangelog(size_t index, size_t insert, size_t remove,
 	changelog.insert(std::pair<size_t, ChangelogStruct>(index, c));
 }
 
+// Generates an offspring genome from the parent genome and changelog
 void StephanieGenome::generateNewGenome() {
 	modifiedSites.resize(genomeSize);
 	int offset = 0;
@@ -388,6 +390,7 @@ void StephanieGenome::generateNewGenome() {
 	//std::cout << std::endl;
 }
 
+// Prints changelog
 void StephanieGenome::printChangelog() {
 	std::cout << "\n--- start of map ---" << std::endl;
 	for (auto site : changelog) {
@@ -403,6 +406,7 @@ void StephanieGenome::printChangelog() {
 	std::cout << "--- end of map ---" << std::endl << std::endl;
 }
 
+// Shifts changelog left or right based on offset and sites affected
 void StephanieGenome::shiftChangelog(bool shiftLeft, std::vector<size_t>& sitesAffected, size_t offset) {
 	// Shift sites left
 	if (shiftLeft) {
