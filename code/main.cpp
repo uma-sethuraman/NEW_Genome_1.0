@@ -398,11 +398,73 @@ int main(int argc, char* argv[]) {
 //    return 0;
 
         std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-        runUmaChangelogTests<TetianaGenome>(0);
+        runUmaChangelogTests<TetianaGenome>(1);
         std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-
+//
         int result = Catch::Session().run(argc, argv);
         return result;
+    
+//    // original genome: 4 3 2 0 1 2 4 3 1 0
+//    std::cout << "will create genome" << std::endl;
+//
+//
+//
+//    AbstractGenome* genome = new TetianaGenome(10);
+//
+//    std::cout << "genome ready" << std::endl;
+//    std::cout << "genome size: " << genome->size() << std::endl;
+//    std::cout << "start filling genome with values" << std::endl;
+//
+//    GN::genomeWrite<std::byte>(genome, 0, (std::byte)4);
+//    GN::genomeWrite<std::byte>(genome, 1, (std::byte)3);
+//    GN::genomeWrite<std::byte>(genome, 2, (std::byte)2);
+//    GN::genomeWrite<std::byte>(genome, 3, (std::byte)0);
+//    GN::genomeWrite<std::byte>(genome, 4, (std::byte)1);
+//    GN::genomeWrite<std::byte>(genome, 5, (std::byte)2);
+//    GN::genomeWrite<std::byte>(genome, 6, (std::byte)4);
+//    GN::genomeWrite<std::byte>(genome, 7, (std::byte)3);
+//    GN::genomeWrite<std::byte>(genome, 8, (std::byte)1);
+//    GN::genomeWrite<std::byte>(genome, 9, (std::byte)0);
+//
+//    std::cout << "genome filled" << std::endl;
+//    std::cout << "genome size: " << genome->size() << std::endl;
+
+    
+//    std::cout << "----------------------------------------" << std::endl;
+//    std::cout << "ORIGINAL GENOME: ";
+//    genome->show();
+//    std::cout << std::endl;
+//
+//    // point mutation - change position 1's value to 4
+//    genome->overwrite(1, std::vector<std::byte>({(std::byte)(4)}));
+//
+//    // point mutation - change position 7's value to  2
+//    genome->overwrite(7, std::vector<std::byte>({(std::byte)(2)}));
+//
+//    // point mutation - change position 3's value to 4
+//    genome->overwrite(3, std::vector<std::byte>({(std::byte)(4)}));
+//
+//    /* original genome: 4 3 2 0 1 2 4 3 1 0
+//     after mutation 1: 4 4 2 0 1 2 4 3 1 0
+//     after mutation 2: 4 4 2 0 1 2 4 2 1 0
+//     after mutation 3: 4 4 2 4 1 2 4 2 1 0
+//     current genome: 4 4 2 4 1 2 4 2 1 0 */
+//
+//    std::cout << "CURRENT GENOME: ";
+//    genome->show();
+//    std::cout << std::endl;
+//
+//    // correct answer: 4 4 2 4 1 2 4 2 1 0
+//    std::vector<std::byte> answer{(std::byte)4,(std::byte)4,(std::byte)2,
+//        (std::byte)4,(std::byte)1,(std::byte)2,
+//        (std::byte)4,(std::byte)2,(std::byte)1,
+//        (std::byte)0};
+//
+//    printResults(answer, genome, "Point Test 1: ");
+//
+//    delete genome;
+//
+    
 }
 
 

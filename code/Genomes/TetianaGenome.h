@@ -12,7 +12,8 @@ class TetianaGenome : public AbstractGenome {
 private:
     std::vector<std::byte> sites;
     
-    std::map<int, std::pair<int, bool>> change_log{{0, {0, false}}}; // {index, {shift, insertion?}}
+    // Is it ok to initialize the
+    std::map<int, std::pair<int, bool>> change_log; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
     
     size_t genomeSize;
@@ -25,6 +26,9 @@ public:
     
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
     
+    int get_ind(int ind_curr);
+    std::byte val_at_index(int ind_curr);
+
     virtual void resize(size_t new_size) override;
     
     virtual AbstractGenome* clone(bool forceCopy = false) override;
@@ -46,7 +50,6 @@ public:
         return(geneMap);
     }
     
-    int get_ind(int ind_curr);
 
     
     // starting at index, write values in segement over values currently in genome
@@ -59,7 +62,7 @@ public:
     virtual void remove(size_t index, size_t segmentSize) override;
     
     
-    std::vector<std::byte> offspring_recon();
+    std::vector<std::byte> offspring_recon(size_t index, size_t byteSize);
     
     // print the whole genome
     virtual void show() override;
