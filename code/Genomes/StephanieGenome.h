@@ -9,17 +9,16 @@
 class StephanieGenome : public AbstractGenome {
 private:
 	struct ChangelogStruct {
-		std::byte value;
 		size_t insertOffset;
 		size_t removeOffset;
+		std::byte value;
 	};
-	bool mutationFlag = false;
 	bool genomeGenerated = false;
+	bool mutationFlag = false;
 	size_t genomeSize;
 	std::map<size_t, ChangelogStruct> changelog;
+	std::vector<std::byte> modifiedSites;
 	std::vector<std::byte> sites;
-	std::vector<std::byte> modifiedSites; //added
-	std::vector<size_t> keys; //TODO: check if this is needed?
 
 public:
 	StephanieGenome(size_t _size);
@@ -71,8 +70,10 @@ public:
 
 	void generateNewGenome();
 
-	void shiftChangelogLeft();
+	void addToChangelog(size_t index, size_t insert, size_t remove, std::byte value);
 
 	void printChangelog();
+
+	void shiftChangelog(bool shiftLeft, std::vector<size_t>& sitesAffected, size_t offset);
 
 };

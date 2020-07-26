@@ -2089,13 +2089,13 @@ void stressTest1(bool debug) {
 
     // point mutation - change position 4000's value to 95
     genome->overwrite(4000, std::vector<std::byte>({(std::byte)(95)}));
-
+  
     // point mutation - change position 5000's value to 105
     genome->overwrite(5000, std::vector<std::byte>({(std::byte)(105)}));
-
+        
     // point mutation - change position 6000's value to 205
     genome->overwrite(6000, std::vector<std::byte>({(std::byte)(205)}));
-
+        
     // point mutation - change position 70000's value to 15
     genome->overwrite(70000, std::vector<std::byte>({(std::byte)(15)}));
 

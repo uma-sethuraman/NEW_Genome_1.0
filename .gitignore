@@ -1,3 +1,10 @@
 # files that are re-generated for every build
 code/Genomes/libgenomes.a
-code/test
+# code/test
+
+# IDE files
+.vscode/
+
+code/build/test
+code/build/bench
+code/build/logs/*
