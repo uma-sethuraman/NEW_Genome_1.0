@@ -33,9 +33,17 @@ std::byte* TetianaGenome::data(size_t index, size_t byteSize) {
     std::vector<std::byte> offspring_sites = offspring_recon(index, byteSize);
     std::byte* offspring_sites_heap = new std::byte[offspring_sites.size()];
     offspring_sites_heap = offspring_sites.data();
-    //    for (int i = 0; i < offspring_sites.size(); ++i) {
-    //        offspring_sites_heap[i] = offspring_sites[i];
-    //    }
+    
+    for (int i = 0; i < offspring_sites.size(); ++i) {
+        offspring_sites_heap[i] = offspring_sites[i];
+    }
+    
+//    std::cout << "offspring_sites_heap[i]: " << std::endl;
+//    for (int i = 0; i < offspring_sites.size(); ++i) {
+//        std::cout << (int)offspring_sites_heap[i] << " ";
+//    }
+//    std::cout << std::endl;
+
     
     return offspring_sites_heap;
 }
@@ -87,11 +95,11 @@ AbstractGenome* TetianaGenome::clone(bool forceCopy) {
         //        }
         
         std::vector<std::byte> offspring_sites = offspring_recon(0, 0);
-        std::cout << "offspring: " << std::endl;
-        for (auto el : offspring_sites) {
-            std::cout << (int)el << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "offspring: " << std::endl;
+//        for (auto el : offspring_sites) {
+//            std::cout << (int)el << " ";
+//        }
+//        std::cout << std::endl;
         
         // Genome clone
         // Will this init empty change_log and segments_log?
@@ -101,6 +109,11 @@ AbstractGenome* TetianaGenome::clone(bool forceCopy) {
         return cloned;
     }
     
+//    std::cout << "offspring if not forced clone: " << std::endl;
+//    for (auto el : this->sites) {
+//        std::cout << (int)el << " ";
+//    }
+//    std::cout << std::endl;
     return new TetianaGenome(*this);
 }
 
@@ -190,8 +203,10 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
                     segments_log.find(it->first)->second = segm_to_merge;
                     
                     auto key_to_shift = segments_log.extract(it->first);
-                    key_to_shift.key() = index /* OR it->first - shift OR min(ind,it->first) ? */;
-                    segments_log.insert(move(key_to_shift));
+                    if (!key_to_shift.empty()) { // TODO: add this check everywhere
+                        key_to_shift.key() = index /* OR it->first - shift OR min(ind,it->first) ? */;
+                        segments_log.insert(move(key_to_shift));
+                    }
                 }
             }
         } else { // it->first > (index + segmentSize): (key - shift, val - shift)
@@ -438,7 +453,8 @@ std::vector<std::byte> TetianaGenome::offspring_recon(size_t index, size_t byteS
 //    std::cout << "sites_offspring.size(): " << sites_offspring.size() << std::endl;
 //    std::cout << "sites_offspring_part.size(): " << sites_offspring_part.size() << std::endl;
 
-    return sites_offspring;
+    //return sites_offspring;
+    return sites_offspring_part;
 }
 
 void TetianaGenome::show() {
