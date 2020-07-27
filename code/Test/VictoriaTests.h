@@ -192,7 +192,7 @@ namespace VictoriaTests
             genome->show();
 
         // assertions
-        for (size_t i(64999); i < size; i++)
+        for (size_t i(0); i < size; i++)
         {
             if (*(genome->data(i, 1)) != (Byte)10)
                 std::cout << i << std::endl;

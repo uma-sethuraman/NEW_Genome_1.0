@@ -23,8 +23,6 @@ class GenomeLite : public AbstractGenome
 private:
     SegmentList* List;
 
-    void Reallocate();
-
 public:
     /** (deleted) default constructor **/
     GenomeLite() = default;

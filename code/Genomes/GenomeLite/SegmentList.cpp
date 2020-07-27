@@ -64,37 +64,8 @@ SegmentList::SegmentList(size_t size)
 SegmentList::SegmentList(const SegmentList &list)
     : SiteCount(list.SiteCount), Page(list.Page)
 {
-    if (CalculatePage(SiteCount) < Page*2)
-    {
-        Pool = list.Pool;
-        IndexTable = list.IndexTable;
-    }
-    else
-    {
-        Page = CalculatePage(SiteCount);
-        Pool.reserve(list.Pool.size()/2);
-        IndexTable.reserve(list.Pool.size()/2);
-
-        size_t currSize = 0;
-
-        for (size_t i(0); i < list.Pool.size(); i+=2)
-        {
-            IndexTable.push_back(currSize);
-
-            size_t first = list.Pool.at(i).size();
-            size_t second = 0 ? i+1 > list.Pool.size() : list.Pool.at(i+1).size();
-
-            Pool.push_back(std::vector<Byte>(first+second));
-            std::copy(list.Pool.at(i).begin(), list.Pool.at(i).end(), Pool.back().begin());
-
-            if (second)
-                std::copy(list.Pool.at(i+1).begin(), list.Pool.at(i+1).end(), Pool.back().begin()+first);
-
-            currSize += first + second;
-        }
-    }
-    
-    
+    Pool = list.Pool;
+    IndexTable = list.IndexTable;
 }
 
 
@@ -124,8 +95,7 @@ void SegmentList::Resize(size_t size)
 TableEntry SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
-    auto poolIndex = std::upper_bound(IndexTable.begin(), IndexTable.end(), index) - IndexTable.begin();
-    --poolIndex;
+    auto poolIndex = std::upper_bound(IndexTable.begin(), IndexTable.end(), index) - IndexTable.begin() - 1;
     size_t left = IndexTable.at(poolIndex);
 
     // iterate through segment list if not in index
@@ -211,7 +181,7 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 /** 
  * Inserts into list
  * \param index 
- * \param segment to insert
+ * \param segmentSize to remove
  **/
 void SegmentList::Remove(size_t index, size_t segmentSize)
 {
@@ -222,7 +192,7 @@ void SegmentList::Remove(size_t index, size_t segmentSize)
     // update size
     SiteCount -= segmentSize;
 
-    // loop until the whole segment is removed
+    // loop until the whole segmentSize is removed
     while(segmentSize)
     {
         size_t removeSize = std::min(Pool.at(poolIndex).size()-localIndex, segmentSize);

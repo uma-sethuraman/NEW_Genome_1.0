@@ -34,8 +34,6 @@ struct TableEntry
 class SegmentList
 {
 private:
-    friend class GenomeLite;
-
     /// member variables
     std::vector< size_t > IndexTable; ///< pair(index and location in segmentPool)
     std::vector< std::vector<Byte> > Pool;
