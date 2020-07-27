@@ -415,19 +415,19 @@ std::vector<std::byte> TetianaGenome::offspring_recon(size_t index, size_t byteS
         
         if (it_curr->second.second == true) {
             std::vector<std::byte> vals_to_insert = segments_log.at(it_curr->first);
-            if (it_next == change_log.end()) { // will this ever happen?
-                                               // This loop fills out the last part of the vector
-                int ind_to_insert = 0;
-                for (int ind = it_curr->first; ind < genomeSize; ++ind) {
-                    sites_offspring[ind] = vals_to_insert[ind_to_insert];
-                    ind_to_insert++;
-                }
-            } else {
+//            if (it_next == change_log.end()) { // will this ever happen? - No!
+//                                               // This loop fills out the last part of the vector
+//                int ind_to_insert = 0;
+//                for (int ind = it_curr->first; ind < genomeSize; ++ind) {
+//                    sites_offspring[ind] = vals_to_insert[ind_to_insert];
+//                    ind_to_insert++;
+//                }
+//            } else {
                 int ind_to_insert = 0;
                 for (int ind = it_curr->first; ind < it_next->first; ++ind) {
                     sites_offspring[ind] = vals_to_insert[ind_to_insert];
                     ind_to_insert++;
-                }
+//                }
             }
         } else {
             if (it_next == change_log.end()) {
