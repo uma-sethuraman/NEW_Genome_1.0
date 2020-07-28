@@ -126,9 +126,7 @@ void TetianaGenome::overwrite(size_t index, const std::vector<std::byte>& segmen
 }
 
 void TetianaGenome::remove(size_t index, size_t segmentSize) {
-    
-//    std::cout << "===== remove " << index << ", " << segmentSize <<  " =====" << std::endl;
-    
+        
     if (index + segmentSize > genomeSize) {
         std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
         exit(1);
@@ -137,11 +135,28 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
     // Calculate new genome size
     genomeSize -= segmentSize;
     
+    // Special case, where the segment is inserted at the end
     if (change_log.lower_bound(index) == change_log.end()) {
         // no key is >= ind -> just add the key and shift
         auto prev_key = std::prev(change_log.lower_bound(index)); // always valid for change_log.lower_bound(ind) == change_log.end()
         int shift_upd = prev_key->second.first - segmentSize;
         change_log[index] = std::make_pair(shift_upd, false);
+        
+        
+//        std::cout << "+++++ change_log: +++++" << std::endl;
+//        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//            std::cout << it->first << " : " <<
+//            it->second.first << " : " << it->second.second << std::endl;
+//        }
+//        std::cout << "+++++ segments_log: +++++:" << std::endl;
+//        for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
+//            std::cout << it->first << " : ";
+//            for (auto v : it->second) {
+//                std::cout << (int)v << " ";
+//            }
+//            std::cout << std::endl;
+//        }
+        
         
         return;
     }
@@ -155,14 +170,14 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
     }
     
     if (next_key_it != change_log.begin() && (std::prev(next_key_it))->second.second == true) {
-        // update segments_log: need to remove couple of values at the end of last insertion
+        // update segments_log: need to remove a couple of values at the end of last insertion
         std::vector<std::byte> segm_to_update;
-        segm_to_update = segments_log.find((std::prev(next_key_it))->first)->second;
+        segm_to_update = segments_log.find((std::prev(next_key_it))->first)->second; // O(1)
         auto it_from_erase = segm_to_update.end() - (next_key_it->first - index);
         auto it_till_erase = it_from_erase + segmentSize;
         int dist = std::distance(it_till_erase, segm_to_update.end());
         segm_to_update.erase(it_from_erase, (dist <= 0 ? segm_to_update.end() : it_till_erase));
-        segments_log.find((std::prev(next_key_it))->first)->second = segm_to_update;
+        segments_log.find((std::prev(next_key_it))->first)->second = segm_to_update; // O(1)?
     }
     
     for (auto it = next_key_it; it != change_log.end(); ++it) {
@@ -170,12 +185,18 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
         if (it->first <= (index + segmentSize)) {
             if (it->second.second == false) {
                 // erase, so skip - don't add to new map, unless it is the last key
+                
+                if (std::next(it) != change_log.end() && (std::next(it))->first > (index + segmentSize)) {
+                    change_log_temp.insert({{index, {it->second.first - segmentSize, it->second.second}}});
+                }
+                
                 if (std::next(it) == change_log.end()) {
                     // special case when the key is the last in the map
                     int new_key = index; //it->first - (it->first - index); // what!
                     change_log_temp.insert({{new_key, {it->second.first - segmentSize, it->second.second}}});
                 }
             } else { // it->second.second == true
+                // Whole inserted segment is temoved
                 if (it->first + (segments_log.find(it->first)->second).size() <= (index + segmentSize)) {
                     int to_erase = it->first;
                     segments_log.erase(to_erase);
@@ -211,8 +232,10 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
         
     }
     
+    //
     if (change_log_temp.size() == 1 && change_log_temp.begin()->first == 0 && (change_log_temp.begin()->second.first + change_log.rbegin()->second.first) <= -sites.size()) {
         // this means that everything was deleted
+        // TODO: this will never happen, right?
         genomeSize = 0;
         change_log.clear();// = change_log_temp;
         change_log[0] = {0, false};
@@ -238,29 +261,25 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
             }
         }
     }
-    
-    
-    
+        
     if (change_log.empty() || (change_log.begin())->first != 0) {
         change_log.insert({{0, {0, false}}});
     }
     
-    
-    
-    //    std::cout << "change_log:" << std::endl;
-    //    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-    //        std::cout << it->first << ": " << it->second.first << ", " << it->second.second << std::endl;
-    //    }
-    //    std::cout << std::endl;
-    //
-    //    std::cout << "segments_log:" << std::endl;
-    //    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
-    //        std::cout << it->first << ": ";
-    //        for (auto v : it->second) {
-    //            std::cout << (int)v << " ";
-    //        }
-    //    }
-    //    std::cout << std::endl;
+//    std::cout << "+++++ change_log: +++++" << std::endl;
+//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//        std::cout << it->first << " : " <<
+//        it->second.first << " : " << it->second.second << std::endl;
+//    }
+//    std::cout << "+++++ segments_log: +++++:" << std::endl;
+//    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
+//        std::cout << it->first << " : ";
+//        for (auto v : it->second) {
+//            std::cout << (int)v << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+
 }
 
 void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) {

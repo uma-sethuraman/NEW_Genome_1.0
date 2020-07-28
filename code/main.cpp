@@ -338,130 +338,39 @@ std::vector<size_t> randomList(size_t size, double rate=0.01)
 
 int main(int argc, char* argv[]) {
     
-//
-//    // Variables
-//#define MutationRate 0.005     //< any mutation rate <= 0.01
-//#define Size 500000    //< 500,000 ; 250,000 ; 100,000 ; 20,000 avaliable
-//
-//    typedef std::byte Byte;
-//
-//    std::vector<size_t> mutations = randomList(Size, MutationRate);
-//
-//    AbstractGenome* genome = new TetianaGenome(Size);
-//    AbstractGenome* genometest = new TestGenome(Size);
-//
-//
-//    for (size_t i(0); i < genome->size(); i++)
-//    {
-//        *genome->data(i) = (std::byte)(i*2);
-//        *genometest->data(i) = (std::byte)(i*2);
-//    }
-//
-//    for (size_t i(0); i < genome->size(); i++) {
-//        assert(*genome->data(i) == *genometest->data(i));
-//    }
-//
-//
-//    int ind = 0;
-//    for (const auto& site : mutations)
-//    {
-//        genome->insert(site, std::vector< Byte >(1, (Byte)1));
-//        ++ind;
-//    }
-//    std::cout << "mutations for genome done" <<std::endl;
-//
-//
-//    ind = 0;
-//    for (const auto& site : mutations)
-//    {
-//        genometest->insert(site, std::vector< Byte >(1, (Byte)1));
-//        ++ind;
-//    }
-//    std::cout << "mutations for genometest done" <<std::endl;
-//
-//
-//    std::cout << "genome->size() " << genome->size() <<std::endl;
-//    std::cout << "genometest->size() " << genometest->size() <<std::endl;
-//
-//    std::byte* genome_data = genome->data(0, 0);
-//    std::byte* genometest_data = genometest->data(0, 0);
-//
-//    for (size_t i(0); i < genome->size(); i++) {
-//        if (*(genome_data + i) != *(genometest_data + i)) {
-//            std::cout << "wrong value at ind " << i << std::endl;
-//            exit(1);
-//        }
-//    }
-//    std::cout << "all correct " << std::endl;
-//
-//
-//    return 0;
+    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
+    runUmaChangelogTests<TetianaGenome>(0);
+    std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
 
-        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-        runUmaChangelogTests<TetianaGenome>(1);
-        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
-//
-        int result = Catch::Session().run(argc, argv);
-        return result;
+    int result = Catch::Session().run(argc, argv);
+    return result;
     
     
+//        AbstractGenome* myGenome = new TetianaGenome(11);
+//
+//        GN::genomeWrite<std::byte>(myGenome, 0, (std::byte)21);
+//        GN::genomeWrite<std::byte>(myGenome, 1, (std::byte)35);
+//        GN::genomeWrite<std::byte>(myGenome, 2, (std::byte)43);
+//        GN::genomeWrite<std::byte>(myGenome, 3, (std::byte)84);
+//        GN::genomeWrite<std::byte>(myGenome, 4, (std::byte)12);
+//        GN::genomeWrite<std::byte>(myGenome, 5, (std::byte)15);
+//        GN::genomeWrite<std::byte>(myGenome, 6, (std::byte)19);
+//        GN::genomeWrite<std::byte>(myGenome, 7, (std::byte)28);
+//        GN::genomeWrite<std::byte>(myGenome, 8, (std::byte)39);
+//        GN::genomeWrite<std::byte>(myGenome, 9, (std::byte)45);
+//        GN::genomeWrite<std::byte>(myGenome, 10, (std::byte)51);
+//
+//        myGenome->show();
+//
+//        myGenome->remove(3, 2);
+//        myGenome->show();
+//
+//        myGenome->remove(6, 2);
+//        myGenome->show();
+//
+//        myGenome->remove(1, 4);
+//        myGenome->show();
     
-    
-    
-    
-//
-//#define Byte std::byte
-//    size_t size = 5000;
-//    AbstractGenome* genome = new TetianaGenome(size);
-//
-//    for (size_t i(0); i < genome->size(); i++)
-//    {
-//        *(genome->data(i, 1)) = (Byte)i;
-//    }
-//
-//    AbstractGenome* clone = genome->clone();
-//
-//    clone->remove(0, 100);
-//    clone->remove(400, 100);
-//    clone->remove(2700, 100);
-//    clone->remove(2600, 200);
-//    clone->remove(4400, 100);
-//
-//    AbstractGenome* forceClone = clone->clone(1);
-//
-////    if (debug)
-////    {
-////        genome->show();
-////        clone->show();
-////        forceClone->show();
-////    }
-//
-//    for (size_t i(0); i < genome->size(); i++)
-//    {
-//        assert(*(genome->data(i, 1)) == (Byte)i);
-//    }
-//
-//    for (size_t i(0); i < clone->size(); i++)
-//    {
-//        if (i < 400)
-//            assert(*clone->data(i) == (Byte)(i+100));
-//        else if (i >= 400 && i < 2600)
-//            assert(*clone->data(i) == (Byte)(i+200));
-//        else if (i >= 2600)
-//            assert(*clone->data(i) == (Byte)(i+500));
-//
-//        assert(*clone->data(i) == *forceClone->data(i));
-//    }
-//
-//    assert(genome->size() != clone->size());
-//    assert(clone->size() == forceClone->size());
-//
-//    std::cout << "Test Clone Delete: PASSED" << std::endl;
-//
-//    delete genome;
-//    delete clone;
-//    delete forceClone;
-//
 }
 
 
