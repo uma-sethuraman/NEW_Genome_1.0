@@ -1078,7 +1078,7 @@ namespace VictoriaTests
 
         for (size_t i(0); i < genome->size(); i++)
         {
-            assert(*genome->data(i, 1) == *clone->data(i));
+            assert(*genome->data(i, 1) == *clone->data(i, 1));
         }
 
         assert(genome->size() == clone->size());
@@ -1115,7 +1115,7 @@ namespace VictoriaTests
 
         for (size_t i(0); i < genome->size(); i++)
         {
-            assert(*genome->data(i, 1) == *clone->data(i));
+            assert(*genome->data(i, 1) == *clone->data(i, 1));
         }
 
         assert(genome->size() == clone->size());
@@ -1152,7 +1152,7 @@ namespace VictoriaTests
 
         for (size_t i(0); i < genome->size(); i++)
         {
-            assert(*genome->data(i, 1) == *clone->data(i));
+            assert(*genome->data(i, 1) == *clone->data(i, 1));
         }
 
         assert(genome->size() == clone->size());
@@ -1213,16 +1213,16 @@ namespace VictoriaTests
         // test overwrite
         for (size_t i(0); i < genome->size(); i++)
         {
-            // std::cout << i << "\t" << (int)*clone->data(i) << "\t" << (int)*genome->data(i, 1) << std::endl;
+            // std::cout << i << "\t" << (int)*clone->data(i, 1) << "\t" << (int)*genome->data(i, 1) << std::endl;
             if ((i >= 40 && i < 140)|| (i >= 2950 && i < 3050) || (i >= 4000 && i < 4100))
             {
-                assert(*clone->data(i) == (Byte)10);
+                assert(*clone->data(i, 1) == (Byte)10);
                 assert(*genome->data(i, 1) == (Byte)i);
             }
             else
-                assert(*genome->data(i, 1) == *clone->data(i));
+                assert(*genome->data(i, 1) == *clone->data(i, 1));
 
-            assert(*clone->data(i) == *forceClone->data(i));
+            assert(*clone->data(i, 1) == *forceClone->data(i, 1));
         }
 
         assert(genome->size() == clone->size());
@@ -1274,21 +1274,21 @@ namespace VictoriaTests
 
         for (size_t i(0); i < clone->size(); i++)
         {
-            // std::cout << i << "\t" << (int)*clone->data(i) << "\t" << (int)*genome->data(i, 1) << std::endl;
+            // std::cout << i << "\t" << (int)*clone->data(i, 1) << "\t" << (int)*genome->data(i, 1) << std::endl;
             if ((i < 100)|| (i >= 400 && i < 500) || (i >= 3200 && i < 3300) || i >= 5300 )
             {
-                assert(*clone->data(i) == (Byte)10);
+                assert(*clone->data(i, 1) == (Byte)10);
             }
             else if (i >= 100 && i < 400)
-                assert(*clone->data(i) == (Byte)(i-100));
+                assert(*clone->data(i, 1) == (Byte)(i-100));
             else if (i >= 500 && i < 3200)
-                assert(*clone->data(i) == (Byte)(i-200));
+                assert(*clone->data(i, 1) == (Byte)(i-200));
             else if (i >= 3300 && i < 5300)
-                assert(*clone->data(i) == (Byte)(i-300));
+                assert(*clone->data(i, 1) == (Byte)(i-300));
 
-            if (*clone->data(i) != *forceClone->data(i))
-                std::cout << i << "\t" << (int)*clone->data(i) << "\t"  << (int)*forceClone->data(i) << std::endl;
-            assert(*clone->data(i) == *forceClone->data(i));
+            if (*clone->data(i, 1) != *forceClone->data(i, 1))
+                std::cout << i << "\t" << (int)*clone->data(i, 1) << "\t"  << (int)*forceClone->data(i, 1) << std::endl;
+            assert(*clone->data(i, 1) == *forceClone->data(i, 1));
         }
 
         assert(genome->size() != clone->size());
@@ -1342,13 +1342,13 @@ namespace VictoriaTests
         for (size_t i(0); i < clone->size(); i++)
         {
             if (i < 400)
-                assert(*clone->data(i) == (Byte)(i+100));
+                assert(*clone->data(i, 1) == (Byte)(i+100));
             else if (i >= 400 && i < 2600)
-                assert(*clone->data(i) == (Byte)(i+200));
+                assert(*clone->data(i, 1) == (Byte)(i+200));
             else if (i >= 2600)
-                assert(*clone->data(i) == (Byte)(i+500));
+                assert(*clone->data(i, 1) == (Byte)(i+500));
 
-            assert(*clone->data(i) == *forceClone->data(i));
+            assert(*clone->data(i, 1) == *forceClone->data(i, 1));
         }
 
         assert(genome->size() != clone->size());
@@ -1398,11 +1398,11 @@ namespace VictoriaTests
         for (size_t i(0); i < clone->size(); i++)
         {
             if (i < 400)
-                assert(*clone->data(i) == (Byte)(i+100));
+                assert(*clone->data(i, 1) == (Byte)(i+100));
             else if (i >= 400 && i < 2600)
-                assert(*clone->data(i) == (Byte)(i+200));
+                assert(*clone->data(i, 1) == (Byte)(i+200));
             else if (i >= 2600)
-                assert(*clone->data(i) == (Byte)(i+500));
+                assert(*clone->data(i, 1) == (Byte)(i+500));
 
         }
 
