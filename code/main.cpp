@@ -345,32 +345,6 @@ int main(int argc, char* argv[]) {
     int result = Catch::Session().run(argc, argv);
     return result;
     
-    
-//        AbstractGenome* myGenome = new TetianaGenome(11);
-//
-//        GN::genomeWrite<std::byte>(myGenome, 0, (std::byte)21);
-//        GN::genomeWrite<std::byte>(myGenome, 1, (std::byte)35);
-//        GN::genomeWrite<std::byte>(myGenome, 2, (std::byte)43);
-//        GN::genomeWrite<std::byte>(myGenome, 3, (std::byte)84);
-//        GN::genomeWrite<std::byte>(myGenome, 4, (std::byte)12);
-//        GN::genomeWrite<std::byte>(myGenome, 5, (std::byte)15);
-//        GN::genomeWrite<std::byte>(myGenome, 6, (std::byte)19);
-//        GN::genomeWrite<std::byte>(myGenome, 7, (std::byte)28);
-//        GN::genomeWrite<std::byte>(myGenome, 8, (std::byte)39);
-//        GN::genomeWrite<std::byte>(myGenome, 9, (std::byte)45);
-//        GN::genomeWrite<std::byte>(myGenome, 10, (std::byte)51);
-//
-//        myGenome->show();
-//
-//        myGenome->remove(3, 2);
-//        myGenome->show();
-//
-//        myGenome->remove(6, 2);
-//        myGenome->show();
-//
-//        myGenome->remove(1, 4);
-//        myGenome->show();
-    
 }
 
 
