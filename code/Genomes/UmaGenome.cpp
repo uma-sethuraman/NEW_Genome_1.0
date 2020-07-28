@@ -25,20 +25,20 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     }
 
     if(!mutationsOccurred) {
-        // before any mutations, don't need to check changelog
+        // before any mutations, don't need to check changelog and offset map
         return static_cast<std::byte*>(&sites[index]);
     }
     else{
-        // need to use changelog
-        int dataSize = 0;
-        int end = 0;
+        // need to use changelog and offset map
+        int dataSize = 0; // bytes of data to return
+        int end = 0; // end index of data to return
         if (byteSize == 0){
             // get entire genome starting at index
             dataSize = currentGenomeSize;
             end = currentGenomeSize;
         }
         else{
-            // get genome from index to index+byteSize
+            // get genome from index to index+byteSize(end)
             dataSize = byteSize;
             end = index+byteSize;
         }
@@ -57,7 +57,21 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
 }
 
 void UmaGenome::resize(size_t new_size) {
+
+    // set parent genome to current genome
+    sites = getCurrentGenome();
+
+    // clear changelog
+    changelog.clear();
+
+    // clear offset map and insert default (0,0) entry
+    offsetMap.clear();
+    offsetMap.insert({0,0});
+
+    // resize sites
     sites.resize(new_size);
+
+    // modify size variable
     currentGenomeSize = new_size;
 };
 
@@ -65,7 +79,7 @@ void UmaGenome::resize(size_t new_size) {
 int UmaGenome::getLowerBoundOffset(int key) {
     std::map<int,int>::iterator it = offsetMap.lower_bound(key);
 
-    // find closest lower bound (key that's immediately less than key in map)
+    // find closest lower bound (closest key less than (key) in map)
     if (it != offsetMap.begin())
         --it;
     int lb_offset = it->second;
@@ -74,34 +88,24 @@ int UmaGenome::getLowerBoundOffset(int key) {
 
 /* Returns a clone of the current genome.
    If forceCopy is true, then it resets the "parent" genome of the clone
-   to the actual current genome. If forceCopy is false, it directly clones
-   the current genome, leaving the "parent", changelog, and offset map the same
-   in the clone. */
+   to the actual current genome and clears the changelog and offset map.
+   If forceCopy is false, it directly clones the current genome, 
+   leaving the "parent", changelog, and offset map the same in the clone. */
 AbstractGenome* UmaGenome::clone(bool forceCopy) {
     if (forceCopy) {
-        // reconstruct current genome using changelog and offset map
-        std::vector<std::byte> new_sites(currentGenomeSize);
-        for (int new_sites_ind = 0; new_sites_ind < currentGenomeSize; new_sites_ind++) {
-            new_sites[new_sites_ind] = getCurrentGenomeAt(new_sites_ind);
-        }
-
+        
         // create a clone with an empty changelog and offset map
         AbstractGenome* cloneGenome = new UmaGenome(currentGenomeSize);
 
         /* reset the "parent" in the clone by changing the sites vector
            to be equal to the reconstructed current genome */
-        (static_cast<UmaGenome*>(cloneGenome))->sites = new_sites;
+        (static_cast<UmaGenome*>(cloneGenome))->sites = getCurrentGenome();
         return cloneGenome;
     }
     else {
         // clone directly (copy over changelog, offset map, and parent)
         return new UmaGenome(*this);
     }
-}
-
-// Not fully implemented or used yet
-void UmaGenome::mutate() {
-    
 }
 
 // point mutation at position index with given value
@@ -167,35 +171,33 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
         seg_index++;
     }
 
-    /* Loop from last key in offset map until you hit index (or its upper bound) 
-       and increment the keys by insertion size. Incrementing the keys in reverse
-       order prevents us from changing a key into a key that already exists */
-    std::map<int,int>::reverse_iterator ofs_it = offsetMap.rbegin();
-    while(ofs_it != offsetMap.rend() && (ofs_it->first >= index)) {
+    /* Loop from last key in offset map until you hit index+size (position after
+       end of insertion) or its upper bound. Increment the keys by insertion size. 
+       Incrementing the keys in reverse order prevents us from changing 
+       a key into a key that already exists. */
+    std::map<int,int>::reverse_iterator offset_it_rev = offsetMap.rbegin();
+    while(offset_it_rev != offsetMap.rend() && (offset_it_rev->first >= (index+size))) {
 
         // increment current key in offset map by size
-        int key = ofs_it->first;
+        int key = offset_it_rev->first;
         auto keyToChange = offsetMap.extract(key);
         keyToChange.key() += size;
         offsetMap.insert(move(keyToChange));
-        ofs_it++;
+
+        // increment current value (offset) by size
+        offset_it_rev->second += size;
+        offset_it_rev++;
     }
 
 
-    // If insertion start position isn't a key in offsetMap, add it to offsetMap
-    std::map<int,int>::iterator offset_it = offsetMap.find(index);
+    /* If position after insertion (index+size) isn't a key in offsetMap, 
+       add it to offsetMap */
+    std::map<int,int>::iterator offset_it = offsetMap.find(index+size);
     if (offset_it == offsetMap.end()){
-        // index not in offsetMap, so add it
-        // set its offset to offset of lower bound
-        int lb_offset = getLowerBoundOffset(index);
-        offsetMap.insert({index, lb_offset});
-        offset_it = offsetMap.find(index);
-    }
-
-    // Add insertion size to all offsets in offsetMap beginning at index
-    while(offset_it != offsetMap.end()) {
-        offset_it->second += size;
-        offset_it++;
+        // (index+size) not in offsetMap, so add it
+        // set its offset to (offset of lower bound + insertion size)
+        int lb_offset = getLowerBoundOffset(index+size);
+        offsetMap.insert({index+size, lb_offset+size});
     }
 
     currentGenomeSize += size; // update current genome size
@@ -297,6 +299,16 @@ void UmaGenome::printOffsetMap() {
         std::cout << "Key: " << it->first << ", ";
         std::cout << "Offset: " << it->second << std::endl;
     }
+}
+
+// returns the current genome
+std::vector<std::byte> UmaGenome::getCurrentGenome() {
+    // reconstruct current genome using changelog and offset map
+    std::vector<std::byte> current(currentGenomeSize);
+    for (int ind = 0; ind < currentGenomeSize; ind++) {
+        current[ind] = getCurrentGenomeAt(ind);
+    }
+    return current;
 }
 
 // random access function : returns value in current genome at position pos

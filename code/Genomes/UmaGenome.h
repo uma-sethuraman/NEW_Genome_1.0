@@ -21,13 +21,13 @@ public:
     }
 
     // copy constructor
-	UmaGenome(const UmaGenome &genome) {
-		sites = genome.sites;
+    UmaGenome(const UmaGenome &genome) {
+        sites = genome.sites;
         changelog = genome.changelog;
         offsetMap = genome.offsetMap;
         mutationsOccurred = genome.mutationsOccurred;
         currentGenomeSize = genome.currentGenomeSize;
-	}
+    }
 
     std::byte* data(size_t index = 0, size_t byteSize = 0) override;
 
@@ -53,8 +53,6 @@ public:
         return(geneMap);
     }
 
-    virtual void mutate() override; 
-
     void pointMutate(size_t index, std::byte value);
     virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override;
     virtual void insert(size_t index, const std::vector<std::byte>& segment) override;
@@ -64,5 +62,6 @@ public:
     int getLowerBoundOffset(int key);
     void printChangelog();
     void printOffsetMap();
+    std::vector<std::byte> getCurrentGenome();
     std::byte getCurrentGenomeAt(int pos); // random access method
 };
