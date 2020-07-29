@@ -120,9 +120,22 @@ TableEntry SegmentList::Find(size_t index)
  * \param index in genome
  * \return pointer to data
  **/
-Byte* SegmentList::GetData(size_t index)
+Byte* SegmentList::GetData(size_t index, size_t segmentSize)
 {
     auto found = Find(index);
+
+    if (found.Offset+segmentSize > Pool.at(found.PoolIndex).size())
+    {
+        auto insertSize = found.Offset+segmentSize-Pool.at(found.PoolIndex).size();
+        Pool.at(found.PoolIndex).insert(Pool.at(found.PoolIndex).begin(), Pool.at(found.PoolIndex+1).begin(), Pool.at(found.PoolIndex+1).begin()+insertSize);
+
+        // update table
+        if (found.PoolIndex < IndexTable.size()-1)
+        {
+            IndexTable.resize(found.PoolIndex+1);
+        }
+    }
+
     return Pool.at(found.PoolIndex).data()+(index-found.Offset);
 }
 

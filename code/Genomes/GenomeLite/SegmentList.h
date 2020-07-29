@@ -53,7 +53,7 @@ public:
     size_t GetSiteCount() { return SiteCount; }
 
     TableEntry Find(size_t index);
-    Byte* GetData(size_t index);
+    Byte* GetData(size_t index, size_t segmentSize = 1);
     void Resize(size_t size);
 
     void Overwrite(size_t index, const std::vector<std::byte>& segment);

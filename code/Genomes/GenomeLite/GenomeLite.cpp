@@ -43,7 +43,7 @@ void GenomeLite::resize(size_t newSize)
  **/
 Byte* GenomeLite::data(size_t index, size_t byteSize)
 {
-    return List->GetData(index);
+    return List->GetData(index, byteSize);
 }
 
 /**
