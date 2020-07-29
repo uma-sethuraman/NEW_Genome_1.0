@@ -47,9 +47,9 @@ AbstractGenome* StephanieGenome::clone(bool forceCopy) {
 	// Assign offspring genome to clone genome
 	// Return clone genome
 	if (forceCopy) {
-		AbstractGenome* genomeClone = new StephanieGenome(genomeSize);
 		generateNewGenome();
-		(static_cast<StephanieGenome*>(genomeClone))->sites = modifiedSites;
+		AbstractGenome* genomeClone = new StephanieGenome(genomeSize);
+		(static_cast<StephanieGenome*>(genomeClone))->sites = std::move(modifiedSites);
 		return genomeClone;
 	}
 	// Return parent genome
@@ -79,6 +79,7 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 			// Site in changelog is a remove mutation
 			else if (changelog.count(site) && changelog[site].removeOffset > 0) {
 
+				// Optimize?
 				// Get a vector of sites in the changelog that will be affected by the remove mutation
 				for (size_t i = site + 1; i < genomeSize; i++) {
 					if (changelog.count(i)) {
@@ -86,17 +87,26 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 					}
 				}
 
+				/* Proposed Optimize method
+				auto test = changelog.upper_bound(site);
+				for (auto it = test; it != changelog.end(); ++it) {
+					sitesAffected.push_back(it->first);
+				}
+				*/
+
+
 				// Shift the affected sites in the changelog to the right by 1
 				shiftChangelog(false, sitesAffected, 1);
 
 				// Index exists in changelog
 				// Get removeOffset value from site in changelog
 				// Erase site
-				if (changelog.count(site)) {
-					offsetFlag = true;
-					removeOffset = changelog[site].removeOffset;
-					changelog.erase(site);
-				}
+				//if (changelog.count(site)) {
+				offsetFlag = true;
+				removeOffset = changelog[site].removeOffset;
+				changelog.erase(site);
+				//}
+
 				// Create site in changelog with overwrite mutation
 				addToChangelog(site, 0, 0, seg);
 			}
@@ -107,7 +117,7 @@ void StephanieGenome::overwrite(size_t index, const std::vector<std::byte>& segm
 				addToChangelog(site, 0, 0, seg);
 			}
 
-			site++;
+			++site;
 		}
 
 		// A site affected by the overwrite mutation was a remove mutation
@@ -161,7 +171,7 @@ void StephanieGenome::insert(size_t index, const std::vector<std::byte>& segment
 		for (size_t i = 0; i < segment.size(); i++) {
 			addToChangelog(indexCounter, 1, 0, segment[i]);
 
-			indexCounter++;
+			++indexCounter;
 		}
 		genomeSize += segment.size();
 	}
@@ -179,6 +189,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			bool insertFlag = false;
 
 			// Get a vector of sites in the changelog that will be affected by the remove mutation
+			// Optimize?
 			for (size_t i = index; i < (index + segmentSize); i++) {
 				if (changelog.count(i)) {
 					if (changelog[i].removeOffset > 0) {
@@ -198,7 +209,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 				// Erase sites affected
 				for (auto siteAffected : sitesAffected) {
 					changelog.erase(siteAffected);
-					sitesRemoved--;
+					--sitesRemoved;
 				}
 
 				// Get a new vector of the rest of the sites in the changelog
@@ -230,11 +241,12 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 
 				// Erase sites affected
 				for (auto siteAffected : sitesAffected) {
-					modifiedRemoveOffset--;
+					--modifiedRemoveOffset;
 					changelog.erase(siteAffected);
 				}
 
 				// Get a new vector of the rest of the sites in the changelog
+				// Optimize?
 				sitesAffected.clear();
 				for (size_t i = index + 1; i < genomeSize; i++) {
 					if (changelog.count(i)) {
@@ -242,7 +254,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 					}
 				}
 
-				// Shift the sites in the changelog to the left by modifiedRemoveOffset
+				// Shift the sites in the changelog to the left by segmentSize
 				shiftChangelog(true, sitesAffected, segmentSize);
 
 				// If the number sites removed from the changelog was not segmentSize
@@ -272,6 +284,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			addToChangelog(index, 0, segmentSize, (std::byte)0);
 
 			// Get a vector of sites in the changelog that will be affected by the remove mutation
+			// Optimize?
 			for (size_t i = index + 1; i < (index + segmentSize); i++) {
 				if (changelog.count(i)) {
 					sitesAffected.push_back(i);
@@ -292,6 +305,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 			changelog[index].removeOffset = segmentSize - insertSitesAffected;
 
 			// Get a new vector of the rest of the sites in the changelog
+			// Optimize?
 			sitesAffected.clear();
 			for (size_t i = index + 1; i < genomeSize; i++) {
 				if (changelog.count(i) && changelog[i].removeOffset == 0) {
@@ -383,11 +397,11 @@ void StephanieGenome::generateNewGenome() {
 	}
 
 	//print modified genome
-	//std::cout << "\nGENERATED GENOME: ";
-	//for (int index = 0; index < genomeSize; index++) {
-		//std::cout << (int)modifiedSites[index] << " ";
-	//}
-	//std::cout << std::endl;
+	/*	std::cout << "\nGENERATED GENOME: ";
+	for (int index = 0; index < genomeSize; index++) {
+		std::cout << (int)modifiedSites[index] << " ";
+	}
+	std::cout << std::endl; */
 }
 
 // Prints changelog
