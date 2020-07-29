@@ -23,7 +23,7 @@ std::byte* TetianaGenome::data(size_t index, size_t byteSize) {
     }
     
     if (byteSize == 1) {
-        std::byte* val = new std::byte(val_at_index(index));
+        std::byte* val = new std::byte(val_at_index(index)); // return non-owning pointer to val instead?
         return val;
     }
     
@@ -58,7 +58,6 @@ std::byte TetianaGenome::val_at_index(int ind_curr) {
 }
 
 void TetianaGenome::resize(size_t new_size) {
-    // TODO: ? it doesn't have to be collapsed
     
     std::vector<std::byte> offspring_sites = offspring_recon(0, 0);
     sites = offspring_sites;
@@ -79,14 +78,14 @@ AbstractGenome* TetianaGenome::clone(bool forceCopy) {
         std::vector<std::byte> offspring_sites = offspring_recon(0, 0);
         
         // Genome clone
-        // Will this init empty change_log and segments_log?
+        // Q: Will this init empty change_log and segments_log?
         AbstractGenome* cloned = new TetianaGenome(genomeSize);
         (static_cast<TetianaGenome*>(cloned))->sites = offspring_sites;
         
         return cloned;
     }
     
-    return new TetianaGenome(*this);
+    return new TetianaGenome(*this); // Q: default copy constructor, what will it copy?
 }
 
 
@@ -190,7 +189,7 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
             } else {
                 if (lb_it != change_log.begin() && std::prev(lb_it)->second.second == true) {
                     // need to merge with previous
-                    
+
                     std::vector<std::byte> segm_to_merge;
                     segm_to_merge = segments_log.find(it->first)->second; // this will be updated and then merged at the end of prev
                     auto it_till_erase = segm_to_merge.begin() + (index + segmentSize - it->first);
@@ -198,7 +197,7 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
 
                     std::vector<std::byte> segm_to_update = segments_log.find(std::prev(lb_it)->first)->second;
                     segm_to_update.insert(segm_to_update.end(), segm_to_merge.begin(), segm_to_merge.end());
-                    
+
                     //segments_log.find(std::prev(std::prev(lb_it))->first)->second = segm_to_update; // this sometimes(!) crashes with Thread 1: EXC_BAD_ACCESS (code=1, address=0x28)???
                     segments_log[std::prev(std::prev(lb_it))->first] = segm_to_update;
                     int key_to_erase = it->first; // it was merged with previous, so we don't need it anymore
