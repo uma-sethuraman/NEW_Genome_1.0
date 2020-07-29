@@ -12,7 +12,6 @@ class TetianaGenome : public AbstractGenome {
 private:
     std::vector<std::byte> sites;
     
-    // Is it ok to initialize the
     std::map<int, std::pair<int, bool>> change_log; // {index, {shift, insertion?}}
     std::unordered_map<int, std::vector<std::byte>> segments_log; // {index, {inserted vals}}
     
