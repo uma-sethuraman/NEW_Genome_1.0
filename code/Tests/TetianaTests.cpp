@@ -10,27 +10,27 @@
 
 
 SCENARIO("Test genome mutations ???") {
-    
+
     GIVEN("Empty genome") {
-        
+
         AbstractGenome* myGenome = new TetianaGenome(0);
-        
+
         WHEN("Inserting sites at the beginning once") {
-            
+
             myGenome->insert(0, std::vector<std::byte>{ (std::byte)1, (std::byte)2, (std::byte)3 });
-            
+
             THEN("Possible to reconstruct offspring genome") {
-                
+
                 auto offspring_data = myGenome->data(0, 0);
-                
+
 //                std::cout << (int)(*(offspring_data + 0)) << ", " << (int)((std::byte)1) << std::endl;
 //                std::cout << (int)(*(offspring_data + 1)) << ", " << (int)((std::byte)2) << std::endl;
 //                std::cout << (int)(*(offspring_data + 2)) << ", " << (int)((std::byte)3) << std::endl;
-                
+
                 CHECK(*(offspring_data + 0) == (std::byte)1);
                 CHECK(*(offspring_data + 1) == (std::byte)2);
                 CHECK(*(offspring_data + 2) == (std::byte)3);
-                
+
 //                std::cout << "==========" << std::endl;
 //                std::cout << (int)(*(offspring_data + 0)) << ", " << (int)((std::byte)1) << std::endl;
 //                std::cout << (int)(*(offspring_data + 1)) << ", " << (int)((std::byte)2) << std::endl;
@@ -371,18 +371,22 @@ SCENARIO("Test genome mutations") {
         WHEN("Delete 1 site at index 3 && "
              "Insert {1} at index 4 && ") {
 
+//            std::cout << "remove(3, 1)" << std::endl;
             myGenome->remove(3, 1);
             testGenome->remove(3, 1);
 
+//            std::cout << "insert(4, {1})" << std::endl;
             std::vector<std::byte> segment1{
                 (std::byte)1
             };
             myGenome->insert(4, segment1);
             testGenome->insert(4, segment1);
 
+//            std::cout << "remove(6, 2)" << std::endl;
             myGenome->remove(6, 2);
             testGenome->remove(6, 2);
 
+//            std::cout << "insert(5, {2, 3, 4})" << std::endl;
             std::vector<std::byte> segment2{
                 (std::byte)2,
                 (std::byte)3,
@@ -391,12 +395,15 @@ SCENARIO("Test genome mutations") {
             myGenome->insert(5, segment2);
             testGenome->insert(5, segment2);
 
+//            std::cout << "remove(6, 3)" << std::endl;
             myGenome->remove(6, 3);
             testGenome->remove(6, 3);
 
+//            std::cout << "remove(6, 2)" << std::endl;
             myGenome->remove(6, 2);
             testGenome->remove(6, 2);
 
+//            std::cout << "insert(0, {5, 6, 7})" << std::endl;
             std::vector<std::byte> segment3{
                 (std::byte)5,
                 (std::byte)6,

@@ -126,6 +126,8 @@ void TetianaGenome::overwrite(size_t index, const std::vector<std::byte>& segmen
 }
 
 void TetianaGenome::remove(size_t index, size_t segmentSize) {
+//    std::cout << "===== remove " << index << ", " << segmentSize <<  " =====" << std::endl;
+
     
     if (index + segmentSize > genomeSize) {
         std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
@@ -156,16 +158,16 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
 //            }
 //            std::cout << std::endl;
 //        }
-//
+        //
         
         return;
     }
     
     auto lb_it = change_log.lower_bound(index); // >= index
     auto lb_segm_it = change_log.lower_bound(index + segmentSize); // >= index
-//    std::cout << "lb_it->first " << lb_it->first << std::endl;
-//    std::cout << "lb_segm_it->first " << lb_segm_it->first << std::endl;
-
+                                                                   //    std::cout << "lb_it->first " << lb_it->first << std::endl;
+                                                                   //    std::cout << "lb_segm_it->first " << lb_segm_it->first << std::endl;
+    
     
     if (lb_it != change_log.begin() && (std::prev(lb_it))->second.second == true) {
         // update segments_log: need to remove a couple of values at the end of last insertion
@@ -210,19 +212,50 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
             if (it->second.second == false) {
                 change_log_temp[index] = {it->second.first - segmentSize, false};
             } else {
-                change_log_temp[index] = {0, true};
                 
-                // update segments_log
-                std::vector<std::byte> segm_to_update;
-                segm_to_update = segments_log.find(it->first)->second;
-                auto it_till_erase = segm_to_update.begin() + (index + segmentSize - it->first);
-                segm_to_update.erase(segm_to_update.begin(), it_till_erase);
-                segments_log.find(it->first)->second = segm_to_update;
-                
-                auto key_to_shift = segments_log.extract(it->first);
-                if (!key_to_shift.empty()) { // TODO: add this check everywhere
-                    key_to_shift.key() = index;
-                    segments_log.insert(move(key_to_shift));
+                if (lb_it != change_log.begin() && std::prev(lb_it)->second.second == true) {
+                    // need to merge with previous
+                    
+                    std::vector<std::byte> segm_to_merge;
+                    segm_to_merge = segments_log.find(it->first)->second; // this will be updated and then merged at the end of prev
+                    auto it_till_erase = segm_to_merge.begin() + (index + segmentSize - it->first);
+                    segm_to_merge.erase(segm_to_merge.begin(), it_till_erase);
+
+                    std::vector<std::byte> segm_to_update = segments_log.find(std::prev(lb_it)->first)->second;
+                    segm_to_update.insert(segm_to_update.end(), segm_to_merge.begin(), segm_to_merge.end());
+                    
+                    //segments_log.find(std::prev(std::prev(lb_it))->first)->second = segm_to_update; // this sometimes(!) crashes with Thread 1: EXC_BAD_ACCESS (code=1, address=0x28)???
+                    segments_log[std::prev(std::prev(lb_it))->first] = segm_to_update;
+                    int key_to_erase = it->first; // it was merged with previous, so we don't need it anymore
+
+                    segments_log.erase(key_to_erase);
+                    // change_log - don't need to erase, just don't add it to change_log_temp
+                } else {
+                    change_log_temp[index] = {0, true};
+                    
+                    //                if (it != change_log.begin() && std::prev(it)->second.second == true) {
+                    //                    std::cout << "merge " << std::endl;
+                    //                    // Merge with prev
+                    //                    std::vector<std::byte> segm_to_update = segments_log.find(std::prev(it)->first)->second;
+                    //                    std::vector<std::byte> segm_to_merge = segments_log.find(it->first)->second;
+                    //                    segm_to_update.insert(segm_to_update.end(), segm_to_merge.begin(), segm_to_merge.end());
+                    //                    segments_log.find(std::prev(it)->first)->second = segm_to_update;
+                    //                    int key_to_erase = it->first; // it was merged with previous, so we don't need it anymore
+                    //                    segments_log.erase(key_to_erase);
+                    //                    // change_log - don't need to erase, just don't add it to change_log_temp
+                    //                } else {
+                    // update segments_log
+                    std::vector<std::byte> segm_to_update;
+                    segm_to_update = segments_log.find(it->first)->second;
+                    auto it_till_erase = segm_to_update.begin() + (index + segmentSize - it->first);
+                    segm_to_update.erase(segm_to_update.begin(), it_till_erase);
+                    segments_log.find(it->first)->second = segm_to_update;
+                    
+                    auto key_to_shift = segments_log.extract(it->first);
+                    if (!key_to_shift.empty()) { // TODO: add this check everywhere
+                        key_to_shift.key() = index;
+                        segments_log.insert(move(key_to_shift));
+                    }
                 }
             }
         }
@@ -232,7 +265,7 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
         
         // update change_log
         int updated_val = (it->second.second == true) ? 0 : (it->second.first - segmentSize);
-//        std::cout << "inserting " << it->first - segmentSize << ",  " << updated_val << " : " << it->second.second << std::endl;
+        //        std::cout << "inserting " << it->first - segmentSize << ",  " << updated_val << " : " << it->second.second << std::endl;
         change_log_temp.insert({{(it->first - segmentSize), {updated_val, it->second.second}}});
         
         // update segments_log
@@ -245,51 +278,75 @@ void TetianaGenome::remove(size_t index, size_t segmentSize) {
         }
     }
     
-//    std::cout << "+++++ change_log before: +++++" << std::endl;
-//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-//        std::cout << it->first << " : " <<
-//        it->second.first << " : " << it->second.second << std::endl;
-//    }
+//        std::cout << "+++++ change_log before: +++++" << std::endl;
+//        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//            std::cout << it->first << " : " <<
+//            it->second.first << " : " << it->second.second << std::endl;
+//        }
     
     change_log = change_log_temp;
     
-        // Merge any insertions that are one after another
-        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-            if (it->second.second == true) {
-                if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
-                    auto next_it = std::next(it);
-                    std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
-                    std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
-                    segm_merged.insert(segm_merged.end(), segm_to_merge.begin(), segm_to_merge.end());
-                    segments_log.find(it->first)->second = segm_merged; // rempace in segments_log
+    //        // Merge any insertions that are one after another
+    //        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+    //            if (it->second.second == true) {
+    //                if (std::next(it) != change_log.end() && (std::next(it))->second.second == true) {
+    //                    auto next_it = std::next(it);
+    //                    std::vector<std::byte> segm_merged = segments_log.find(it->first)->second;
+    //                    std::vector<std::byte> segm_to_merge = segments_log.find(next_it->first)->second;
+    //                    segm_merged.insert(segm_merged.end(), segm_to_merge.begin(), segm_to_merge.end());
+    //                    segments_log.find(it->first)->second = segm_merged; // rempace in segments_log
+    //
+    //                    int to_erase = next_it->first;
+    //                    change_log.erase(to_erase);
+    //                    segments_log.erase(to_erase);
+    //                }
+    //            }
+    //        }
     
-                    int to_erase = next_it->first;
-                    change_log.erase(to_erase);
-                    segments_log.erase(to_erase);
-                }
+    //        if (change_log.empty() || (change_log.begin())->first != 0) {
+    //            change_log.insert({{0, {0, false}}});
+    //        }
+    
+    bool not_merged = false;
+    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+        if (std::next(it) != change_log.end()) {
+            if (it->second.second == true && (std::next(it))->second.second == true) {
+                std::cout << "not merged" << std::endl;
+                not_merged = true;
             }
         }
+    }
+    //    if (not_merged) {
+    //        std::cout << "+++++ change_log: +++++" << std::endl;
+    //        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+    //            std::cout << it->first << " : " <<
+    //            it->second.first << " : " << it->second.second << std::endl;
+    //        }
+    //        std::cout << "+++++ segments_log: +++++:" << std::endl;
+    //        for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
+    //            std::cout << it->first << " : ";
+    //            for (auto v : it->second) {
+    //                std::cout << (int)v << " ";
+    //            }
+    //            std::cout << std::endl;
+    //        }
+    //    }
     
-//        if (change_log.empty() || (change_log.begin())->first != 0) {
-//            change_log.insert({{0, {0, false}}});
+    
+//        std::cout << "+++++ change_log: +++++" << std::endl;
+//        for (auto it = change_log.begin(); it != change_log.end(); ++it) {
+//            std::cout << it->first << " : " <<
+//            it->second.first << " : " << it->second.second << std::endl;
 //        }
-    
-    
-    
-//    std::cout << "+++++ change_log: +++++" << std::endl;
-//    for (auto it = change_log.begin(); it != change_log.end(); ++it) {
-//        std::cout << it->first << " : " <<
-//        it->second.first << " : " << it->second.second << std::endl;
-//    }
-//    std::cout << "+++++ segments_log: +++++:" << std::endl;
-//    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
-//        std::cout << it->first << " : ";
-//        for (auto v : it->second) {
-//            std::cout << (int)v << " ";
-//        }
-//        std::cout << std::endl;
-//    }
-//
+    //    std::cout << "+++++ segments_log: +++++:" << std::endl;
+    //    for (auto it = segments_log.begin(); it != segments_log.end(); ++it) {
+    //        std::cout << it->first << " : ";
+    //        for (auto v : it->second) {
+    //            std::cout << (int)v << " ";
+    //        }
+    //        std::cout << std::endl;
+    //    }
+    //
 }
 
 void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
@@ -305,6 +362,10 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     auto next_key = change_log.upper_bound(index); // can be end()
     auto lb_key = change_log.lower_bound(index); // can be end()
     auto prev_key = std::prev(change_log.upper_bound(index)); // always valid, as change_log.size() >= 1
+    
+//    std::cout << "next_key: " << next_key->first << ": " << next_key->second.first << ", " << next_key->second.second << std::endl;
+//    std::cout << "lb_key: " << lb_key->first << ": " << lb_key->second.first << ", " << lb_key->second.second << std::endl;
+//    std::cout << "prev_key: " << prev_key->first << ": " << prev_key->second.first << ", " << prev_key->second.second << std::endl;
     
     if (lb_key == change_log.end()) {
         // the last key will always be false, so if there nothing <= than index: just add index to both maps
@@ -343,11 +404,24 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
     std::map<int, std::pair<int, bool>> change_log_temp;
     std::unordered_map<int, std::vector<std::byte>> segments_log_temp;
     
-    if (prev_key->second.second == true) { // prev_key == lb_key if key == index
+    
+    if (prev_key->second.second == true || (prev_key->first == lb_key->first && lb_key != change_log.begin() && (std::prev(lb_key))->second.second)) { // prev_key == lb_key if key == index
+        if (prev_key->first == lb_key->first && lb_key != change_log.begin()) {
+            prev_key = std::prev(lb_key);
+            // this is to consider the case merging with key < lb_key
+            /*
+             e.g.
+             4,0,1
+             5,0,0
+             insert(5, {5,6,7}) - see test
+             */
+            
+        }
         
         // Keys before insertion
         for (auto it = change_log.begin(); it != std::next(prev_key); ++it) { // lb_key instead of std::next(prev_key)?
-                                                                              // update change_log
+            
+            // update change_log
             change_log_temp.insert(std::make_pair(it->first, std::make_pair(it->second.first, it->second.second)));
             
             // update segments_log
@@ -379,11 +453,11 @@ void TetianaGenome::insert(size_t index, const std::vector<std::byte>& segment) 
         if (it_to_merge != segments_log.end()) {
             segm_to_merge = it_to_merge->second;
             segm_to_merge.insert(segm_to_merge.begin() + (index - prev_key->first), segment.begin(), segment.end()); // this is slow for small vectors
-                                                                                                                     // what is segm_to_merge.begin() + (index - prev_key->first) is our of range? -> should not happen for correct maps
+        // what is segm_to_merge.begin() + (index - prev_key->first) is our of range? -> should not happen for correct maps
             it_to_merge->second = segm_to_merge; // replace with merged segment in segments_log
         } else {
             // should not happen, because prev_key->second.second == true
-            std::cout << "SEGMENTS MAP IS WRONG!" << std::endl;
+            std::cout << "ALREADY MERGED!" << std::endl;
         }
         
     } else { //if (next_key != change_log.end() && next_key->second.second == true) {
