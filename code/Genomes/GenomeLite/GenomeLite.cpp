@@ -5,10 +5,21 @@
 
 #include "GenomeLite.h"
 
+/**
+ * Constructor
+ * \param size of genome
+ **/
 GenomeLite::GenomeLite(size_t size)
-{
-    List = new SegmentList(size);
-}
+    : List (new SegmentList(size)) 
+{}
+
+/**
+ * Constructor
+ * \param list of genome
+ **/
+GenomeLite::GenomeLite(SegmentList* list)
+    : List (list) 
+{}
 
 /**
  * Clones the genome
@@ -16,7 +27,7 @@ GenomeLite::GenomeLite(size_t size)
  **/
 AbstractGenome* GenomeLite::clone(bool forceCopy)
 {
-    return new GenomeLite(*this);
+    return new GenomeLite(List->Reallocate());
 }
 
 /**

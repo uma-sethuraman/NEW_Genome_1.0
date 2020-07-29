@@ -653,8 +653,8 @@ namespace VictoriaTests
     template <class genomeName>
     void TestDeleteMiddle(bool debug)
     {
-        // test size 5000
-        size_t size = 5000;
+        // test size 100
+        size_t size = 100;
         AbstractGenome* genome = new genomeName(size);
 
         for (size_t i(0); i < genome->size(); i++)
@@ -662,7 +662,7 @@ namespace VictoriaTests
             *(genome->data(i, 1)) = (Byte)i;
         }
 
-        genome->remove(2999, 100);
+        genome->remove(29, 10);
 
         if (debug)
             genome->show();
@@ -670,13 +670,13 @@ namespace VictoriaTests
         // assertions
         for (size_t i(0); i < genome->size(); i++)
         {
-            if (i < 2999)
+            if (i < 29)
                 assert(*(genome->data(i, 1)) == (Byte)i);
             else
-                assert(*(genome->data(i, 1)) == (Byte)(i+100));
+                assert(*(genome->data(i, 1)) == (Byte)(i+10));
             
         }
-        assert(genome->size() == size-100);
+        assert(genome->size() == size-10);
 
         std::cout << "Test Delete Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
 
@@ -712,7 +712,7 @@ namespace VictoriaTests
 
         assert(genome->size() == size-100);
 
-        std::cout << "Test Delete Middle: " BOLDGREEN " PASSED" << RESET << std::endl;
+        std::cout << "Test Delete Back: " BOLDGREEN " PASSED" << RESET << std::endl;
 
         delete genome;
     }
@@ -1187,7 +1187,7 @@ namespace VictoriaTests
     void TestCloneOverwrite(bool debug)
     {
         // test size 5000
-        size_t size = 5000;
+        size_t size = 500;
         AbstractGenome* genome = new genomeName(size);
 
         for (size_t i(0); i < genome->size(); i++)
@@ -1197,9 +1197,9 @@ namespace VictoriaTests
 
         AbstractGenome* clone = genome->clone();
 
-        clone->overwrite(40, std::vector<Byte>(100, (Byte)10));
-        clone->overwrite(2950, std::vector<Byte>(100, (Byte)10));
-        clone->overwrite(4000, std::vector<Byte>(100, (Byte)10));
+        clone->overwrite(40, std::vector<Byte>(10, (Byte)10));
+        clone->overwrite(295, std::vector<Byte>(10, (Byte)10));
+        clone->overwrite(400, std::vector<Byte>(10, (Byte)10));
 
         AbstractGenome* forceClone = clone->clone(1);
 
@@ -1214,7 +1214,7 @@ namespace VictoriaTests
         for (size_t i(0); i < genome->size(); i++)
         {
             // std::cout << i << "\t" << (int)*clone->data(i, 1) << "\t" << (int)*genome->data(i, 1) << std::endl;
-            if ((i >= 40 && i < 140)|| (i >= 2950 && i < 3050) || (i >= 4000 && i < 4100))
+            if ((i >= 40 && i < 50)|| (i >= 295 && i < 305) || (i >= 400 && i < 410))
             {
                 assert(*clone->data(i, 1) == (Byte)10);
                 assert(*genome->data(i, 1) == (Byte)i);
@@ -1309,7 +1309,7 @@ namespace VictoriaTests
     void TestCloneDelete(bool debug)
     {
          // test size 5000
-        size_t size = 5000;
+        size_t size = 500;
         AbstractGenome* genome = new genomeName(size);
 
         for (size_t i(0); i < genome->size(); i++)
@@ -1319,11 +1319,11 @@ namespace VictoriaTests
 
         AbstractGenome* clone = genome->clone();
 
-        clone->remove(0, 100);
-        clone->remove(400, 100);
-        clone->remove(2700, 100);
-        clone->remove(2600, 200);
-        clone->remove(4400, 100);
+        clone->remove(0, 10);
+        clone->remove(40, 10);
+        clone->remove(270, 10);
+        clone->remove(260, 20);
+        clone->remove(440, 10);
 
         AbstractGenome* forceClone = clone->clone(1);
 
@@ -1341,12 +1341,12 @@ namespace VictoriaTests
 
         for (size_t i(0); i < clone->size(); i++)
         {
-            if (i < 400)
-                assert(*clone->data(i, 1) == (Byte)(i+100));
-            else if (i >= 400 && i < 2600)
-                assert(*clone->data(i, 1) == (Byte)(i+200));
-            else if (i >= 2600)
-                assert(*clone->data(i, 1) == (Byte)(i+500));
+            if (i < 40)
+                assert(*clone->data(i, 1) == (Byte)(i+10));
+            else if (i >= 40 && i < 260)
+                assert(*clone->data(i, 1) == (Byte)(i+20));
+            else if (i >= 260)
+                assert(*clone->data(i, 1) == (Byte)(i+50));
 
             assert(*clone->data(i, 1) == *forceClone->data(i, 1));
         }

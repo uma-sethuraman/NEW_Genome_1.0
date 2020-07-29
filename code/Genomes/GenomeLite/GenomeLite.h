@@ -25,10 +25,13 @@ private:
 
 public:
     /** (deleted) default constructor **/
-    GenomeLite() = default;
+    GenomeLite() = delete;
 
     /** size constructor **/
     GenomeLite(size_t size);
+
+    /** size constructor **/
+    GenomeLite(SegmentList* list);
 
     /** size constructor **/
     GenomeLite(const GenomeLite &genome) 

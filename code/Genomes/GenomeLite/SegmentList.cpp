@@ -14,47 +14,19 @@
 #define RESET   "\033[0m"
 #define CYAN    "\033[36m"      /* Cyan */
 
-
-/** 
- * Calculates approximate page size for largest SegmentNode
- * \param size of genome
- * \return page size
- **/
-size_t SegmentList::CalculatePage(size_t size)
-{
-    if (size > 30000)
-        return 0.13*size;
-    else
-        return 4000;
-}
-
 /** 
  * Constructor 
  * \param size of new list
  **/
 SegmentList::SegmentList(size_t size)
-    : SiteCount(size), Page(CalculatePage(size))
+    : SiteCount(size)
 {
-    size_t poolSize = std::ceil(SiteCount/Page);
-    Pool.reserve(poolSize);
-    IndexTable.reserve(poolSize);
+    auto mutations = size;
+    Pool.reserve(size+mutations);
+    Pool.resize(size);
 
-    // Creates list
-    size_t node = 0;
-    size_t currSize = 0;
-
-    while(currSize < SiteCount)
-    {
-        // creates new node
-        size_t nodeSize = std::min((size_t)Page, SiteCount - currSize);
-        Pool.push_back(std::vector<Byte>(nodeSize));
-
-        // adds node to indexing table
-        IndexTable.push_back(currSize);   
-
-        currSize += nodeSize;
-    }
-
+    IndexTable.reserve(1+mutations);
+    IndexTable.push_back( TableEntry(0, size, Pool.data()) );
 }
 
 /** 
@@ -62,12 +34,37 @@ SegmentList::SegmentList(size_t size)
  * \param list to copy from
  **/
 SegmentList::SegmentList(const SegmentList &list)
-    : SiteCount(list.SiteCount), Page(list.Page)
+    : SiteCount(list.SiteCount)
 {
     Pool = list.Pool;
     IndexTable = list.IndexTable;
 }
 
+/** 
+ * Reallocates list
+ * \returns new segmentList
+ **/
+SegmentList* SegmentList::Reallocate()
+{
+    auto newList = new SegmentList();
+    newList->SiteCount = SiteCount;
+
+    auto mutations = SiteCount;
+    newList->Pool.reserve(SiteCount+mutations);
+    newList->Pool.resize(SiteCount);
+
+    newList->IndexTable.reserve(1+mutations);
+    newList->IndexTable.push_back( TableEntry(0, SiteCount, newList->Pool.data()) );
+
+    auto offset = 0;
+    for (size_t i(0); i < IndexTable.size(); i++)
+    {
+        std::memcpy(newList->Pool.data()+offset, IndexTable.at(i).Address, IndexTable.at(i).Size);
+        offset += IndexTable.at(i).Size;
+    }
+
+    return newList;
+}
 
 /**
  * Resizes the genome
@@ -90,28 +87,13 @@ void SegmentList::Resize(size_t size)
 /** 
  * Finds index in list
  * \param index to find
- * \return pair node index in pool and offset within node
+ * \return index into IndexTable
  **/
-TableEntry SegmentList::Find(size_t index)
+size_t SegmentList::Find(size_t index)
 {
     // binary sesarch through Index Table 
-    auto poolIndex = std::upper_bound(IndexTable.begin(), IndexTable.end(), index) - IndexTable.begin() - 1;
-    size_t left = IndexTable.at(poolIndex);
-
-    // iterate through segment list if not in index
-    while (poolIndex < Pool.size()-1)
-    {
-        if (left + Pool.at(poolIndex).size() > index)
-            break;
-            
-        // update index table
-        left += Pool.at(poolIndex).size();
-        IndexTable.push_back(left);
-
-        ++poolIndex;
-    }
-
-    return TableEntry(poolIndex, left);
+    auto it = std::upper_bound(IndexTable.begin(), IndexTable.end(), TableEntry(index), [](const TableEntry& lhs, const TableEntry& rhs){ return lhs.Index < rhs.Index; }) ;
+    return it - IndexTable.begin() - 1;
 }
 
 
@@ -122,21 +104,10 @@ TableEntry SegmentList::Find(size_t index)
  **/
 Byte* SegmentList::GetData(size_t index, size_t segmentSize)
 {
-    auto found = Find(index);
+    auto tableIndex = Find(index);
+    auto offset = index-IndexTable.at(tableIndex).Index;
 
-    if (found.Offset+segmentSize > Pool.at(found.PoolIndex).size())
-    {
-        auto insertSize = found.Offset+segmentSize-Pool.at(found.PoolIndex).size();
-        Pool.at(found.PoolIndex).insert(Pool.at(found.PoolIndex).begin(), Pool.at(found.PoolIndex+1).begin(), Pool.at(found.PoolIndex+1).begin()+insertSize);
-
-        // update table
-        if (found.PoolIndex < IndexTable.size()-1)
-        {
-            IndexTable.resize(found.PoolIndex+1);
-        }
-    }
-
-    return Pool.at(found.PoolIndex).data()+(index-found.Offset);
+    return IndexTable.at(tableIndex).Address+offset;
 }
 
 
@@ -147,22 +118,19 @@ Byte* SegmentList::GetData(size_t index, size_t segmentSize)
  **/
 void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
 {
-    auto found = Find(index);
-    auto poolIndex = found.PoolIndex;
-    auto localIndex = index-found.Offset;
-
-    size_t startIndex = 0;
+    auto tableIndex = Find(index);
+    size_t offset = index-IndexTable.at(tableIndex).Index;
+    size_t overwritten = 0;
 
     // loop until overwrite is all written
-    while(startIndex < segment.size())
+    while (overwritten < segment.size())
     {
-        size_t size = std::min((Pool.at(poolIndex).size()-localIndex), (segment.size()-startIndex));
-        std::copy_n(segment.begin()+startIndex, size, Pool.at(poolIndex).begin()+localIndex);
+        auto copySize = std::min(segment.size()-overwritten, IndexTable.at(tableIndex).Size-offset);
+        std::memcpy(IndexTable.at(tableIndex).Address+offset, segment.data()+overwritten, copySize);
+        overwritten += copySize;
 
-        startIndex += size;
-        localIndex = 0;
-        
-        ++poolIndex;      
+        ++tableIndex;
+        offset = 0;
     }
 }
 
@@ -174,20 +142,28 @@ void SegmentList::Overwrite(size_t index, const std::vector<Byte>& segment)
  **/
 void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
 {
-    auto found = Find(index);
-    auto localIndex = index-found.Offset;
-
-    // overwrite current genome
-    Pool.at(found.PoolIndex).insert(Pool.at(found.PoolIndex).begin()+localIndex, segment.begin(), segment.end());
+    auto tableIndex = Find(index);
+    auto offset = index-IndexTable.at(tableIndex).Index;
 
     // update size
     SiteCount += segment.size();
 
-    // update table
-    if (found.PoolIndex < IndexTable.size()-1)
-    {
-        IndexTable.resize(++found.PoolIndex);
+    if (offset && offset != IndexTable.at(tableIndex).Size) // middle
+    {        
+        IndexTable.insert(IndexTable.begin()+tableIndex+1, TableEntry(IndexTable.at(tableIndex).Index+offset, IndexTable.at(tableIndex).Size-offset, IndexTable.at(tableIndex).Address+offset));
+        IndexTable.at(tableIndex).Size = offset;
     }
+    tableIndex += bool(offset); 
+
+    // create mutation and insert into table
+    IndexTable.insert(IndexTable.begin()+tableIndex, TableEntry(index, segment.size(), Pool.data()+Pool.size()));
+    Pool.insert(Pool.end(), segment.begin(), segment.end());
+        
+    
+    std::for_each(IndexTable.begin()+tableIndex+1, IndexTable.end(),[segment](TableEntry &entry)
+    {
+        entry.Index += segment.size();
+    });
 }
 
 
@@ -198,39 +174,59 @@ void SegmentList::Insert(size_t index, const std::vector<Byte>& segment)
  **/
 void SegmentList::Remove(size_t index, size_t segmentSize)
 {
-    auto found = Find(index);
-    auto poolIndex = found.PoolIndex;
-    auto localIndex = index-found.Offset;
+    auto tableIndex = Find(index);
+    auto offset = index-IndexTable.at(tableIndex).Index;
 
     // update size
     SiteCount -= segmentSize;
 
-    // loop until the whole segmentSize is removed
-    while(segmentSize)
+    size_t removed = 0;
+    
+    // loop until overwrite is all written
+    while (removed < segmentSize)
     {
-        size_t removeSize = std::min(Pool.at(poolIndex).size()-localIndex, segmentSize);
+        IndexTable.at(tableIndex).Index -= removed;
 
-        // remove whole node
-        if (!localIndex && removeSize == Pool.at(poolIndex).size())
+        auto removeSize = std::min(segmentSize-removed, IndexTable.at(tableIndex).Size-offset);
+        auto endOffset = offset+removeSize;
+
+        // erase whole entry
+        if (!offset && endOffset == IndexTable.at(tableIndex).Size)
         {
-            Pool.erase(Pool.begin()+poolIndex);
+            IndexTable.erase(IndexTable.begin()+tableIndex);
+            --tableIndex;
         }
+        // edit current entry
         else
-        {
-            Pool.at(poolIndex).erase(Pool.at(poolIndex).begin()+localIndex, Pool.at(poolIndex).begin()+localIndex+removeSize);
-            poolIndex++;
+        {  
+            if (endOffset == IndexTable.at(tableIndex).Size) // back
+            {
+                IndexTable.at(tableIndex).Size -= removeSize;
+            }
+            else if (offset) // middle
+            {
+                IndexTable.insert(IndexTable.begin()+tableIndex+1, TableEntry(index, IndexTable.at(tableIndex).Size-endOffset, IndexTable.at(tableIndex).Address+endOffset));
+                IndexTable.at(tableIndex).Size = offset;
+                
+                ++tableIndex;
+            }
+            else // front
+            {
+                IndexTable.at(tableIndex).Address += removeSize;
+                IndexTable.at(tableIndex).Size -= removeSize;
+            }
         }
         
-        segmentSize -= removeSize;
-        localIndex = 0;
+        removed += removeSize;
+        offset = 0;
+
+        tableIndex += bool(removed < segmentSize);
     }
 
-    // update table
-    if (found.PoolIndex < IndexTable.size()-1)
+    std::for_each(IndexTable.begin()+tableIndex+1, IndexTable.end(),[segmentSize](TableEntry &entry)
     {
-        IndexTable.resize(++found.PoolIndex);
-    }
-        
+        entry.Index -= segmentSize;
+    });
 }
 
 /** 
@@ -242,20 +238,27 @@ void SegmentList::Print()
     std::cout << CYAN << "\nIndex Table:" << std::endl;;
     for (const auto &entry : IndexTable)
     {
-        std::cout << entry << ",";
+        std::cout << entry.Index << "," << entry.Size << "," << entry.Address << std::endl;
     }
 
     std::cout << "\n" << RESET << std::endl;
 
     
     // print segment list
-    for (const auto &segment : Pool)
+    for (const auto &entry : IndexTable)
     {
-        std::cout << "\nSegment" << std::endl;
-        for (const auto &site : segment)
+        for (size_t i(0); i < entry.Size; i++)
         {
-            std::cout << (int)site << ", ";
+            std::cout << (int)*(entry.Address+i) << ",";
         }
     }
+
+    // std::cout << "\n" << std::endl;
+
+    // for (const auto &segment : Pool)
+    // {
+    //     std::cout << (int)segment << ",";
+
+    // }
     std::cout << std::endl;
 }

@@ -19,7 +19,7 @@ void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::stri
     else {
         std::byte* genomeData = gen->data(0,0);
         for(int i = 0; i < answer.size(); i++) {
-            if((*(genomeData+i)) != answer[i]){
+            if(*(gen->data(i,1)) != answer[i]){
                 failed = true;
             }
         }

@@ -24,11 +24,11 @@
 #include "catch.hpp"
 
 // Variables
-#define MutationRate 0.005     //< any mutation rate <= 0.02
-#define Size 75000    //< 500,000 ; 250,000 ; 100,000 ; 75,000, 50,000, 20,000 ; 5,000 avaliable 
+#define MutationRate 0.02     //< any mutation rate <= 0.02
+#define Size 50000    //< 500,000 ; 250,000 ; 100,000 ; 75,000, 50,000, 20,000 ; 5,000 avaliable 
 
 typedef std::byte Byte;
-typedef TestGenome GenomeType;  //< change to genomeType
+typedef GenomeLite GenomeType;  //< change to genomeType
 
 std::string name = typeid(GenomeType).name();  
 const std::vector<size_t> mutations = randomList(Size, MutationRate);
@@ -39,89 +39,89 @@ const std::vector<size_t> mutations = randomList(Size, MutationRate);
  *                                  TESTING
  * 
  ********************************************************************************/
-// TEST_CASE("Resize Benchmarks", "[benchmark]") 
-// {
-//     std::string file = "logs/"+name+".log";
-//     freopen(file.c_str(), "a", stdout);
+TEST_CASE("Resize Benchmarks", "[benchmark]") 
+{
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
-//     // initializing mutation list 
-//     size_t newSize = Size+(Size/10);
+    // initializing mutation list 
+    size_t newSize = Size+(Size/10);
 
-//     // Nested Insertion
-//     std::cout << "BENCHING: Resize" << std::endl;
-//     printTime();
-//     std::cout << "\n" << name << ": \nSize\t" << Size << "\nNew Size\t" << newSize << std::endl;  
+    // Nested Insertion
+    std::cout << "BENCHING: Resize" << std::endl;
+    printTime();
+    std::cout << "\n" << name << ": \nSize\t" << Size << "\nNew Size\t" << newSize << std::endl;  
 
-//     BENCHMARK("Resize") 
-//     {
-//         AbstractGenome* genome = new GenomeType(Size);
+    BENCHMARK("Resize") 
+    {
+        AbstractGenome* genome = new GenomeType(Size);
 
-//         genome->resize(newSize);
+        genome->resize(newSize);
 
-//         delete genome;
-//     };
+        delete genome;
+    };
 
-// } 
+} 
 
-// TEST_CASE("Clone Construction Benchmarks", "[benchmark]") 
-// {
-//     std::string file = "logs/"+name+".log";
-//     freopen(file.c_str(), "a", stdout);
+TEST_CASE("Clone Construction Benchmarks", "[benchmark]") 
+{
+    std::string file = "logs/"+name+".log";
+    freopen(file.c_str(), "a", stdout);
 
-//     // Apply multi mutations to genome
-//     AbstractGenome* genome = new GenomeType(Size);
+    // Apply multi mutations to genome
+    AbstractGenome* genome = new GenomeType(Size);
 
-//     for (size_t i(0); i < mutations.size(); i++)
-//     {
-//         if (i%3 == 0)
-//             genome->overwrite(mutations[i], std::vector< Byte >(1, (Byte)1));
-//         else if (i%3 == 1)
-//             genome->insert(mutations[i], std::vector< Byte >(1, (Byte)1));   
-//         else
-//             genome->remove(mutations[i], 1);
-//     }
+    for (size_t i(0); i < mutations.size(); i++)
+    {
+        if (i%3 == 0)
+            genome->overwrite(mutations[i], std::vector< Byte >(1, (Byte)1));
+        else if (i%3 == 1)
+            genome->insert(mutations[i], std::vector< Byte >(1, (Byte)1));   
+        else
+            genome->remove(mutations[i], 1);
+    }
 
-//     size_t childNum = 100;
+    size_t childNum = 100;
 
-//     // Nested Insertion
-//     std::cout << "BENCHING: Clone" << std::endl;
-//     printTime();
-//     std::cout << "\n" << name << ": \nSize\t" << Size << "\nChildren\t" << childNum << std::endl;  
+    // Nested Insertion
+    std::cout << "BENCHING: Clone" << std::endl;
+    printTime();
+    std::cout << "\n" << name << ": \nSize\t" << Size << "\nChildren\t" << childNum << std::endl;  
 
-//     BENCHMARK("Clone Constructor") 
-//     {
-//         std::vector<AbstractGenome*> children;
-//         children.reserve(childNum);
+    BENCHMARK("Clone Constructor") 
+    {
+        std::vector<AbstractGenome*> children;
+        children.reserve(childNum);
 
-//         for (size_t i(0); i < childNum; ++i)
-//         {
-//             children.push_back(genome->clone(0));
-//         }
+        for (size_t i(0); i < childNum; ++i)
+        {
+            children.push_back(genome->clone(0));
+        }
 
-//         for (size_t i(0); i < childNum; i++)
-//         {
-//             delete children[i];
-//         }
-//     };
+        for (size_t i(0); i < childNum; i++)
+        {
+            delete children[i];
+        }
+    };
 
-//      BENCHMARK("Force Clone Constructor") 
-//     {        
-//         std::vector<AbstractGenome*> children;
-//         children.reserve(childNum);
+     BENCHMARK("Force Clone Constructor") 
+    {        
+        std::vector<AbstractGenome*> children;
+        children.reserve(childNum);
 
-//         for (size_t i(0); i < childNum; ++i)
-//         {
-//             children.push_back(genome->clone(1));
-//         }
+        for (size_t i(0); i < childNum; ++i)
+        {
+            children.push_back(genome->clone(1));
+        }
 
-//         for (size_t i(0); i < childNum; i++)
-//         {
-//             delete children[i];
-//         }
-//     }; 
+        for (size_t i(0); i < childNum; i++)
+        {
+            delete children[i];
+        }
+    }; 
 
-//     delete genome; 
-// } 
+    delete genome; 
+} 
 
 
 TEST_CASE("Overwrite Benchmarks", "[benchmark]") 
@@ -134,14 +134,14 @@ TEST_CASE("Overwrite Benchmarks", "[benchmark]")
     printTime();
     std::cout << "\n" << name << ": \nSize\t" << Size << "\nMutations\t" << mutations.size() << std::endl;  
     
-    // BENCHMARK("Whole Genome Overwrite") 
-    // {
-    //     AbstractGenome* genome = new GenomeType(Size);
+    BENCHMARK("Whole Genome Overwrite") 
+    {
+        AbstractGenome* genome = new GenomeType(Size);
 
-    //     genome->overwrite(0, std::vector<Byte>(Size, (Byte)0));
+        genome->overwrite(0, std::vector<Byte>(Size, (Byte)0));
 
-    //     delete genome;
-    // }; 
+        delete genome;
+    }; 
 
     std::cout << "\n" << name << ": \nSize\t" << Size << "\nMutations\t" << mutations.size() << "\nMutation Rate\t" << MutationRate << std::endl;  
     BENCHMARK("Random Overwrites") 
