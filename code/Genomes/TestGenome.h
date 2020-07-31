@@ -10,13 +10,14 @@ private:
 	// custom properties & functions
 	std::vector<std::byte> sites;
 public:
-	TestGenome(size_t _size);
 
+	TestGenome(size_t _size);
 	~TestGenome() override {
+		std::cout << "done" << std::endl;
 	}
 
 	// copy constructor to copy sites vector
-	TestGenome(const TestGenome &genome) {
+	TestGenome(const TestGenome& genome) {
 		sites = genome.sites;
 	}
 
@@ -47,10 +48,10 @@ public:
 	}
 
 
-	// starting at index, write values in segement over values currently in genome
+	// starting at index, write values in segment over values currently in genome
 	virtual void overwrite(size_t index, const std::vector<std::byte>& segment) override {
 		if (index + segment.size() > sites.size()) {
-			std::cout << "attept to overwrite would write past end of genome! exiting..." << std::endl;
+			std::cout << "attempt to overwrite would write past end of genome! exiting..." << std::endl;
 			exit(1);
 		}
 		for (size_t i(0); i < segment.size(); i++) {
@@ -59,15 +60,19 @@ public:
 		//std::copy_n(segment, segment.size(), sites.begin() + index);
 	}
 
-	// starting at index, write values in segement genome between genome[index-1] and genome[index]
+	// starting at index, write values in segment genome between genome[index-1] and genome[index]
 	virtual void insert(size_t index, const std::vector<std::byte>& segment) override {
+		if (index > sites.size()) {
+			std::cout << "attempt to insert starting after end of genome! exiting..." << std::endl;
+			exit(1);
+		}
 		sites.insert(sites.begin() + index, segment.begin(), segment.end());
 	}
 
 	// starting at index, delete segmentSize values from genome starting at genome[index]
 	virtual void remove(size_t index, size_t segmentSize) override {
 		if (index + segmentSize > sites.size()) {
-			std::cout << "attept to erase would erase past end of genome! exiting..." << std::endl;
+			std::cout << "attempt to remove would remove past end of genome! exiting..." << std::endl;
 			exit(1);
 		}
 		sites.erase(sites.begin() + index, sites.begin() + index + segmentSize);
