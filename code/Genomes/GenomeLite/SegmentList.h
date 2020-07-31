@@ -24,12 +24,12 @@ typedef std::byte Byte; // easy reading
 /** struct for finding **/
 struct TableEntry
 {
-    size_t TableEnd; 
+    size_t Entry;
     size_t PoolIndex;
     size_t Offset;
 
-    TableEntry(size_t te, size_t pInd, size_t offset)
-        : TableEnd(te), PoolIndex(pInd), Offset(offset) {}
+    TableEntry(size_t entry, size_t pInd, size_t offset)
+        : Entry(entry), PoolIndex(pInd), Offset(offset) {}
 };
 
 
@@ -45,12 +45,16 @@ private:
     size_t Root; ///< Root node of tree
 
     size_t SiteCount = 0;
+    size_t Page;
+    double MutationRate;
+
+    size_t CalculatePage(size_t size);
 
 public:
     SegmentList() = default;
-    SegmentList(size_t size);
+    SegmentList(size_t size, double mutationRate = 0.01);
     SegmentList(const SegmentList &List);
-    void Reallocate();
+    SegmentList* Reallocate();
 
     ~SegmentList() { delete Pool; }
 
@@ -60,7 +64,6 @@ public:
     TableEntry Find(size_t index);
     Byte* GetData(size_t index);
     void Resize(size_t size);
-    size_t CreateList(size_t size);
 
     void Overwrite(size_t index, const std::vector<std::byte>& segment);
     void Insert(size_t index, const std::vector<std::byte>& segment);

@@ -43,20 +43,16 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
             end = index+byteSize;
         }
 
-        // allocate required amount of data based on dataSize
-        std::byte* ret = (std::byte*)malloc(dataSize*sizeof(std::byte));
-        if (ret == nullptr) {
-            std::cout << "data allocation failed, exiting" << std::endl;
-            exit(-1);
+        // create data vector of given size and fill it with genome values
+        std::vector<std::byte> data_returned(dataSize);
+        int data_index = 0;
+        for (int gen_index = index; gen_index < end && data_index < dataSize; gen_index++) {
+            data_returned[data_index] = getCurrentGenomeAt(gen_index);
+            data_index++;
         }
 
-        // get values in range requested by user
-        int ret_index = 0;
-        for (int gen_index = index; gen_index < end && ret_index < dataSize; gen_index++) {
-            ret[ret_index] = getCurrentGenomeAt(gen_index);
-            ret_index++;
-        }
-        return ret;
+        // return pointer to beginning of data vector
+        return static_cast<std::byte*>(&data_returned[0]);
    }
 }
 
@@ -74,6 +70,33 @@ int UmaGenome::getLowerBoundOffset(int key) {
         --it;
     int lb_offset = it->second;
     return lb_offset;
+}
+
+/* Returns a clone of the current genome.
+   If forceCopy is true, then it resets the "parent" genome of the clone
+   to the actual current genome. If forceCopy is false, it directly clones
+   the current genome, leaving the "parent", changelog, and offset map the same
+   in the clone. */
+AbstractGenome* UmaGenome::clone(bool forceCopy) {
+    if (forceCopy) {
+        // reconstruct current genome using changelog and offset map
+        std::vector<std::byte> new_sites(currentGenomeSize);
+        for (int new_sites_ind = 0; new_sites_ind < currentGenomeSize; new_sites_ind++) {
+            new_sites[new_sites_ind] = getCurrentGenomeAt(new_sites_ind);
+        }
+
+        // create a clone with an empty changelog and offset map
+        AbstractGenome* cloneGenome = new UmaGenome(currentGenomeSize);
+
+        /* reset the "parent" in the clone by changing the sites vector
+           to be equal to the reconstructed current genome */
+        (static_cast<UmaGenome*>(cloneGenome))->sites = new_sites;
+        return cloneGenome;
+    }
+    else {
+        // clone directly (copy over changelog, offset map, and parent)
+        return new UmaGenome(*this);
+    }
 }
 
 // Not fully implemented or used yet
@@ -98,6 +121,11 @@ void UmaGenome::pointMutate(size_t index, std::byte value) {
 }
 
 void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
+    if (index + segment.size() > currentGenomeSize) {
+        std::cout << "attempt to overwrite would write past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
+
     int size = segment.size();
     int seg_index = 0;
 
@@ -111,6 +139,10 @@ void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
 }
 
 void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
+    if (index > currentGenomeSize) {
+        std::cout << "attempt to insert past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
 
     int size = segment.size(); // insertion size
 
@@ -153,14 +185,14 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
     // If insertion start position isn't a key in offsetMap, add it to offsetMap
     std::map<int,int>::iterator offset_it = offsetMap.find(index);
     if (offset_it == offsetMap.end()){
-        // start not in offsetMap, so add it
+        // index not in offsetMap, so add it
         // set its offset to offset of lower bound
         int lb_offset = getLowerBoundOffset(index);
-        offsetMap.insert({index, getLowerBoundOffset(index)});
+        offsetMap.insert({index, lb_offset});
         offset_it = offsetMap.find(index);
     }
 
-    // Add insertion size to all offsets in offsetMap beginning at start
+    // Add insertion size to all offsets in offsetMap beginning at index
     while(offset_it != offsetMap.end()) {
         offset_it->second += size;
         offset_it++;
@@ -172,6 +204,10 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 }
 
 void UmaGenome::remove(size_t index, size_t segmentSize) {
+    if (index + segmentSize > currentGenomeSize) {
+        std::cout << "attempt to remove past end of genome! exiting..." << std::endl;
+        exit(1);
+    }
 
     // Remove all keys in deletion from changelog
     for (int deleteInd = index; deleteInd < (index+segmentSize); deleteInd++) {
@@ -180,7 +216,8 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         changelog.erase(deleteInd); 
     }
 
-    // Loop through every position after the end of the deletion and decrement keys by size
+    /* Loop through every position after the end of the deletion in changelog
+       and decrement keys by size */
     std::map<int,std::byte>::iterator changelog_it = changelog.upper_bound(index+segmentSize-1);
     while(changelog_it != changelog.end()) {
 
@@ -192,32 +229,36 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         changelog_it++;
     }
 
-    // Decrement all keys starting at index in offset map
-    std::map<int,int>::iterator ofs_it = offsetMap.upper_bound(index);
-    while(ofs_it != offsetMap.end()) {
-
-        // decrement current key by (segmentSize-1) because
-        // the index that is offsetted is always 
-        // one after the index of deletion
-        int key = ofs_it->first;
-        auto keyToChange = offsetMap.extract(key);
-        keyToChange.key() -= (segmentSize-1);
-        offsetMap.insert(move(keyToChange));
-        ofs_it++;
-    }
-
-    // If start not a key in offsetMap, add it to offsetMap
-    std::map<int,int>::iterator offset_it = offsetMap.find(index);
+    /* Add index after end of deletion (index+segmentSize) to offset map
+       if it's not already there. This position is where offsetting begins. */
+    std::map<int,int>::iterator offset_it = offsetMap.find(index+segmentSize);
     if (offset_it == offsetMap.end()){
-        // start not in offsetMap, so add it
+        // index+segmentSize not in offsetMap, so add it
         // set its offset equal to offset of lower bound
-        int lb_offset = getLowerBoundOffset(index);
-        offsetMap.insert({index, getLowerBoundOffset(index)});
-        offset_it = offsetMap.find(index);
+        int lb_offset = getLowerBoundOffset(index+segmentSize);
+        offsetMap.insert({index+segmentSize, lb_offset});
+        offset_it = offsetMap.find(index+segmentSize);
     }
 
-    // Subtract deletion size from all offsets in offsetMap beginning at start
+    // Remove all keys in deletion from offset map
+    for (int deleteInd = index; deleteInd < (index+segmentSize); deleteInd++) {
+        // erase key if it's in offset map
+        // this call does nothing if key isn't in offset map
+        offsetMap.erase(deleteInd); 
+    }
+
+    /* Decrement all keys/values starting after end of deletion (index+segmentSize)
+       in offset map by size because these positions are all 
+       offsetted by the deletion */
     while(offset_it != offsetMap.end()) {
+
+        // decrement current key in offset map by size
+        int key = offset_it->first;
+        auto keyToChange = offsetMap.extract(key);
+        keyToChange.key() -= segmentSize;
+        offsetMap.insert(move(keyToChange));
+
+        // decrement current value (offset) by size
         offset_it->second -= segmentSize;
         offset_it++;
     }
