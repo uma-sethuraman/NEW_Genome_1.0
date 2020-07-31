@@ -2,15 +2,21 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <memory>
 
 UmaGenome::UmaGenome(size_t _size){
-    sites.resize(_size);
+
+    /* constructing a genome from scratch so 
+       set parent (shared pointer) to point 
+       to empty vector of size _size */
+    parent = std::make_shared<std::vector<std::byte>>(_size);
+
     currentGenomeSize = _size;
 
     // insert initial default entry into offset map
     offsetMap.insert({0, 0});
 
-    // no mutations have occurred yet, parent genome intact
+    // no mutations have occurred yet, parent genome still intact
     mutationsOccurred = false;
 }
 
@@ -18,6 +24,8 @@ size_t UmaGenome::size() {
     return currentGenomeSize;
 }
 
+/* returns a pointer to byteSize bytes of data,
+   starting at index in the current genome */
 std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     if ((index+byteSize) > currentGenomeSize){
         std::cout << "error: byteSize exceeds the size of current genome" << std::endl;
@@ -25,11 +33,14 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     }
 
     if(!mutationsOccurred) {
-        // before any mutations, don't need to check changelog and offset map
-        return static_cast<std::byte*>(&sites[index]);
+        /* before any mutations, don't need to check changelog and offset map.
+           return from parent directly. */
+        return static_cast<std::byte*>(&((*parent)[index]));
     }
     else{
-        // need to use changelog and offset map
+        /* mutations have occurred so need to
+           use changelog and offset map */
+
         int dataSize = 0; // bytes of data to return
         int end = 0; // end index of data to return
         if (byteSize == 0){
@@ -43,33 +54,38 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
             end = index+byteSize;
         }
 
-        // create data vector of given size and fill it with genome values
-        std::vector<std::byte> data_returned(dataSize);
-        int data_index = 0;
-        for (int gen_index = index; gen_index < end && data_index < dataSize; gen_index++) {
-            data_returned[data_index] = getCurrentGenomeAt(gen_index);
-            data_index++;
+        // allocate required amount of data
+        std::byte* dataPtr = (std::byte*)malloc(dataSize*sizeof(std::byte));
+        if(dataPtr == nullptr) {
+            std::cout << "data allocation in data function failed, exiting!" << std::endl;
+            exit(-1);
         }
 
-        // return pointer to beginning of data vector
-        return static_cast<std::byte*>(&data_returned[0]);
+        // get values in range requested by user
+        int data_index = 0;
+        for (int gen_index = index; gen_index < end && data_index < dataSize; ++gen_index) {
+            dataPtr[data_index] = getCurrentGenomeAt(gen_index);
+            ++data_index;
+        }
+
+        /* add pointer to this genome's dataPointers vector,
+           pointer will be deleted in genome's destructor */
+        dataPointers.push_back(dataPtr);
+
+        // return pointer to requested data
+        return dataPtr;
    }
 }
 
+// resizes the current genome to new_size
 void UmaGenome::resize(size_t new_size) {
-
-    // set parent genome to current genome
-    sites = getCurrentGenome();
-
-    // clear changelog
-    changelog.clear();
-
-    // clear offset map and insert default (0,0) entry
-    offsetMap.clear();
-    offsetMap.insert({0,0});
-
-    // resize sites
-    sites.resize(new_size);
+    /* reset the parent to point to the 
+       reconstructed current genome and clear
+       the changelog and offset map */
+    genomeReset();
+    
+    // resize the vector of parent genome values
+    (*parent).resize(new_size);
 
     // modify size variable
     currentGenomeSize = new_size;
@@ -88,18 +104,17 @@ int UmaGenome::getLowerBoundOffset(int key) {
 
 /* Returns a clone of the current genome.
    If forceCopy is true, then it resets the "parent" genome of the clone
-   to the actual current genome and clears the changelog and offset map.
+   to point to the actual current genome and clears the changelog and offset map.
    If forceCopy is false, it directly clones the current genome, 
-   leaving the "parent", changelog, and offset map the same in the clone. */
+   leaving the parent, changelog, and offset map the same in the clone. */
 AbstractGenome* UmaGenome::clone(bool forceCopy) {
     if (forceCopy) {
-        
         // create a clone with an empty changelog and offset map
         AbstractGenome* cloneGenome = new UmaGenome(currentGenomeSize);
 
-        /* reset the "parent" in the clone by changing the sites vector
-           to be equal to the reconstructed current genome */
-        (static_cast<UmaGenome*>(cloneGenome))->sites = getCurrentGenome();
+        /* reset the parent in the clone to point to 
+           the reconstructed current genome */
+        (static_cast<UmaGenome*>(cloneGenome))->parent = std::make_shared<std::vector<std::byte>>(getCurrentGenome());
         return cloneGenome;
     }
     else {
@@ -124,6 +139,9 @@ void UmaGenome::pointMutate(size_t index, std::byte value) {
     mutationsOccurred = true;
 }
 
+/* overwrite the current genome values at indices 
+   from [index, index+segment.size()) with the 
+   values from the segment vector */
 void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
     if (index + segment.size() > currentGenomeSize) {
         std::cout << "attempt to overwrite would write past end of genome! exiting..." << std::endl;
@@ -134,14 +152,16 @@ void UmaGenome::overwrite(size_t index, const std::vector<std::byte>& segment) {
     int seg_index = 0;
 
     // calls point mutate on each byte in segment
-    for (int gen_index = index; gen_index < index+size; gen_index++) {
+    for (int gen_index = index; gen_index < index+size; ++gen_index) {
         pointMutate(gen_index, segment[seg_index]);
-        seg_index++;
+        ++seg_index;
     }
 
     mutationsOccurred = true;
 }
 
+/* insert the values in the segment vector 
+   into the current genome, starting at index */
 void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
     if (index > currentGenomeSize) {
         std::cout << "attempt to insert past end of genome! exiting..." << std::endl;
@@ -161,14 +181,14 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
         auto keyToChange = changelog.extract(key);
         keyToChange.key() += size;
         changelog.insert(move(keyToChange));
-        changelog_it++;
+        ++changelog_it;
     }
 
     // Insert (key, value) pairs from insertion into changelog
     int seg_index = 0;
-    for(int insertInd = index; insertInd < (index+size); insertInd++) {
+    for(int insertInd = index; insertInd < (index+size); ++insertInd) {
         changelog.insert({insertInd, segment[seg_index]});
-        seg_index++;
+        ++seg_index;
     }
 
     /* Loop from last key in offset map until you hit index+size (position after
@@ -186,7 +206,7 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
 
         // increment current value (offset) by size
         offset_it_rev->second += size;
-        offset_it_rev++;
+        ++offset_it_rev;
     }
 
 
@@ -205,6 +225,8 @@ void UmaGenome::insert(size_t index, const std::vector<std::byte>& segment) {
     mutationsOccurred = true;
 }
 
+/* remove segmentSize values from the
+   current genome, starting at index */
 void UmaGenome::remove(size_t index, size_t segmentSize) {
     if (index + segmentSize > currentGenomeSize) {
         std::cout << "attempt to remove past end of genome! exiting..." << std::endl;
@@ -212,7 +234,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
     }
 
     // Remove all keys in deletion from changelog
-    for (int deleteInd = index; deleteInd < (index+segmentSize); deleteInd++) {
+    for (int deleteInd = index; deleteInd < (index+segmentSize); ++deleteInd) {
         // erase key if it's in changelog
         // this call does nothing if key isn't in changelog
         changelog.erase(deleteInd); 
@@ -228,7 +250,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         auto keyToChange = changelog.extract(key);
         keyToChange.key() -= segmentSize;
         changelog.insert(move(keyToChange));
-        changelog_it++;
+        ++changelog_it;
     }
 
     /* Add index after end of deletion (index+segmentSize) to offset map
@@ -243,7 +265,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
     }
 
     // Remove all keys in deletion from offset map
-    for (int deleteInd = index; deleteInd < (index+segmentSize); deleteInd++) {
+    for (int deleteInd = index; deleteInd < (index+segmentSize); ++deleteInd) {
         // erase key if it's in offset map
         // this call does nothing if key isn't in offset map
         offsetMap.erase(deleteInd); 
@@ -262,7 +284,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
 
         // decrement current value (offset) by size
         offset_it->second -= segmentSize;
-        offset_it++;
+        ++offset_it;
     }
 
     currentGenomeSize -= segmentSize; // update current genome size
@@ -272,7 +294,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
 
 // prints entire current genome
 void UmaGenome::show() {
-    for (int index = 0; index < currentGenomeSize; index++) {
+    for (int index = 0; index < currentGenomeSize; ++index) {
         std::byte& num = GN::genomeRead<std::byte>(this, index);
         std::cout << (int)num << " ";
     }
@@ -283,7 +305,7 @@ void UmaGenome::show() {
 void UmaGenome::printChangelog() {
     std::map<int,std::byte>::iterator it;
 
-    for(it = changelog.begin(); it != changelog.end(); it++)
+    for(it = changelog.begin(); it != changelog.end(); ++it)
     {
         std::cout << "Key: " << it->first << ", ";
         std::cout << "Value: " << (int)it->second << std::endl;
@@ -294,24 +316,43 @@ void UmaGenome::printChangelog() {
 void UmaGenome::printOffsetMap() {
     std::map<int,int>::iterator it;
 
-    for(it = offsetMap.begin(); it != offsetMap.end(); it++)
+    for(it = offsetMap.begin(); it != offsetMap.end(); ++it)
     {
         std::cout << "Key: " << it->first << ", ";
         std::cout << "Offset: " << it->second << std::endl;
     }
 }
 
-// returns the current genome
+// returns a vector of bytes containing the entire current genome
 std::vector<std::byte> UmaGenome::getCurrentGenome() {
+
     // reconstruct current genome using changelog and offset map
     std::vector<std::byte> current(currentGenomeSize);
-    for (int ind = 0; ind < currentGenomeSize; ind++) {
+    for (int ind = 0; ind < currentGenomeSize; ++ind) {
         current[ind] = getCurrentGenomeAt(ind);
     }
     return current;
 }
 
-// random access function : returns value in current genome at position pos
+/* resets parent to point to the reconstructed current genome,
+   collapses/resets changelog and offset map */
+void UmaGenome::genomeReset() {
+
+    // change parent genome to point to reconstructed current genome
+    parent = std::make_shared<std::vector<std::byte>>(getCurrentGenome());;
+    
+    // clear changelog
+    changelog.clear();
+
+    // clear offset map and insert default (0,0) entry
+    offsetMap.clear();
+    offsetMap.insert({0,0});
+
+    // no mutations have occurred yet on the reset genome
+    mutationsOccurred = false;
+}
+
+// random access function: returns value in current genome at position pos
 std::byte UmaGenome::getCurrentGenomeAt(int pos) {
     std::map<int,std::byte>::iterator changelog_it;
     changelog_it = changelog.find(pos);
@@ -338,6 +379,6 @@ std::byte UmaGenome::getCurrentGenomeAt(int pos) {
         }
 
         // get value from parent at index (pos-pos_offset)
-        return sites[pos-pos_offset];
+        return (*parent)[pos-pos_offset];
     }
 }
