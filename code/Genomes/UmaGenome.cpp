@@ -1,3 +1,8 @@
+/**
+ * \file UmaGenome.cpp
+ * \author Uma Sethuraman
+ **/
+
 #include "UmaGenome.h"
 #include <iostream>
 #include <vector>

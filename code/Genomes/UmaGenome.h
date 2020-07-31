@@ -1,3 +1,8 @@
+/**
+ * \file UmaGenome.h
+ * \author Uma Sethuraman
+ **/
+
 #pragma once
 #include <vector>
 #include <stdint.h>
