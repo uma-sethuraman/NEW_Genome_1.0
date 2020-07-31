@@ -13,8 +13,7 @@
 // base can work with a global seed if they want, as well as some
 // utility functions for getting common number types easily.
 
-/****** DIRECT COPY OF Random.h FROM MABE CODE
-MAINLY NEEDED IN MUTATE METHOD IN UmaGenome.cpp RIGHT NOW ******/
+/****** DIRECT COPY OF Random.h FROM MABE CODE ******/
 
 #pragma once
 
