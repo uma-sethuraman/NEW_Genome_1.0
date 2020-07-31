@@ -235,7 +235,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 				addToChangelog(indexChangelog, 0, segmentSize, (std::byte)0);
 			}
 
-			// There is at least one site with an insert mutation affected
+			// There is at least one site affected with an insert mutation 
 			else if (removeFlag == false && insertFlag == true) {
 				size_t modifiedRemoveOffset = segmentSize;
 
@@ -260,9 +260,15 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 				// If the number sites removed from the changelog was not segmentSize
 				// Site at index does not exist in the changelog
 				if (modifiedRemoveOffset != 0 && !changelog.count(index)) {
+					//std::cout << "in  boss" << std::endl;
 					addToChangelog(index, 0, modifiedRemoveOffset, (std::byte)0);
 
 				}
+			}
+
+			// There is at least two sites affected with an insert and remove mutation
+			else if (removeFlag == true && insertFlag == true) {
+				std::cout << "in here boss" << std::endl;
 			}
 
 			// Index site in changelog is an insert mutation
@@ -349,6 +355,7 @@ void StephanieGenome::remove(size_t index, size_t segmentSize) {
 }
 
 void StephanieGenome::show() {
+	printChangelog();
 	for (int index = 0; index < genomeSize; index++) {
 		std::byte& num = GN::genomeRead<std::byte>(this, index);
 		std::cout << (int)num << " ";
@@ -371,7 +378,7 @@ void StephanieGenome::generateNewGenome() {
 	int offset = 0;
 
 	// Create an offspring genome
-	for (int i = 0; i < genomeSize; i++) {
+	for (size_t i = 0; i < genomeSize; i++) {
 
 		// Index does not exist in the changelog
 		if (!changelog.count(i)) {
