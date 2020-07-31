@@ -10,7 +10,6 @@
 
 // testing
 #include "UmaChangelogTests.h"
-#include "VictoriaTests.h"
 
 // genomes
 #include "AbstractGenome.h"
