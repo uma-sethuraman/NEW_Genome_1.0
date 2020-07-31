@@ -24,7 +24,7 @@ private:
     std::map<int, std::byte> changelog;
     std::map<int, int> offsetMap;
 
-    bool mutationsOccurred; // false if no mutations have occurred on sites yet
+    bool mutationsOccurred; // false if no mutations have occurred on parent yet
     size_t currentGenomeSize; // current genome size
 
     /* stores all pointers returned by the data function

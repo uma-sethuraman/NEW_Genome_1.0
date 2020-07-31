@@ -40,7 +40,7 @@ std::byte* UmaGenome::data(size_t index, size_t byteSize) {
     if(!mutationsOccurred) {
         /* before any mutations, don't need to check changelog and offset map.
            return from parent directly. */
-        return static_cast<std::byte*>(&((*parent)[index]));
+        return static_cast<std::byte*>(&(parent->at(index)));
     }
     else{
         /* mutations have occurred so need to
@@ -90,7 +90,7 @@ void UmaGenome::resize(size_t new_size) {
     genomeReset();
     
     // resize the vector of parent genome values
-    (*parent).resize(new_size);
+    parent->resize(new_size);
 
     // modify size variable
     currentGenomeSize = new_size;
@@ -132,12 +132,12 @@ AbstractGenome* UmaGenome::clone(bool forceCopy) {
 void UmaGenome::pointMutate(size_t index, std::byte value) {
     std::map<int, std::byte>::iterator it = changelog.find(index);
     if(it != changelog.end()){
-        // key index already in map, change its value
+        // key index already in changelog, change its value
         it->second = value;
     }
     else
     {
-        // key index not in map, insert it with value
+        // key index not in changelog, insert it with value
         changelog.insert({index, value});
     }
 
@@ -384,6 +384,6 @@ std::byte UmaGenome::getCurrentGenomeAt(int pos) {
         }
 
         // get value from parent at index (pos-pos_offset)
-        return (*parent)[pos-pos_offset];
+        return parent->at(pos-pos_offset);
     }
 }
