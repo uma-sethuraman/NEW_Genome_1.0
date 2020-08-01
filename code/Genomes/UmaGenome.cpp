@@ -94,7 +94,7 @@ void UmaGenome::resize(size_t new_size) {
 
     // modify size variable
     currentGenomeSize = new_size;
-};
+}
 
 // gets offset of key's lower bound from offsetMap
 int UmaGenome::getLowerBoundOffset(int key) {
