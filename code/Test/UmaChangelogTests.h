@@ -4,6 +4,7 @@
 #include <vector>
 
 /* TO RUN THESE TESTS ON ANY GENOME:
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
  - in the main.cpp file, include "UmaChangelogTests.h"
  - in the main method, call runUmaChangelogTests<genomeName>(debug),
  where genomeName is the name of the genome class you want to test
@@ -14,6 +15,18 @@
 
 /* checks if test passes or fails by
  comparing genome passed in to the answer vector */
+=======
+   - in the main.cpp file, include "UmaChangelogTests.h"
+   - in the main method, call runUmaChangelogTests<genomeName>(debug),
+     where genomeName is the name of the genome class you want to test
+     and you can pass in true or false for debug based on if you want
+     to see the debug output 
+   - users can manually set and change the debug output in any function
+     if they do not want the default debug output */
+
+/* checks if test passes or fails by 
+   comparing genome passed in to the answer vector */
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::string testName) {
     bool failed = false;
     if (gen->size() != answer.size())
@@ -213,6 +226,7 @@ void copyTest1(bool debug) {
 }
 
 /* overwriting at position past end of genome,
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
  should exit with error message,
  should be called separate from other tests
  since it will exit immediately */
@@ -220,6 +234,15 @@ template <class genomeName>
 void invalidOverwriteTest(bool debug) {
     AbstractGenome* genome = new genomeName(100);
     
+=======
+   should exit with error message, 
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidOverwriteTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
     // trying to overwrite at position 110 in size 100 genome
     genome->overwrite(110, std::vector<std::byte>({(std::byte)10}));
 }
@@ -885,7 +908,7 @@ void removeTest12(bool debug) {
     
     // insert {100, 110, 120, 130, 140} starting at position 6
     genome->insert(6, std::vector<std::byte>({(std::byte)(100), (std::byte)(110), (std::byte)(120), (std::byte)(130), (std::byte)(140)}));
-    
+
     // remove positions 7 and 8
     genome->remove(7, 2);
     
@@ -1011,6 +1034,7 @@ void removeTest14(bool debug) {
     delete genome;
 }
 
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
 /* removing past end of genome,
  should exit with error message,
  should be called separate from other tests
@@ -1019,6 +1043,72 @@ template <class genomeName>
 void invalidRemoveTest(bool debug) {
     AbstractGenome* genome = new genomeName(100);
     
+=======
+/* overlapping remove mutations (removing the same 
+   positions more than once) in a size 17 genome */
+template <class genomeName>
+void removeTest14(bool debug) {
+
+    // original genome of size 17: all values equal to their indices
+    AbstractGenome* genome = new genomeName(17);
+    for (int i(0); i < genome->size(); i++) {
+        GN::genomeWrite(genome, i, (std::byte)i);
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    // remove positions 0 and 1
+    genome->remove(0, 2);
+
+    // remove positions 3 and 4
+    genome->remove(3, 2);
+
+    // remove positions 7 and 8
+    genome->remove(7, 2);
+
+    /* remove positions 6,7,8.
+       old 7 and 8 positions removed by previous mutation,
+       this mutation should remove current 7 and 8 positions. */
+    genome->remove(6, 3);
+
+    /* original genome: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+       after mutation 1: 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+       after mutation 2: 2 3 4 7 8 9 10 11 12 13 14 15 16
+       after mutation 3: 2 3 4 7 8 9 10 13 14 15 16
+       after mutation 4: 2 3 4 7 8 9 15 16
+       current genome: 2 3 4 7 8 9 15 16 */
+
+    if (debug) {
+        std::cout << "CURRENT GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    // correct answer: 2 3 4 7 8 9 15 16
+    std::vector<std::byte> answer{(std::byte)2, (std::byte)3,
+                                  (std::byte)4, (std::byte)7,
+                                  (std::byte)8, (std::byte)9,
+                                  (std::byte)15, (std::byte)16};
+    
+    printResults(answer, genome, "Remove Test 14: ");
+
+    delete genome;
+}
+
+/* removing past end of genome,
+   should exit with error message,
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidRemoveTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
     // removing 5 at position 100 will try to remove past end of genome
     genome->remove(100, 5);
 }
@@ -1832,6 +1922,263 @@ void cloneTest3(bool debug) {
     delete finalClone;
 }
 
+/* inserting starting at position past end of genome,
+   should exit with error message,
+   should be called separate from other tests
+   since it will exit immediately */
+template <class genomeName>
+void invalidInsertTest(bool debug) {
+    AbstractGenome* genome = new genomeName(100);
+
+    // trying to insert at position 110 in size 100 genome
+    genome->insert(110, std::vector<std::byte>({(std::byte)10}));
+}
+
+/* clones a size 100 genome and
+   checks if clone data matches original data */
+template <class genomeName>
+void cloneTest1(bool debug) {
+
+    // original genome of size 100: all values are equal to their indices
+    AbstractGenome* genome = new genomeName(100);
+    std::vector<std::byte> answer(100); // stores original genome data
+    for(int i = 0; i < genome->size(); i++) {
+        GN::genomeWrite(genome, i, (std::byte)i);
+        answer[i] = (std::byte)i;
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    AbstractGenome* clone = genome->clone();
+
+    if (debug) {
+        std::cout << "CLONED GENOME: ";
+        clone->show();
+        std::cout << std::endl;
+    }
+
+    printResults(answer, clone, "Clone Test 1: ");
+
+    delete genome;
+    delete clone;
+}
+
+/* cloning test on size 20 genome.
+   clone original genome, mutate the clone,
+   and check if clone's values are correct. */
+template <class genomeName>
+void cloneTest2(bool debug) {
+
+    // original genome of size 20: all values are 0
+    AbstractGenome* genome = new genomeName(20);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    AbstractGenome* clone = genome->clone();
+
+    // Mutating the clone: 
+
+    // overwrite first 10 values to be 44
+    clone->overwrite(0, std::vector<std::byte>(10, (std::byte)44));
+
+    // remove positions 5 through 9
+    clone->remove(5, 5);
+
+    // insert {33, 33, 33, 33} at position 2
+    clone->insert(2, std::vector<std::byte>(4, (std::byte)33));
+
+    /* Original clone: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+       After mutation 1: 44 44 44 44 44 44 44 44 44 44 0 0 0 0 0 0 0 0 0 0
+       After mutation 2: 44 44 44 44 44 0 0 0 0 0 0 0 0 0 0
+       After mutation 3: 44 44 33 33 33 33 44 44 44 0 0 0 0 0 0 0 0 0 0 */
+
+    /* Cloning the clone, passed in forceCopy flag as true
+       to tell the method to set the parent/exemplar genome
+       to the current genome */
+    AbstractGenome* finalClone = clone->clone(true);
+
+    if (debug) {
+        std::cout << "CLONED GENOME: ";
+        clone->show();
+        std::cout << "COPY OF CLONED GENOME: ";
+        finalClone->show();
+        std::cout << std::endl;
+    }
+
+    /* correct answer (what clone values should be):
+       44 44 33 33 33 33 44 44 44 0 0 0 0 0 0 0 0 0 0 */
+    std::vector<std::byte> answer(19, (std::byte)0);
+    for (int i = 0; i <= 8; i++) {
+        if(i >= 2 && i <= 5)
+            answer[i] = (std::byte)33;
+        else
+            answer[i] = (std::byte)44;
+    }
+
+    // check if clone data is correct and matches finalClone data
+    bool failed = false;
+    if (clone->size() != answer.size())
+        failed = true;
+    else {
+        for(int i = 0; i < answer.size(); i++) {
+            if((*(clone->data(i, 1))) != answer[i]){
+                failed = true;
+            }
+            if (*(clone->data(i,1)) != *(finalClone->data(i,1))) {
+                failed = true;
+            }
+        }
+    }
+
+    std::cout << "Clone Test 2: ";
+    if(failed) 
+        std::cout << "failed" << std::endl;
+    else
+        std::cout << "passed" << std::endl;
+    
+    delete genome;
+    delete clone;
+    delete finalClone;
+}
+
+/* cloning test on size 10 genome,
+   10 generations of cloning and mutating. */
+template <class genomeName>
+void cloneTest3(bool debug) {
+
+    // original genome of size 10: all values are 0
+    AbstractGenome* genome = new genomeName(10);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "ORIGINAL GENOME: ";
+        genome->show();
+        std::cout << std::endl;
+    }
+
+    /* Clone genome, overwrite first 10 values to be 30.
+       After overwrite: 30 30 30 30 30 30 30 30 30 30 */
+    AbstractGenome* clone = genome->clone();
+    clone->overwrite(0, std::vector<std::byte>(10, (std::byte)30));
+
+    /* Clone clone, overwrite position 2 to be 2, insert {3,4} at position 3.
+       After overwrite: 30 30 2 30 30 30 30 30 30 30
+       After insert: 30 30 2 3 4 30 30 30 30 30 30 30 */
+    AbstractGenome* clone1 = clone->clone();
+    clone1->overwrite(2, std::vector<std::byte>({(std::byte)2}));
+    clone1->insert(3, std::vector<std::byte>({(std::byte)3, (std::byte)4}));
+
+    /* Clone clone1, remove positions 1 through 3.
+       After remove: 30 4 30 30 30 30 30 30 30 */
+    AbstractGenome* clone2 = clone1->clone();
+    clone2->remove(1, 3);
+
+    /* Clone clone2, insert {40, 40, 40, 40} at position 4, insert 50 at position 5.
+       After first insert:  30 4 30 30 40 40 40 40 30 30 30 30 30
+       After second insert: 30 4 30 30 40 50 40 40 40 30 30 30 30 30 */
+    AbstractGenome* clone3 = clone2->clone();
+    clone3->insert(4, std::vector<std::byte>(4, (std::byte)40));
+    clone3->insert(5, std::vector<std::byte>({(std::byte)50}));
+
+    /* Clone clone3, overwrite positions 0 to 3 with value 10.
+       After overwrite: 10 10 10 10 40 50 40 40 40 30 30 30 30 30 */
+    AbstractGenome* clone4 = clone3->clone();
+    clone4->overwrite(0, std::vector<std::byte>(4, (std::byte)10));
+
+    /* Clone clone4, remove positions 0 and 1, remove positions 10 and 11.
+       After first remove: 10 10 40 50 40 40 40 30 30 30 30 30
+       After second remove: 10 10 40 50 40 40 40 30 30 30 */
+    AbstractGenome* clone5 = clone4->clone();
+    clone5->remove(0, 2);
+    clone5->remove(10, 2);
+
+    /* Clone clone5, overwrite positions 7 and 8 with value 70.
+       After overwrite: 10 10 40 50 40 40 40 70 70 30 */
+    AbstractGenome* clone6 = clone5->clone();
+    clone6->overwrite(7, std::vector<std::byte>(2, (std::byte)70));
+
+    /* Clone clone6, insert {20, 20, 20} at position 3.
+       After insert: 20 20 20 10 10 40 50 40 40 40 70 70 30 */
+    AbstractGenome* clone7 = clone6->clone();
+    clone7->insert(0, std::vector<std::byte>(3, (std::byte)20));
+
+    /* Clone clone7, remove positions 1 through 5.
+       After remove: 20 50 40 40 40 70 70 30 */
+    AbstractGenome* clone8 = clone7->clone();
+    clone8->remove(1, 5);
+
+    /* Clone clone8, overwrite positions 5 through 7 with value 90.
+       After overwrite: 20 50 40 40 40 90 90 90 */
+    AbstractGenome* clone9 = clone8->clone();
+    clone9->overwrite(5, std::vector<std::byte>(3, (std::byte)90));
+
+    /* Clone clone9, passed in forceCopy flag as true
+       to tell the method to set the parent/exemplar genome
+       to the current genome. 
+       same values as clone9: 20 50 40 40 40 90 90 90 */
+    AbstractGenome* finalClone = clone9->clone(true);
+
+    if (debug) {
+        std::cout << "LAST MUTATED CLONE: ";
+        clone9->show();
+        std::cout << "COPY OF LAST MUTATED CLONE: ";
+        finalClone->show();
+        std::cout << std::endl;
+    }
+
+    /* correct answer (clone9 and finalClone data):
+       20 50 40 40 40 90 90 90 */
+    std::vector<std::byte> answer{(std::byte)20, (std::byte)50, 
+                                  (std::byte)40, (std::byte)40,
+                                  (std::byte)40, (std::byte)90,
+                                  (std::byte)90, (std::byte)90};
+
+    // check if clone9 data is correct and matches finalClone data
+    bool failed = false;
+    if (clone9->size() != answer.size())
+        failed = true;
+    else {
+        for(int i = 0; i < answer.size(); i++) {
+            if((*(clone9->data(i, 1))) != answer[i]){
+                failed = true;
+            }
+            if (*(clone9->data(i,1)) != *(finalClone->data(i,1))) {
+                failed = true;
+            }
+        }
+    }
+
+    std::cout << "Clone Test 3: ";
+    if(failed) 
+        std::cout << "failed" << std::endl;
+    else
+        std::cout << "passed" << std::endl;
+    
+    // delete original genome and all clones
+    delete genome;
+    delete clone;
+    delete clone1;
+    delete clone2;
+    delete clone3;
+    delete clone4;
+    delete clone5;
+    delete clone6;
+    delete clone7;
+    delete clone8;
+    delete clone9;
+    delete finalClone;
+}
+
 // point, insert, and remove mutations on size 5 genome
 template <class genomeName>
 void allMutationsTest1(bool debug) {
@@ -2102,10 +2449,17 @@ void allMutationsTest4(bool debug) {
     delete genome;
 }
 
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
 /* multiple point mutations on size 100000 large genome,
  initially rewrites all values in genome,
  debug doesn't print entire genome since it's very large,
  user can modify test to print what they want when debug is set */
+=======
+/* multiple point mutations on size 100000 large genome, 
+   initially rewrites all values in genome,
+   debug doesn't print entire genome since it's very large,
+   user can modify test to print what they want when debug is set */
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 template <class genomeName>
 void stressTest1(bool debug) {
     
@@ -2126,6 +2480,7 @@ void stressTest1(bool debug) {
     
     // point mutation - change position 4000's value to 95
     genome->overwrite(4000, std::vector<std::byte>({(std::byte)(95)}));
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
     
     // point mutation - change position 5000's value to 105
     genome->overwrite(5000, std::vector<std::byte>({(std::byte)(105)}));
@@ -2133,6 +2488,15 @@ void stressTest1(bool debug) {
     // point mutation - change position 6000's value to 205
     genome->overwrite(6000, std::vector<std::byte>({(std::byte)(205)}));
     
+=======
+  
+    // point mutation - change position 5000's value to 105
+    genome->overwrite(5000, std::vector<std::byte>({(std::byte)(105)}));
+        
+    // point mutation - change position 6000's value to 205
+    genome->overwrite(6000, std::vector<std::byte>({(std::byte)(205)}));
+        
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
     // point mutation - change position 70000's value to 15
     genome->overwrite(70000, std::vector<std::byte>({(std::byte)(15)}));
     
@@ -2174,9 +2538,15 @@ void stressTest1(bool debug) {
 }
 
 /* insertion of size 300 at beginning of size 100000 genome,
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
  initially rewrites all values in genome,
  debug doesn't print entire genome since it's very large,
  user can modify test to print what they want when debug is set */
+=======
+   initially rewrites all values in genome,
+   debug doesn't print entire genome since it's very large,
+   user can modify test to print what they want when debug is set */
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 template <class genomeName>
 void stressTest2(bool debug) {
     
@@ -2209,9 +2579,15 @@ void stressTest2(bool debug) {
 }
 
 /* deletion of size 300 at beginning of size 100000 genome,
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
  initially rewrites all values in genome,
  debug doesn't print entire genome since it's very large,
  user can modify test to print what they want when debug is set */
+=======
+   initially rewrites all values in genome,
+   debug doesn't print entire genome since it's very large,
+   user can modify test to print what they want when debug is set */
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 template <class genomeName>
 void stressTest3(bool debug) {
     
@@ -2238,9 +2614,15 @@ void stressTest3(bool debug) {
 }
 
 /* point, copy, insert, and delete mutations on size 1 million genome,
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
  initially rewrites all values in genome,
  debug doesn't print entire genome since it's very large,
  user can modify test to print what they want when debug is set */
+=======
+   initially rewrites all values in genome, 
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 template<class genomeName>
 void stressTest4(bool debug) {
     AbstractGenome* genome = new genomeName(1000000);
@@ -2427,6 +2809,138 @@ void stressTest8(bool debug) {
     delete genome;
 }
 
+/* 5000 overwrite mutations on size 500000 genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest5(bool debug) {
+
+    // all 500000 values are initially 0
+    AbstractGenome* genome = new genomeName(500000);
+
+    /* correct answer: genome of size 500000 with every value 
+       equal to 0 except every 100th value which is 25 */
+    std::vector<std::byte> answer(genome->size(), (std::byte)0);
+
+    /* 5000 overwrite mutations: point mutation on every 100th value
+       to set that value to 25 */
+    for (int i = 0; i < genome->size(); i+=100) {
+         genome->overwrite(i, std::vector<std::byte>({(std::byte)25}));
+         answer[i] = (std::byte)25; // update answer vector too
+    }
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer, genome, "Stress Test 5: ");
+
+    delete genome;
+}
+
+/* 1000 insert mutations of size 200 at position 0 in size 1 million genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest6(bool debug) {
+
+    size_t genomeSize = 1000000;
+
+    // all 1 million values are initially 0
+    AbstractGenome* genome = new genomeName(genomeSize);
+
+    /* 1000 insertions of size 200 
+       with all values in the insertions equal to 55,
+       inserting at the start of the genome */
+    for (int i = 0; i < 1000; i++) {
+        std::vector<std::byte> vals(200, (std::byte)55);
+        genome->insert(0, vals);
+    }
+
+    /* correct answer: genome of size 1200000 with the first 200000
+       indices having a value of 55 and the remaining 1 million indices
+       having value 0 */
+    std::vector<std::byte> answer_part_one(200000, (std::byte)55);
+    std::vector<std::byte> answer_part_two(genomeSize, (std::byte)0);
+    answer_part_two.insert(answer_part_two.begin(), answer_part_one.begin(), answer_part_one.end());
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer_part_two, genome, "Stress Test 6: ");
+
+    delete genome;
+}
+
+/* 1000 remove mutations of size 200 at position 0 in size 1 million genome, 
+   doesn't initially rewrite entire genome (unlike stress tests 1-4),
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest7(bool debug) {
+
+    // all 1 million values are initially 0
+    AbstractGenome* genome = new genomeName(1000000);
+
+    /* 1000 deletions of size 200 at position 0, 
+       removing the first 200000 indices of the genome */
+    for (int i = 0; i < 1000; i++) {
+         genome->remove(0, 200);
+    }
+
+    /* correct answer: genome of size 800000 with all values equal to 0 */
+    std::vector<std::byte> answer(800000, (std::byte)0);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    printResults(answer, genome, "Stress Test 7: ");
+
+    delete genome;
+}
+
+/* multiple large-scale mutations (overwriting entire genome, 
+   5000 insertions, 5000 deletions) on size 500000 genome,
+   debug doesn't print entire genome since it's very large, 
+   user can modify test to print what they want when debug is set */
+template <class genomeName>
+void stressTest8(bool debug) {
+    // all 500000 values are initially 0
+    AbstractGenome* genome = new genomeName(500000);
+
+    // overwrite all 500000 values to 20
+    genome->overwrite(0, std::vector<std::byte>(500000, (std::byte)20));
+
+    // insert 5000 values of 30 at beginning of genome
+    genome->insert(0, std::vector<std::byte>(5000, (std::byte)30));
+
+    // remove 5000 values starting at position 2500
+    genome->remove(2500, 5000);
+
+    if (debug) {
+        std::cout << "----------------------------------------" << std::endl;
+        std::cout << "Debug output must be set by user, because of very large size genome.\n" << std::endl;
+    }
+
+    /* correct answer: genome of size 500000 with 
+       first 2500 values being 30 and remaining 
+       values being 20. */
+    std::vector<std::byte> answer(500000, (std::byte)20);
+    for (int i = 0; i < 2500; i++)
+        answer[i] = (std::byte)30;
+    
+    printResults(answer, genome, "Stress Test 8: ");
+
+    delete genome;
+}
+
 // runs all point and copy mutation tests
 template <class genomeName>
 void runOverwriteTests(bool debug) {
@@ -2520,6 +3034,7 @@ void runAllStressTests(bool debug) {
     
     auto t04 = std::chrono::steady_clock::now();
     stressTest4<genomeName>(debug);
+<<<<<<< HEAD:code/Tests/UmaChangelogTests.h
     auto t14 = std::chrono::steady_clock::now();
     std::cout << "Stress test 4 took " << std::chrono::duration_cast<std::chrono::seconds>(t14 - t04).count() << " s" << std::endl;
     
@@ -2542,6 +3057,12 @@ void runAllStressTests(bool debug) {
     stressTest8<genomeName>(debug);
     auto t18 = std::chrono::steady_clock::now();
     std::cout << "Stress test 8 took " << std::chrono::duration_cast<std::chrono::seconds>(t18 - t08).count() << " s" << std::endl;
+=======
+    stressTest5<genomeName>(debug);
+    stressTest6<genomeName>(debug);
+    stressTest7<genomeName>(debug);
+    stressTest8<genomeName>(debug);
+>>>>>>> origin/master:code/Test/UmaChangelogTests.h
 }
 
 // runs all tests in this file

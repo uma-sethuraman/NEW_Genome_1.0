@@ -1,6 +1,11 @@
 /*
+<<<<<<< HEAD
  *  Catch v2.12.2
  *  Generated: 2020-05-25 15:09:23.791719
+=======
+ *  Catch v2.12.4
+ *  Generated: 2020-07-05 11:47:18.451282
+>>>>>>> origin/master
  *  ----------------------------------------------------------
  *  This file has been merged from multiple headers. Please don't edit it directly
  *  Copyright (c) 2020 Two Blue Cubes Ltd. All rights reserved.
@@ -15,7 +20,11 @@
 
 #define CATCH_VERSION_MAJOR 2
 #define CATCH_VERSION_MINOR 12
+<<<<<<< HEAD
 #define CATCH_VERSION_PATCH 2
+=======
+#define CATCH_VERSION_PATCH 4
+>>>>>>> origin/master
 
 #ifdef __clang__
 #    pragma clang system_header
@@ -775,7 +784,11 @@ constexpr auto operator "" _catch_sr( char const* rawChars, std::size_t size ) n
 #define INTERNAL_CATCH_REMOVE_PARENS_4_ARG(_0, _1, _2, _3) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_3_ARG(_1, _2, _3)
 #define INTERNAL_CATCH_REMOVE_PARENS_5_ARG(_0, _1, _2, _3, _4) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_4_ARG(_1, _2, _3, _4)
 #define INTERNAL_CATCH_REMOVE_PARENS_6_ARG(_0, _1, _2, _3, _4, _5) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_5_ARG(_1, _2, _3, _4, _5)
+<<<<<<< HEAD
 #define INTERNAL_CATCH_REMOVE_PARENS_7_ARG(_0, _1, _2, _3, _4, _5, _6) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_6_ARG(_1, _2, _4, _5, _6)
+=======
+#define INTERNAL_CATCH_REMOVE_PARENS_7_ARG(_0, _1, _2, _3, _4, _5, _6) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_6_ARG(_1, _2, _3, _4, _5, _6)
+>>>>>>> origin/master
 #define INTERNAL_CATCH_REMOVE_PARENS_8_ARG(_0, _1, _2, _3, _4, _5, _6, _7) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_7_ARG(_1, _2, _3, _4, _5, _6, _7)
 #define INTERNAL_CATCH_REMOVE_PARENS_9_ARG(_0, _1, _2, _3, _4, _5, _6, _7, _8) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_8_ARG(_1, _2, _3, _4, _5, _6, _7, _8)
 #define INTERNAL_CATCH_REMOVE_PARENS_10_ARG(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9) INTERNAL_CATCH_REMOVE_PARENS(_0), INTERNAL_CATCH_REMOVE_PARENS_9_ARG(_1, _2, _3, _4, _5, _6, _7, _8, _9)
@@ -2468,7 +2481,11 @@ namespace Catch {
         virtual void sectionEnded( SectionEndInfo const& endInfo ) = 0;
         virtual void sectionEndedEarly( SectionEndInfo const& endInfo ) = 0;
 
+<<<<<<< HEAD
         virtual auto acquireGeneratorTracker( SourceLineInfo const& lineInfo ) -> IGeneratorTracker& = 0;
+=======
+        virtual auto acquireGeneratorTracker( StringRef generatorName, SourceLineInfo const& lineInfo ) -> IGeneratorTracker& = 0;
+>>>>>>> origin/master
 
 #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
         virtual void benchmarkPreparing( std::string const& name ) = 0;
@@ -4080,16 +4097,27 @@ namespace Generators {
         return makeGenerators( value( T( std::forward<U>( val ) ) ), std::forward<Gs>( moreGenerators )... );
     }
 
+<<<<<<< HEAD
     auto acquireGeneratorTracker( SourceLineInfo const& lineInfo ) -> IGeneratorTracker&;
+=======
+    auto acquireGeneratorTracker( StringRef generatorName, SourceLineInfo const& lineInfo ) -> IGeneratorTracker&;
+>>>>>>> origin/master
 
     template<typename L>
     // Note: The type after -> is weird, because VS2015 cannot parse
     //       the expression used in the typedef inside, when it is in
     //       return type. Yeah.
+<<<<<<< HEAD
     auto generate( SourceLineInfo const& lineInfo, L const& generatorExpression ) -> decltype(std::declval<decltype(generatorExpression())>().get()) {
         using UnderlyingType = typename decltype(generatorExpression())::type;
 
         IGeneratorTracker& tracker = acquireGeneratorTracker( lineInfo );
+=======
+    auto generate( StringRef generatorName, SourceLineInfo const& lineInfo, L const& generatorExpression ) -> decltype(std::declval<decltype(generatorExpression())>().get()) {
+        using UnderlyingType = typename decltype(generatorExpression())::type;
+
+        IGeneratorTracker& tracker = acquireGeneratorTracker( generatorName, lineInfo );
+>>>>>>> origin/master
         if (!tracker.hasGenerator()) {
             tracker.setGenerator(pf::make_unique<Generators<UnderlyingType>>(generatorExpression()));
         }
@@ -4102,11 +4130,25 @@ namespace Generators {
 } // namespace Catch
 
 #define GENERATE( ... ) \
+<<<<<<< HEAD
     Catch::Generators::generate( CATCH_INTERNAL_LINEINFO, [ ]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
 #define GENERATE_COPY( ... ) \
     Catch::Generators::generate( CATCH_INTERNAL_LINEINFO, [=]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
 #define GENERATE_REF( ... ) \
     Catch::Generators::generate( CATCH_INTERNAL_LINEINFO, [&]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+=======
+    Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                 CATCH_INTERNAL_LINEINFO, \
+                                 [ ]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+#define GENERATE_COPY( ... ) \
+    Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                 CATCH_INTERNAL_LINEINFO, \
+                                 [=]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+#define GENERATE_REF( ... ) \
+    Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                 CATCH_INTERNAL_LINEINFO, \
+                                 [&]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+>>>>>>> origin/master
 
 // end catch_generators.hpp
 // start catch_generators_generic.hpp
@@ -7463,6 +7505,7 @@ namespace TestCaseTracking {
         SourceLineInfo location;
 
         NameAndLocation( std::string const& _name, SourceLineInfo const& _location );
+<<<<<<< HEAD
     };
 
     struct ITracker;
@@ -7474,6 +7517,32 @@ namespace TestCaseTracking {
 
         // static queries
         virtual NameAndLocation const& nameAndLocation() const = 0;
+=======
+        friend bool operator==(NameAndLocation const& lhs, NameAndLocation const& rhs) {
+            return lhs.name == rhs.name
+                && lhs.location == rhs.location;
+        }
+    };
+
+    class ITracker;
+
+    using ITrackerPtr = std::shared_ptr<ITracker>;
+
+    class  ITracker {
+        NameAndLocation m_nameAndLocation;
+
+    public:
+        ITracker(NameAndLocation const& nameAndLoc) :
+            m_nameAndLocation(nameAndLoc)
+        {}
+
+        // static queries
+        NameAndLocation const& nameAndLocation() const {
+            return m_nameAndLocation;
+        }
+
+        virtual ~ITracker();
+>>>>>>> origin/master
 
         // dynamic queries
         virtual bool isComplete() const = 0; // Successfully completed or failed
@@ -7534,7 +7603,10 @@ namespace TestCaseTracking {
         };
 
         using Children = std::vector<ITrackerPtr>;
+<<<<<<< HEAD
         NameAndLocation m_nameAndLocation;
+=======
+>>>>>>> origin/master
         TrackerContext& m_ctx;
         ITracker* m_parent;
         Children m_children;
@@ -7543,7 +7615,10 @@ namespace TestCaseTracking {
     public:
         TrackerBase( NameAndLocation const& nameAndLocation, TrackerContext& ctx, ITracker* parent );
 
+<<<<<<< HEAD
         NameAndLocation const& nameAndLocation() const override;
+=======
+>>>>>>> origin/master
         bool isComplete() const override;
         bool isSuccessfullyCompleted() const override;
         bool isOpen() const override;
@@ -7910,7 +7985,15 @@ namespace Catch {
 
 #ifdef CATCH_PLATFORM_MAC
 
+<<<<<<< HEAD
     #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
+=======
+    #if defined(__i386__) || defined(__x86_64__)
+        #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
+    #elif defined(__aarch64__)
+        #define CATCH_TRAP()  __asm__(".inst 0xd4200000")
+    #endif
+>>>>>>> origin/master
 
 #elif defined(CATCH_PLATFORM_IPHONE)
 
@@ -8095,7 +8178,11 @@ namespace Catch {
         void sectionEnded( SectionEndInfo const& endInfo ) override;
         void sectionEndedEarly( SectionEndInfo const& endInfo ) override;
 
+<<<<<<< HEAD
         auto acquireGeneratorTracker( SourceLineInfo const& lineInfo ) -> IGeneratorTracker& override;
+=======
+        auto acquireGeneratorTracker( StringRef generatorName, SourceLineInfo const& lineInfo ) -> IGeneratorTracker& override;
+>>>>>>> origin/master
 
 #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
         void benchmarkPreparing( std::string const& name ) override;
@@ -9071,7 +9158,11 @@ namespace detail {
     }
     inline auto convertInto( std::string const &source, bool &target ) -> ParserResult {
         std::string srcLC = source;
+<<<<<<< HEAD
         std::transform( srcLC.begin(), srcLC.end(), srcLC.begin(), []( char c ) { return static_cast<char>( std::tolower(c) ); } );
+=======
+        std::transform( srcLC.begin(), srcLC.end(), srcLC.begin(), []( unsigned char c ) { return static_cast<char>( std::tolower(c) ); } );
+>>>>>>> origin/master
         if (srcLC == "y" || srcLC == "1" || srcLC == "true" || srcLC == "yes" || srcLC == "on")
             target = true;
         else if (srcLC == "n" || srcLC == "0" || srcLC == "false" || srcLC == "no" || srcLC == "off")
@@ -10883,8 +10974,13 @@ namespace Generators {
 
     GeneratorUntypedBase::~GeneratorUntypedBase() {}
 
+<<<<<<< HEAD
     auto acquireGeneratorTracker( SourceLineInfo const& lineInfo ) -> IGeneratorTracker& {
         return getResultCapture().acquireGeneratorTracker( lineInfo );
+=======
+    auto acquireGeneratorTracker( StringRef generatorName, SourceLineInfo const& lineInfo ) -> IGeneratorTracker& {
+        return getResultCapture().acquireGeneratorTracker( generatorName, lineInfo );
+>>>>>>> origin/master
     }
 
 } // namespace Generators
@@ -12304,11 +12400,19 @@ namespace Catch {
 namespace Catch {
 
     class StartupExceptionRegistry {
+<<<<<<< HEAD
+=======
+#if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+>>>>>>> origin/master
     public:
         void add(std::exception_ptr const& exception) noexcept;
         std::vector<std::exception_ptr> const& getExceptions() const noexcept;
     private:
         std::vector<std::exception_ptr> m_exceptions;
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> origin/master
     };
 
 } // end namespace Catch
@@ -12391,7 +12495,15 @@ namespace Catch {
                 m_tagAliasRegistry.add( alias, tag, lineInfo );
             }
             void registerStartupException() noexcept override {
+<<<<<<< HEAD
                 m_exceptionRegistry.add(std::current_exception());
+=======
+#if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+                m_exceptionRegistry.add(std::current_exception());
+#else
+                CATCH_INTERNAL_ERROR("Attempted to register active exception under CATCH_CONFIG_DISABLE_EXCEPTIONS!");
+#endif
+>>>>>>> origin/master
             }
             IMutableEnumValuesRegistry& getMutableEnumValuesRegistry() override {
                 return m_enumValuesRegistry;
@@ -12495,12 +12607,36 @@ namespace Catch {
                 std::shared_ptr<GeneratorTracker> tracker;
 
                 ITracker& currentTracker = ctx.currentTracker();
+<<<<<<< HEAD
                 if( TestCaseTracking::ITrackerPtr childTracker = currentTracker.findChild( nameAndLocation ) ) {
                     assert( childTracker );
                     assert( childTracker->isGeneratorTracker() );
                     tracker = std::static_pointer_cast<GeneratorTracker>( childTracker );
                 }
                 else {
+=======
+                // Under specific circumstances, the generator we want
+                // to acquire is also the current tracker. If this is
+                // the case, we have to avoid looking through current
+                // tracker's children, and instead return the current
+                // tracker.
+                // A case where this check is important is e.g.
+                //     for (int i = 0; i < 5; ++i) {
+                //         int n = GENERATE(1, 2);
+                //     }
+                //
+                // without it, the code above creates 5 nested generators.
+                if (currentTracker.nameAndLocation() == nameAndLocation) {
+                    auto thisTracker = currentTracker.parent().findChild(nameAndLocation);
+                    assert(thisTracker);
+                    assert(thisTracker->isGeneratorTracker());
+                    tracker = std::static_pointer_cast<GeneratorTracker>(thisTracker);
+                } else if ( TestCaseTracking::ITrackerPtr childTracker = currentTracker.findChild( nameAndLocation ) ) {
+                    assert( childTracker );
+                    assert( childTracker->isGeneratorTracker() );
+                    tracker = std::static_pointer_cast<GeneratorTracker>( childTracker );
+                } else {
+>>>>>>> origin/master
                     tracker = std::make_shared<GeneratorTracker>( nameAndLocation, ctx, &currentTracker );
                     currentTracker.addChild( tracker );
                 }
@@ -12656,9 +12792,16 @@ namespace Catch {
 
         return true;
     }
+<<<<<<< HEAD
     auto RunContext::acquireGeneratorTracker( SourceLineInfo const& lineInfo ) -> IGeneratorTracker& {
         using namespace Generators;
         GeneratorTracker& tracker = GeneratorTracker::acquire( m_trackerContext, TestCaseTracking::NameAndLocation( "generator", lineInfo ) );
+=======
+    auto RunContext::acquireGeneratorTracker( StringRef generatorName, SourceLineInfo const& lineInfo ) -> IGeneratorTracker& {
+        using namespace Generators;
+        GeneratorTracker& tracker = GeneratorTracker::acquire(m_trackerContext,
+                                                              TestCaseTracking::NameAndLocation( static_cast<std::string>(generatorName), lineInfo ) );
+>>>>>>> origin/master
         assert( tracker.isOpen() );
         m_lastAssertionInfo.lineInfo = lineInfo;
         return tracker;
@@ -12702,17 +12845,28 @@ namespace Catch {
 
 #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
     void RunContext::benchmarkPreparing(std::string const& name) {
+<<<<<<< HEAD
 		m_reporter->benchmarkPreparing(name);
 	}
+=======
+        m_reporter->benchmarkPreparing(name);
+    }
+>>>>>>> origin/master
     void RunContext::benchmarkStarting( BenchmarkInfo const& info ) {
         m_reporter->benchmarkStarting( info );
     }
     void RunContext::benchmarkEnded( BenchmarkStats<> const& stats ) {
         m_reporter->benchmarkEnded( stats );
     }
+<<<<<<< HEAD
 	void RunContext::benchmarkFailed(std::string const & error) {
 		m_reporter->benchmarkFailed(error);
 	}
+=======
+    void RunContext::benchmarkFailed(std::string const & error) {
+        m_reporter->benchmarkFailed(error);
+    }
+>>>>>>> origin/master
 #endif // CATCH_CONFIG_ENABLE_BENCHMARKING
 
     void RunContext::pushScopedMessage(MessageInfo const & message) {
@@ -13433,6 +13587,10 @@ namespace Catch {
 // end catch_singletons.cpp
 // start catch_startup_exception_registry.cpp
 
+<<<<<<< HEAD
+=======
+#if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+>>>>>>> origin/master
 namespace Catch {
 void StartupExceptionRegistry::add( std::exception_ptr const& exception ) noexcept {
         CATCH_TRY {
@@ -13448,6 +13606,10 @@ void StartupExceptionRegistry::add( std::exception_ptr const& exception ) noexce
     }
 
 } // end namespace Catch
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> origin/master
 // end catch_startup_exception_registry.cpp
 // start catch_stream.cpp
 
@@ -13632,7 +13794,11 @@ namespace Catch {
 
     namespace {
         char toLowerCh(char c) {
+<<<<<<< HEAD
             return static_cast<char>( std::tolower( c ) );
+=======
+            return static_cast<char>( std::tolower( static_cast<unsigned char>(c) ) );
+>>>>>>> origin/master
         }
     }
 
@@ -14215,15 +14381,23 @@ namespace TestCaseTracking {
         m_currentTracker = tracker;
     }
 
+<<<<<<< HEAD
     TrackerBase::TrackerBase( NameAndLocation const& nameAndLocation, TrackerContext& ctx, ITracker* parent )
     :   m_nameAndLocation( nameAndLocation ),
+=======
+    TrackerBase::TrackerBase( NameAndLocation const& nameAndLocation, TrackerContext& ctx, ITracker* parent ):
+        ITracker(nameAndLocation),
+>>>>>>> origin/master
         m_ctx( ctx ),
         m_parent( parent )
     {}
 
+<<<<<<< HEAD
     NameAndLocation const& TrackerBase::nameAndLocation() const {
         return m_nameAndLocation;
     }
+=======
+>>>>>>> origin/master
     bool TrackerBase::isComplete() const {
         return m_runState == CompletedSuccessfully || m_runState == Failed;
     }
@@ -15122,7 +15296,13 @@ namespace Catch {
 
 namespace Catch {
     bool uncaught_exceptions() {
+<<<<<<< HEAD
 #if defined(CATCH_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS)
+=======
+#if defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+        return false;
+#elif defined(CATCH_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS)
+>>>>>>> origin/master
         return std::uncaught_exceptions() > 0;
 #else
         return std::uncaught_exception();
@@ -15162,7 +15342,11 @@ namespace Catch {
     }
 
     Version const& libraryVersion() {
+<<<<<<< HEAD
         static Version version( 2, 12, 2, "", 0 );
+=======
+        static Version version( 2, 12, 4, "", 0 );
+>>>>>>> origin/master
         return version;
     }
 
@@ -17180,6 +17364,13 @@ namespace Catch {
             .writeAttribute( "successes", testGroupStats.totals.assertions.passed )
             .writeAttribute( "failures", testGroupStats.totals.assertions.failed )
             .writeAttribute( "expectedFailures", testGroupStats.totals.assertions.failedButOk );
+<<<<<<< HEAD
+=======
+        m_xml.scopedElement( "OverallResultsCases")
+            .writeAttribute( "successes", testGroupStats.totals.testCases.passed )
+            .writeAttribute( "failures", testGroupStats.totals.testCases.failed )
+            .writeAttribute( "expectedFailures", testGroupStats.totals.testCases.failedButOk );
+>>>>>>> origin/master
         m_xml.endElement();
     }
 
@@ -17189,6 +17380,13 @@ namespace Catch {
             .writeAttribute( "successes", testRunStats.totals.assertions.passed )
             .writeAttribute( "failures", testRunStats.totals.assertions.failed )
             .writeAttribute( "expectedFailures", testRunStats.totals.assertions.failedButOk );
+<<<<<<< HEAD
+=======
+        m_xml.scopedElement( "OverallResultsCases")
+            .writeAttribute( "successes", testRunStats.totals.testCases.passed )
+            .writeAttribute( "failures", testRunStats.totals.testCases.failed )
+            .writeAttribute( "expectedFailures", testRunStats.totals.testCases.failedButOk );
+>>>>>>> origin/master
         m_xml.endElement();
     }
 

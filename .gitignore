@@ -1,19 +1,17 @@
+# files that are re-generated for every build
+code/Genomes/libgenomes.a
+# code/test
+
+# IDE files
+.vscode/
+
+code/build/test
+code/build/bench
+code/build/logs/*
+
 #MacOS
 .DS_Store
-Genome_ChangeLog/.DS_Store
-
-#Xcode
-Genome_ChangeLog/Genome_ChangeLog.xcodeproj/
-
-#Other
-code/map_test.cpp
-build/
-TetianaGenome_Project/
-Genome_ChangeLog/
-build_raw/
-
-code/Genomes/libgenomes.a
-code/test
-
-# test
-test_gitignore/
+code/.DS_Store
+code/Genomes/.DS_Store
+code/Test/.DS_Store
+code/build/.DS_Store

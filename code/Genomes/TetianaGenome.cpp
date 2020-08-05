@@ -72,7 +72,6 @@ void TetianaGenome::resize(size_t new_size) {
 };
 
 AbstractGenome* TetianaGenome::clone(bool forceCopy) {
-    // TODO: I have no idea what I'm doing here
     
     if (forceCopy == true) {
         std::vector<std::byte> offspring_sites = offspring_recon(0, 0);
