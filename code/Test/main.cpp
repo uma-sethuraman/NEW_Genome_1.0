@@ -22,6 +22,8 @@
 // misc
 #include "utilities.h"
 
+// change "TestGenome" to the genome class which you would like to test.
+typedef TestGenome GenomeName; 
 
 /** main function for running tests **/
 int main()
@@ -30,22 +32,22 @@ int main()
     /* Pass in false(0) to just see pass/fail results of all tests.
        Pass in true(1) to see pass/fail results AND debug output of all tests.
        Pass in <GenomeName> based on which genome class you want to test. */
-    UmaTests::runAllTests<TestGenome>(0);
+    UmaTests::runAllTests<GenomeName>(0);
 
     /**     Victoria's Testing Suite         **/
     /* Pass in false(0) to just see pass/fail results of all tests.
        Pass in true(1) to see pass/fail results AND debug output of all tests.
        Pass in <GenomeName> based on which genome class you want to test. */
-     VictoriaTests::TestAll<TestGenome>(0);
+     VictoriaTests::TestAll<GenomeName>(0);
 
     /**     Invalid Mutations Test Suite     **/
     /* The tests below test the out of bounds checks in the mutation methods.
        Run each test by itself, not all three together, since each test should exit.
        Pass in <GenomeName> based on which genome class you want to test.
        Pass in true(1) to enable debug mode. */
-    InvalidMutationTests::invalidOverwriteTest<TestGenome>(0);
-    //InvalidMutationTests::invalidInsertTest<TestGenome>(0);
-    //InvalidMutationTests::invalidRemoveTest<TestGenome>(0);
+    InvalidMutationTests::invalidOverwriteTest<GenomeName>(0);
+    //InvalidMutationTests::invalidInsertTest<GenomeName>(0);
+    //InvalidMutationTests::invalidRemoveTest<GenomeName>(0);
 
     return(0);
 }
