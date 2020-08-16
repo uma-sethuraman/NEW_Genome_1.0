@@ -1,4 +1,3 @@
-// stl library
 #include <iostream>
 #include <cassert>
 #include <array>
@@ -15,8 +14,9 @@
 
 // genomes
 #include "AbstractGenome.h"
-#include "TestGenome.h"
 #include "GenomeLite.h"
+#include "StephanieGenome.h"
+#include "TestGenome.h"
 #include "UmaGenome.h"
 
 // misc
@@ -24,7 +24,7 @@
 
 
 /** main function for running tests **/
-int main() 
+int main()
 {
     /**     Uma's Testing Suite         **/
     /* Pass in false(0) to just see pass/fail results of all tests.

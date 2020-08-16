@@ -19,9 +19,9 @@ public:
     AbstractGenome() {};
 
     virtual ~AbstractGenome() {}
-    
+
     virtual size_t size() = 0;
-    
+
     virtual void resize(size_t new_size) = 0;
 
     /** Gives the user a new byte array of memory
@@ -55,7 +55,7 @@ public:
         exit(1);
     }
 
-    virtual std::unordered_map<std::string,std::vector<size_t>> getGenePositions(int key) {
+    virtual std::unordered_map<std::string, std::vector<size_t>> getGenePositions(int key) {
         std::cout << "getGenePositions has not been written for this genome class" << std::endl;
         exit(1);
     }

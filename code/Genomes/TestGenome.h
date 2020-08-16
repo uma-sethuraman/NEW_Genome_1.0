@@ -13,10 +13,11 @@ public:
 
 	TestGenome(size_t _size);
 	~TestGenome() override {
+		std::cout << "done" << std::endl;
 	}
 
 	// copy constructor to copy sites vector
-	TestGenome(const TestGenome &genome) {
+	TestGenome(const TestGenome& genome) {
 		sites = genome.sites;
 	}
 
@@ -65,7 +66,7 @@ public:
 			std::cout << "attempt to insert starting after end of genome! exiting..." << std::endl;
 			exit(1);
 		}
-		sites.insert(sites.begin()+index, segment.begin(), segment.end());
+		sites.insert(sites.begin() + index, segment.begin(), segment.end());
 	}
 
 	// starting at index, delete segmentSize values from genome starting at genome[index]
@@ -74,7 +75,7 @@ public:
 			std::cout << "attempt to remove would remove past end of genome! exiting..." << std::endl;
 			exit(1);
 		}
-		sites.erase(sites.begin()+index, sites.begin() + index + segmentSize);
+		sites.erase(sites.begin() + index, sites.begin() + index + segmentSize);
 	}
 
 	// print the whole genome
@@ -99,7 +100,7 @@ public:
 		}
 
 		std::size_t skip;
-		for (size_t s_index = 0; s_index < (sites.size() - pattern.size())+1; s_index += skip) {
+		for (size_t s_index = 0; s_index < (sites.size() - pattern.size()) + 1; s_index += skip) {
 			skip = 0;
 			for (int p_index(pattern.size() - 1); p_index >= 0; p_index--) {
 				if (sites[s_index + p_index] != pattern[p_index]) {

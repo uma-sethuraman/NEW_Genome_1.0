@@ -1,3 +1,6 @@
+# files that are re-generated for every build
+code/Genomes/libgenomes.a
+
 # IDE files
 .vscode/
 
