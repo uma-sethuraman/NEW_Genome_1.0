@@ -245,7 +245,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         changelog.erase(deleteInd); 
     }
 
-    /* Loop through every position from last element in deletion in changelog
+    /* Loop through every position after deletion chunk in changelog
        and decrement keys by size */
     std::map<int,std::byte>::iterator changelog_it = changelog.upper_bound(index+segmentSize-1);
     while(changelog_it != changelog.end()) {
@@ -276,7 +276,7 @@ void UmaGenome::remove(size_t index, size_t segmentSize) {
         offsetMap.erase(deleteInd); 
     }
 
-    /* Decrement all keys/values starting at end of deletion (index+segmentSize)
+    /* Decrement all keys/values starting after end of deletion (index+segmentSize)
        in offset map by size because these positions are all 
        offsetted by the deletion */
     while(offset_it != offsetMap.end()) {
