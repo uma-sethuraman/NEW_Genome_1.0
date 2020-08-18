@@ -20,7 +20,7 @@ void printResults(std::vector<std::byte>& answer, AbstractGenome* gen, std::stri
         failed = true;
     else {
         for(int i = 0; i < answer.size(); i++) {
-            if((*(gen->data(i, 1))) != answer[i]){
+            if(*(gen->data(i,1)) != answer[i]){
                 failed = true;
             }
         }

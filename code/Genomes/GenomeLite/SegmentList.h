@@ -22,11 +22,15 @@ typedef std::byte Byte; // easy reading
 /** struct for finding **/
 struct TableEntry
 {
-    size_t PoolIndex;
-    size_t Offset;
+    size_t Index;
+    size_t Size;
+    Byte* Address;
 
-    TableEntry(size_t pInd, size_t offset)
-        : PoolIndex(pInd), Offset(offset) {}
+    TableEntry(size_t index)
+        : Index(index) {}
+
+    TableEntry(size_t index, size_t size, Byte* address)
+        : Index(index), Size(size), Address(address) {}
 };
 
 
@@ -35,24 +39,23 @@ class SegmentList
 {
 private:
     /// member variables
-    std::vector< size_t > IndexTable; ///< pair(index and location in segmentPool)
-    std::vector< std::vector<Byte> > Pool;
+    std::vector< TableEntry > IndexTable; ///< pair(index and size)
+    std::vector< Byte > Pool; //< byte pointers
 
     size_t SiteCount = 0;
-    size_t Page;
-
-    size_t CalculatePage(size_t size);
 
 public:
     SegmentList() = default;
     SegmentList(size_t size);
     SegmentList(const SegmentList &List);
+    SegmentList* Reallocate();
 
     ~SegmentList() {}
-
+    
     size_t GetSiteCount() { return SiteCount; }
+    bool IsFull() { IndexTable.size()+3 > IndexTable.capacity(); }
 
-    TableEntry Find(size_t index);
+    size_t Find(size_t index);
     Byte* GetData(size_t index, size_t segmentSize = 1);
     void Resize(size_t size);
 
