@@ -1,4 +1,4 @@
-#include "TestGenome.h"
+#include "Genomes/TestGenome.h"
 #include <iostream>
 
 TestGenome::TestGenome(size_t _size) {

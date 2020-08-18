@@ -7,3 +7,10 @@ code/Genomes/libgenomes.a
 code/build/test
 code/build/bench
 code/build/logs/*
+
+#MacOS
+.DS_Store
+code/.DS_Store
+code/Genomes/.DS_Store
+code/Test/.DS_Store
+code/build/.DS_Store
