@@ -14,6 +14,8 @@
 #include "AbstractGenome.h"
 #include "GenomeLite.h"
 #include "TestGenome.h"
+#include "StephanieGenome.h"
+#include "TetianaGenome.h"
 #include "UmaGenome.h"
 
 #include "benchUtilities.h"

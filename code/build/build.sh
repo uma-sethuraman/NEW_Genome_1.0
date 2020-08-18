@@ -4,7 +4,7 @@ BUILD=$1
 TYPE=$2
 
 # compile
-cmake ../$BUILD && make
+cmake ../$BUILD && make -j8
 
 # move out of file
 rm "cmake_install.cmake"

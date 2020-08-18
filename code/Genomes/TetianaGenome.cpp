@@ -1,4 +1,4 @@
-#include "Genomes/TetianaGenome.h"
+#include "TetianaGenome.h"
 #include <iostream>
 
 TetianaGenome::TetianaGenome(size_t _size) : genomeSize(_size) {

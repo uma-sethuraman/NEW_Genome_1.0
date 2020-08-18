@@ -2,7 +2,7 @@
 #pragma once
 #include <vector>
 #include <stdint.h>
-#include "Genomes/AbstractGenome.h"
+#include "AbstractGenome.h"
 #include <cstddef>
 #include <algorithm>
 #include <map>

@@ -16,14 +16,20 @@
 #include "AbstractGenome.h"
 #include "GenomeLite.h"
 #include "StephanieGenome.h"
+#include "TetianaGenome.h"
 #include "TestGenome.h"
 #include "UmaGenome.h"
 
 // misc
 #include "utilities.h"
 
-// change "TestGenome" to the genome class which you would like to test.
-typedef TestGenome GenomeName; 
+// ASSUMES
+// GenomeName is defined at compile-time
+// ex: g++ -DGenomeName=TestGenome <regular files...>
+// or
+// cd build; ccmake ../Test; # now choose option using ccmake gui
+// or
+// cd build; cmake ../Test -DGenomeType=TestGenome
 
 /** main function for running tests **/
 int main()
