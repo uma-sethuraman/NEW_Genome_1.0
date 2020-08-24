@@ -9,6 +9,7 @@ To set the genome type that is being tested or benchmarked, follow the instructi
 ```sh
 cd code/build
 cmake -DGenomeType=TestGenome ../Test
+cmake --build ../Test
 ```
 - Replace `TestGenome` with the genome type you want to test.
 - For benchmarking, replace `../Test` with `../Bench`.
@@ -23,6 +24,10 @@ then change options as you see fit using arrow keys
 then [g]enerate the makefile
 then [q]uit
 then make as normal.
+
+```sh
+cmake --build ../Test
+```
 
 - For benchmarking, replace `../Test` with `../Bench`.
 
