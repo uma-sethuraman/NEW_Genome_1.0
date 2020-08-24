@@ -52,11 +52,11 @@ cmake --build .
 ./test
 ```
 
-### Running Benchmarking:
+## Running Benchmarking:
 - **Step 1:** follow the instructions from the "Initialization and Build Configuration" section to configure the build folder. If rebuilding with a new configuration, please remember to remove all files in the build folder.
 - **Step 2:** set the genome size and mutation rate in the `Variables` section at the top of `bench.cpp` in the `code/Bench` folder. 
 - **Step 3:** set the genome type to the desired genome using the instructions from the "Setting the Genome Type" section. 
-- **Step 4:**: create a folder called `logs` inside the `code/build` folder (if `logs` doesn't already exist there). The benchmarking results will be saved in a log file in this folder.
+- **Step 4:**: create a folder called `logs` inside the `code/build` folder (if `logs` doesn't already exist there). The benchmarking results will be saved in a log file in the logs folder.
 - **Step 5:** use the commands below to run benchmarking on the set genome type. Don't execute the first command below if you're already in the build directory.
 ```sh
 cd code/build
