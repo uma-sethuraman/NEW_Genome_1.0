@@ -13,7 +13,7 @@ get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
 set(GenomeType "TestGenome" CACHE STRING "GenomeType chosen by the user at CMake configure time")
 set_property(CACHE GenomeType PROPERTY STRINGS TestGenome UmaGenome StephanieGenome TetianaGenome GenomeLite)
-ADD_DEFINITIONS(-DGenomeName=${GenomeType})
+ADD_DEFINITIONS(-DGenomeType=${GenomeType})
 
 include_directories(${PARENT_DIR}/Genomes)
 include_directories(${PARENT_DIR}/Genomes/GenomeLite)

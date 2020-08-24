@@ -30,7 +30,6 @@
 #define Size 50000    //< 500,000 ; 250,000 ; 100,000 ; 75,000, 50,000, 20,000 ; 5,000 avaliable 
 
 typedef std::byte Byte;
-typedef GenomeLite GenomeType;  //< change to genomeType
 
 std::string name = typeid(GenomeType).name();  
 const std::vector<size_t> mutations = randomList(Size, MutationRate);
