@@ -3,7 +3,7 @@ space to work on new genome class for MABE
 
 
 ### Setting the Genome Type:
-The default genome is TestGenome. To change the genome type that is being tested or benchmarked, follow the instructions below. 
+To set the genome type that is being tested or benchmarked, follow the instructions below. 
 
 #### Option 1: Using cmake
 ```sh
@@ -27,6 +27,7 @@ then make as normal.
 - For benchmarking, replace `../Test` with `../Bench`.
 
 ### To Run Tests:
+- First, set the **genome type** to the desired genome (using instructions from the first section). Then use the commands below to run the tests on that genome type.
 ```sh
 cd code/build
 bash build.sh Test
@@ -34,19 +35,21 @@ bash build.sh Test
 ```
 
 ### To Run Benchmarking:
+- First, set the **genome size** and **mutation rate** in the `Variables` section at the top of `bench.cpp` in the `code/Bench` folder. 
+- Then, set the **genome type** to the desired genome (using instructions from the first section).
+- Now, use the commands below to run benchmarking.
 ```sh
 cd code/build
 bash build.sh Bench
 ./bench
 ```
-To view the benchmarking results, create a folder called `logs` inside the `code/build` folder. Then run `./bench` in the build folder. The benchmarking results will now be outputted to log files in the logs folder.
+To view the benchmarking results, create a folder called `logs` inside the `code/build` folder. Then run `./bench` in the build folder. The benchmarking results will now be saved into GENOMETYPE.log in the logs folder.
 
 ### Adding Tests:
-Create test header under Test folder.
+- Create the testing header file in the `code/Test` folder.
+- Include the testing header file name and add the testing function calls in `main.cpp` in the Test folder. 
+- In `main.cpp`, you can also change the arguments passed into testing function calls.
 
 ### Adding Genomes:
-Create genome .cpp and .h in Genomes Folder. <br />
-If you're adding a folder, add `include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Genomes/< foldername >)` under `# include source` in the CMakeLists.txt.
-
-### Changing Tests:
-Include the testing header file name, and add the function calls in main.cpp.
+- Create genome .cpp and .h in the `code/Genomes` Folder. <br />
+- If you're adding a folder, add `include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Genomes/< foldername >)` under `# include source` in the CMakeLists.txt.
