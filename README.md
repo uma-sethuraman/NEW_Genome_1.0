@@ -1,5 +1,5 @@
 # NEW_Genome_1.0
-space to work on new genome class for MABE
+Developing an optimized genome data structure for MABE (a platform for evolving and analyzing digital organisms)
 
 
 ## Initialization and Build Configuration:
