@@ -5,7 +5,7 @@ Developing an optimized genome data structure for MABE (a platform for evolving 
 ## Initialization and Build Configuration:
 If you haven't already cloned this repository to your local machine, do so with the following command:
 ```sh
-git clone https://github.com/cliff-bohm/new_genome_1.0 newgenome
+git clone https://github.com/uma-sethuraman/NEW_Genome_1.0 newgenome
 ```
 Now, move into the `code` directory in this repository with the following commands:
 ```sh
